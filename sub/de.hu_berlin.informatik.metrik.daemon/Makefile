@@ -1,7 +1,7 @@
 CC = g++ -Wall -ansi  -O3
 EXE = main
 
-all: daemon logging configuration main
+all: daemon logging shell configuration notification main
 
 daemon: daemon.cpp
 	$(CC) -c daemon.cpp
@@ -9,11 +9,17 @@ daemon: daemon.cpp
 logging: logging.cpp
 	$(CC) -c logging.cpp
 
+shell: shell.cpp
+	$(CC) -c shell.cpp
+
 configuration: configuration.cpp
 	$(CC) -c configuration.cpp
 
-main: main.cpp daemon.o logging.o configuration.o
-	$(CC) main.cpp -o main daemon.o logging.o configuration.o
+notification: notification.cpp
+	$(CC) -c notification.cpp
+
+main: main.cpp daemon.o logging.o configuration.o shell.o notification.o
+	$(CC) main.cpp -o main daemon.o logging.o configuration.o shell.o notification.o
 
 .cpp.obj:
 	$(CC) -c $<
