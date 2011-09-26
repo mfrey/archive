@@ -1,42 +1,50 @@
 #include "include/notification.h"
 
-Notification::Notification(){
 
+Notification::Notification(){
+  this->mNotificationInstance = inotify_init();
+  // An error occured whil initializing inotify
+  if(this->mNotificationInstance < 0){
+
+  }
 }
 
 Notification::~Notification(){
+  // Only close the descriptor if opening it was successful
+  if(this->mNotificationInstance >= 0){
+    close(this->mNotificationInstance);
+  }
+}
+
+void Notification::addDirectory(){
 
 }
 
-Notification::addDirectory(){
+void Notification::addFile(){
 
 }
 
-Notification::addFile(){
+void Notification::addDirectories(){
 
 }
 
-Notification::addDirectories(){
+void Notification::addFiles(){
 
 }
 
-Notification::addFiles(){
+void Notification::removeDirectory(){
 
 }
 
-Notification::removeDirectory(){
+void Notification::removeFile(){
 
 }
 
-Notification::removeFile(){
+void Notification::removeDirectories(){
 
 }
 
-Notification::removeDirectories(){
-
-}
-
-Notification::removeFiles(){
+void Notification::removeFiles(){
 
 }
 
