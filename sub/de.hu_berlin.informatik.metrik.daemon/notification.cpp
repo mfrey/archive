@@ -1,32 +1,22 @@
 #include "include/notification.h"
 
 
-Notification::Notification(int pSize){
+Notification::Notification(){
   // Set the list to NULL
   this->mList = NULL;
 
   // An error occured while initializing inotify
-  if((this->mNotificationInstance = inotify_init()) == 0){
+  if((this->mNotificationInstance = inotify_init()) >= 0){
     // Create a first element of the list
     this->mList = (watchDescriptor*) malloc(sizeof(watchDescriptor));
-    // Set the head of the list to the first element
-    this->mHead = this->mList;
-    
+
     if(this->mList != NULL){
-      for(int i = 0; i <  (pSize-1); i++){
-         // Create a new element
-         watchDescriptor *entry = (watchDescriptor*) malloc(sizeof(watchDescriptor));
-         // Check if allocation was successful
-         if(entry != NULL){
-           // Add entry to list
-           this->mList->next = entry;
-           // Update the current head of the list
-           this->mHead = entry;
-         } 
-      }
-    // Allocation failed
+      // Set to be uninitialized
+      this->mList->wd = -1;
+      // Set the head of the list to the first element
+      this->mHead = this->mList;
     }else{
-      // TODO: Error Handling
+      // TODO
     }
   // Initializiation failed
   }else{
@@ -46,22 +36,22 @@ Notification::~Notification(){
            // Error handling
          } 
          // Get the 'current' element
-         watchDescriptor *current = this->mList;
+         watchDescriptor *first = this->mList;
          // Get the 'next' element
-         if(current->next != NULL){
-           watchDescriptor *next = current->next;
+         if(first->next != NULL){
+           watchDescriptor *next = first->next;
            // Set the element after the current element to the new head of the list
            this->mList = next;
            // Reset the pointer of the old entry
-           current->next = NULL;
+           first->next = NULL;
          }
          // Free the memory
-         free(current); 
+         free(first); 
       }
       // Reset the head
       this->mHead = NULL;
-      // Free the last element
-      free(this->mList);
+      // Reset the pointer to free entry
+      this->mFree = NULL;
     }
     
     if(close(this->mNotificationInstance) != 0){
@@ -75,21 +65,59 @@ void Notification::add(const char* pPathName, uint32_t pMask){
     int wd = -1;
     // Add files or directories to the watch list
     if((wd = inotify_add_watch(this->mNotificationInstance, pPathName, pMask)) != 0){
-      watchDescriptor *entry = (watchDescriptor*) malloc(sizeof(watchDescriptor));
-      entry->wd = wd;
-      entry->next = NULL;
-      // Add the element to the end of the list
-      this->mHead->next = entry; 
-      // Move head pointer to the last entry
-      this->mHead = entry;
+      this->addEntry(wd);
     }
   }
 }
 
-void Notification::remove(){
+void Notification::remove(const char* pPathName){
   if(this->mNotificationInstance >= 0){
-
+/*
+    if(inotify_rm_watch(this->mNotificationInstance, ) != 0){
+      // Error handling
+    } 
+*/
   }
 }
 
+void Notification::addEntry(int pWatchDescriptor){
+  //
+  if(this->mList->wd != -1){
+    watchDescriptor *entry = (watchDescriptor*) malloc(sizeof(watchDescriptor));
+    if(entry != NULL){
+      entry->wd = pWatchDescriptor;
+      this->mHead->next = entry;
+    }else{
+      // TODO
+    }
+  }else{
+    this->mList->wd = pWatchDescriptor;
+  }
+}
 
+/**
+ *
+ */
+void Notification::operator()(){
+  // Iterator variable for iterating over the result array
+  int i, length = 0;
+  // The result buffer
+  char buffer[EVENT_BUFFER_LEN];
+  // Read permanently 
+  // TODO: Built 'break' criteria
+  while((length = read(this->mNotificationInstance, buffer, EVENT_BUFFER_LEN)) >= 0){
+    // Iterate over the results
+    while(i < length){
+      // Get event from buffer
+      struct inotify_event *event = (struct inotify_event *) &buffer[i]; 
+      //
+      if(event->mask & IN_ACCESS){
+       std::cout << "bla" << std::endl; 
+      }
+      // Move the position to the next event
+      i += EVENT_SIZE + event->len;
+    }
+    // Reset the iterator
+    i = 0;
+  }
+}
