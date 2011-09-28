@@ -22,13 +22,13 @@ int main(int argc, char **argv){
 
   try {
     PropertyConfigurator::configure("logging.properties");
+    Notification notification;
 
     LOG4CXX_INFO(logger, "Entering application.");
   }catch(Exception&){
     result = EXIT_FAILURE;
   }
   /*
-  Notification notification;
   notification.add("/vol/home-vol1/simulant/frey/tmp/test", IN_ACCESS);
 
   boost::thread workerThread(notification);

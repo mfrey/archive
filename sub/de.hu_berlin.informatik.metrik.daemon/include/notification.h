@@ -29,11 +29,10 @@ namespace de {
 
           class Notification {
             private:
-              log4cxx::LoggerPtr logger;
+              static log4cxx::LoggerPtr logger;
               int mNotificationInstance;
               watchDescriptor *mList;
-              watchDescriptor *mHead;
-              watchDescriptor *mFree;
+              watchDescriptor *mCurrent;
 
               void addEntry(int);
               void removeEntry();

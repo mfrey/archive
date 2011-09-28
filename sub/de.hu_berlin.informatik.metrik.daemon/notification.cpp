@@ -1,6 +1,9 @@
 #include "include/notification.h"
 
 using namespace de::hu_berlin::informatik::metrik::daemon;
+using namespace log4cxx;
+
+LoggerPtr Notification::logger(Logger::getLogger("de.hu_berlin.informatik.metrik.daemon.notification"));
 
 Notification::Notification(){
   // Set the list to NULL
@@ -8,19 +11,22 @@ Notification::Notification(){
 
   // An error occured while initializing inotify
   if((this->mNotificationInstance = inotify_init()) >= 0){
+    LOG4CXX_TRACE(logger, "Initializing notification instance (inotify_init) was successful");
     // Create a first element of the list
     this->mList = (watchDescriptor*) malloc(sizeof(watchDescriptor));
-
+    LOG4CXX_TRACE(logger, "allocating watch descriptor structure");
     if(this->mList != NULL){
-      // Set to be uninitialized
+      LOG4CXX_TRACE(logger, "allocating watch descriptor structure was successful");
       this->mList->wd = -1;
-      // Set the head of the list to the first element
-      this->mHead = this->mList;
+      this->mList->next = NULL;
+      this->mCurrent = this->mList;
     }else{
       // TODO
+      LOG4CXX_FATAL(logger, "malloc() failed on allocating memory for watch descriptor structure");
     }
   // Initializiation failed
   }else{
+    LOG4CXX_FATAL(logger, "initializing notification instance (inotify_init) was not successful");
     // TODO: Error Handling
   }
 }
@@ -28,35 +34,34 @@ Notification::Notification(){
 Notification::~Notification(){
   // Only close the descriptor if opening it was successful
   if(this->mNotificationInstance != 0){
+    watchDescriptor *temp = this->mList;
+
     // Only if the list has been allocated
     if(this->mList != NULL){
       // Iterate over the list
-      while(this->mList->next != NULL){
+      while(temp != NULL){
+	 this->mList= temp->next;
+/*
          // Close the watch descriptor
-         if(inotify_rm_watch(this->mNotificationInstance, this->mList->wd) != 0){
+         if(inotify_rm_watch(this->mNotificationInstance, this->mFirst->wd) != 0){
            // Error handling
+           LOG4CXX_FATAL(logger, "inotify_rm_watch() on watch descriptor failed");
          } 
-         // Get the 'current' element
-         watchDescriptor *first = this->mList;
-         // Get the 'next' element
-         if(first->next != NULL){
-           watchDescriptor *next = first->next;
-           // Set the element after the current element to the new head of the list
-           this->mList = next;
-           // Reset the pointer of the old entry
-           first->next = NULL;
-         }
-         // Free the memory
-         free(first); 
+*/
+         free(temp);
+         temp = this->mList;
       }
-      // Reset the head
-      this->mHead = NULL;
-      // Reset the pointer to free entry
-      this->mFree = NULL;
+
+      free(temp);
+      // Reset the last pointer to the list
+      this->mCurrent= NULL;
+      // Reset the list
+      this->mList = NULL;
     }
     
     if(close(this->mNotificationInstance) != 0){
       // Error handling
+      LOG4CXX_FATAL(logger, "close() on notification instance file descriptor failed");
     }
   }
 }
@@ -87,7 +92,9 @@ void Notification::addEntry(int pWatchDescriptor){
     watchDescriptor *entry = (watchDescriptor*) malloc(sizeof(watchDescriptor));
     if(entry != NULL){
       entry->wd = pWatchDescriptor;
-      this->mHead->next = entry;
+      entry->next = NULL;
+      this->mCurrent->next = entry;
+      this->mCurrent = entry;
     }else{
       // TODO
     }
