@@ -1,6 +1,7 @@
 #ifndef _NOTIFICATION_H_ 
 #define _NOTIFICATION_H_ 
 
+#include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include "sys/types.h"
@@ -24,6 +25,7 @@ namespace de {
 
           struct watchDescriptor {
             int wd;
+	    watchDescriptor *previous;  
             watchDescriptor *next;  
           };
 
@@ -31,8 +33,10 @@ namespace de {
             private:
               static log4cxx::LoggerPtr logger;
               int mNotificationInstance;
-              watchDescriptor *mList;
-              watchDescriptor *mCurrent;
+              watchDescriptor *mFirst;
+              watchDescriptor *mLast;
+	      watchDescriptor *mCurrent;
+              watchDescriptor *mPrevious;
 
               void addEntry(int);
               void removeEntry();
