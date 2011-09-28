@@ -1,5 +1,6 @@
 CC = g++ -Wall -ansi -O3 -g 
 BOOST_THREAD = -lboost_thread-mt
+LOGGING = -llog4cxx
 EXE = main
 
 all: daemon logging shell configuration notification main
@@ -17,10 +18,10 @@ configuration: configuration.cpp
 	$(CC) -c configuration.cpp
 
 notification: notification.cpp
-	$(CC) -c notification.cpp
+	$(CC) $(LOGGING) -c notification.cpp
 
 main: main.cpp daemon.o logging.o configuration.o shell.o notification.o
-	$(CC) main.cpp $(BOOST_THREAD) -o main daemon.o logging.o configuration.o shell.o notification.o
+	$(CC) main.cpp $(BOOST_THREAD) $(LOGGING) -o main daemon.o logging.o configuration.o shell.o notification.o
 
 .cpp.obj:
 	$(CC) -c $<

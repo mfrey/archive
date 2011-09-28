@@ -1,5 +1,6 @@
 #include "include/notification.h"
 
+using namespace de::hu_berlin::informatik::metrik::daemon;
 
 Notification::Notification(){
   // Set the list to NULL
@@ -121,3 +122,4 @@ void Notification::operator()(){
     i = 0;
   }
 }
+
