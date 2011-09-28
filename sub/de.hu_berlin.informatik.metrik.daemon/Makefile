@@ -3,13 +3,10 @@ BOOST_THREAD = -lboost_thread-mt
 LOGGING = -llog4cxx
 EXE = main
 
-all: daemon logging shell configuration notification main
+all: daemon shell configuration notification main
 
 daemon: daemon.cpp
 	$(CC) -c daemon.cpp
-
-logging: logging.cpp
-	$(CC) -c logging.cpp
 
 shell: shell.cpp
 	$(CC) -c shell.cpp
@@ -20,8 +17,8 @@ configuration: configuration.cpp
 notification: notification.cpp
 	$(CC) $(LOGGING) -c notification.cpp
 
-main: main.cpp daemon.o logging.o configuration.o shell.o notification.o
-	$(CC) main.cpp $(BOOST_THREAD) $(LOGGING) -o main daemon.o logging.o configuration.o shell.o notification.o
+main: main.cpp daemon.o configuration.o shell.o notification.o
+	$(CC) main.cpp $(BOOST_THREAD) $(LOGGING) -o main daemon.o configuration.o shell.o notification.o
 
 .cpp.obj:
 	$(CC) -c $<
