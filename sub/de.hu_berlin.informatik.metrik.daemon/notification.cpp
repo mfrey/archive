@@ -37,7 +37,7 @@ Notification::~Notification(){
       // Error handling
       LOG4CXX_FATAL(logger, "inotify_rm_watch() on watch descriptor " << temp->wd << " failed");
     }else{
-      LOG4CXX_FATAL(logger, "inotify_rm_watch() on watch descriptor " << temp->wd << " was successful");
+      LOG4CXX_TRACE(logger, "inotify_rm_watch() on watch descriptor " << temp->wd << " was successful");
     }
 
     LOG4CXX_TRACE(logger, "attempt to remove watch descriptor " << temp->wd << " from list");
@@ -115,7 +115,7 @@ void Notification::addEntry(int pWatchDescriptor){
 /**
  *
  */
-void Notification::operator()(){ 
+void Notification::run(){
   LOG4CXX_TRACE(logger, "starting notification thread");
   // Iterator variable for iterating over the result array
   int i, length = 0;
@@ -143,3 +143,11 @@ void Notification::operator()(){
   LOG4CXX_TRACE(logger, "stopping notification thread");
 }
 
+void Notification::start(){
+  LOG4CXX_TRACE(logger, "initialize notification thread");
+  this->mThread = boost::thread(&Notification::run, this); 
+}
+
+void Notification::join(){
+  this->mThread.join();
+}

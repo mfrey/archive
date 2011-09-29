@@ -21,17 +21,15 @@ int main(int argc, char **argv){
   int result = EXIT_SUCCESS;
 
   try {
-    LOG4CXX_TRACE(logger, "starting application");
     // Read log4cxx property file
     PropertyConfigurator::configure("logging.properties");
+    LOG4CXX_TRACE(logger, "starting application");
     // Initialize notification object
     Notification notification;
     // Add directory to watch list
-    notification.add("/vol/home-vol1/simulant/frey/tmp/test", IN_ACCESS);
-    // Start worker thread
-    //boost::thread notificationThread(notification);
-    // Wait for thread to finish
-    //notificationThread.join();
+    notification.add("/tmp", IN_ACCESS);
+    // Start thread
+    notification.start();
 
     LOG4CXX_TRACE(logger, "stopping application");
   }catch(Exception&){

@@ -38,6 +38,8 @@ namespace de {
 	      watchDescriptor *mCurrent;
               watchDescriptor *mPrevious;
 
+              boost::thread mThread;
+
               void addEntry(int);
               void removeEntry();
 
@@ -46,7 +48,9 @@ namespace de {
               ~Notification();
               void add(const char*, uint32_t);
               void remove(const char*);
-              void operator()();
+              void start();
+              void run();
+              void join();
           };
         }
       }

@@ -9,8 +9,8 @@ Installation from git
 
 2. Install the dependencies for your distribution (packages names can differ):
 
-	boost::thread
-        log4cxx
+	* boost::thread
+        * log4cxx
 
 3. Build application by executing the makefile in the project directory
 
