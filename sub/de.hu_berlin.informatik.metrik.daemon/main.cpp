@@ -1,14 +1,14 @@
-	#include <iostream>
+#include <iostream>
 
-	#include "include/notification.h"
+#include "include/Notification.h"
 
-	#include "log4cxx/logger.h"
-	#include "log4cxx/basicconfigurator.h"
-	#include "log4cxx/propertyconfigurator.h"
-	#include "log4cxx/helpers/exception.h"
+#include "log4cxx/logger.h"
+#include "log4cxx/basicconfigurator.h"
+#include "log4cxx/propertyconfigurator.h"
+#include "log4cxx/helpers/exception.h"
 
-	using namespace log4cxx;
-	using namespace log4cxx::helpers;
+using namespace log4cxx;
+using namespace log4cxx::helpers;
 
 using namespace de::hu_berlin::informatik::metrik::daemon;
 
@@ -27,7 +27,6 @@ void usage(){
 int main(int argc, char **argv){
   int result = EXIT_SUCCESS;
 
-
   try {
     // Read log4cxx property file
     PropertyConfigurator::configure("logging.properties");
@@ -35,7 +34,7 @@ int main(int argc, char **argv){
     // Initialize notification object
     Notification notification;
     // Add directory to watch list
-    notification.add("/tmp", IN_ACCESS);
+    notification.add("/proc", IN_ACCESS);
     // Start thread
     notification.start();
     // Wait till thread finishes

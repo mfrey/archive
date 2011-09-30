@@ -2,6 +2,10 @@
 
 using namespace de::hu_berlin::informatik::metrik::daemon;
 
+Configuration::Configuration(){
+
+}
+
 Configuration::Configuration(int pArgc, char **pArgv){
   this->mOptions = "";
 }
@@ -30,9 +34,31 @@ void Configuration::parseOptions(int pArgc, char **pArgv){
 }
 
 void Configuration::readConfigurationFile(){
+  std::string line;
 
+  std::ifstream configurationFile;
+  // open configuration file
+  configurationFile.open(this->mConfigurationFile);
+  // check if it is really open
+  if(configurationFile.is_open()){
+/*
+    // read all lines from 
+    while(!configurationFile.eof){
+      getline(configurationFile, line);
+      // tokenize it 
+
+      // pass it to configuration file
+//      this->mConfiguration.set();
+    }
+*/
+    configurationFile.close();
+  }
 }
 
 std::string Configuration::getLoggingFile(){
   return this->mLoggingFile;
+}
+
+std::vector<WatchDescriptorEntry> Configuration::getWatchDescriptorEntries(){
+ return std::vector<WatchDescriptorEntry>();
 }

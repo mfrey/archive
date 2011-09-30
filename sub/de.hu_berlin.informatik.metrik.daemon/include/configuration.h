@@ -2,6 +2,12 @@
 #define _CONFIGURATION_H_
 
 #include <string>
+#include <fstream>
+#include <iostream>
+
+#include <vector>
+
+#include "WatchDescriptorEntry.h"
 
 #include "settings.h"
 
@@ -15,14 +21,16 @@ namespace de {
               const char *mOptions;
               ConfigurationSetting mConfiguration;
               std::string mLoggingFile;
-              std::string mConfigurationFile;
+              const char *mConfigurationFile;
 
             public:
+              Configuration();
               Configuration(int, char **);
               ~Configuration();
               std::string getLoggingFile();
               void parseOptions(int, char **);
               void readConfigurationFile();
+              std::vector<WatchDescriptorEntry> getWatchDescriptorEntries();
           };
         }
       }

@@ -8,7 +8,10 @@
 #include "sys/inotify.h"
 
 #include <iostream>
+#include <vector>
 #include <boost/thread.hpp>
+
+#include "WatchDescriptorEntry.h"
 
 #include "log4cxx/logger.h"
 
@@ -24,8 +27,17 @@ namespace de {
         namespace daemon {
 
           struct watchDescriptor {
+            // the watch descriptor
             int wd;
+            // the length of the name field
+            uint32_t length;
+            // the name of the file/directory which will be watched (null terminated)
+            char name[];
+            // the mask of the watch descriptor 
+            uint32_t mask;
+            // a pointer to the previous entry
 	    watchDescriptor *previous;  
+            // a pointer to the next entry
             watchDescriptor *next;  
           };
 
@@ -40,7 +52,7 @@ namespace de {
 
               boost::thread mThread;
 
-              void addEntry(int);
+              void addEntry(int, uint32_t, const char*);
               void removeEntry();
 
             public:
@@ -51,6 +63,8 @@ namespace de {
               void start();
               void run();
               void join();
+              void addWatchDescriptorEntry(WatchDescriptorEntry);
+              void addWatchDescriptorEntries(std::vector<WatchDescriptorEntry>);
           };
         }
       }

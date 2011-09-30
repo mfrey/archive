@@ -3,10 +3,10 @@ BOOST_THREAD = -lboost_thread-mt
 LOGGING = -llog4cxx
 EXE = main
 
-all: daemon shell configuration notification settings main 
+all: Daemon shell configuration Notification settings WatchDescriptorEntry main 
 
-daemon: daemon.cpp
-	$(CC) -c daemon.cpp
+Daemon: Daemon.cpp 
+	$(CC) -c Daemon.cpp
 
 shell: shell.cpp
 	$(CC) -c shell.cpp
@@ -17,11 +17,14 @@ configuration: configuration.cpp
 settings: settings.cpp
 	$(CC) $(LOGGING) -c settings.cpp
 
-notification: notification.cpp
-	$(CC) $(LOGGING) -c notification.cpp
+Notification: Notification.cpp
+	$(CC) $(LOGGING) -c Notification.cpp
 
-main: main.cpp daemon.o configuration.o shell.o notification.o settings.o
-	$(CC) main.cpp $(BOOST_THREAD) $(LOGGING) -o main daemon.o configuration.o shell.o notification.o settings.o
+WatchDescriptorEntry: WatchDescriptorEntry.cpp
+	$(CC) $(LOGGING) -c WatchDescriptorEntry.cpp
+
+main: main.cpp Daemon.o configuration.o shell.o Notification.o settings.o WatchDescriptorEntry.o
+	$(CC) main.cpp $(BOOST_THREAD) $(LOGGING) -o main Daemon.o configuration.o shell.o Notification.o settings.o WatchDescriptorEntry.o
 
 .cpp.obj:
 	$(CC) -c $<

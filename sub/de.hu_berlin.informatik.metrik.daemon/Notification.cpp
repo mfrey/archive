@@ -1,4 +1,4 @@
-#include "include/notification.h"
+#include "include/Notification.h"
 
 using namespace de::hu_berlin::informatik::metrik::daemon;
 using namespace log4cxx;
@@ -56,14 +56,14 @@ Notification::~Notification(){
   }
 }
 
-void Notification::add(const char* pPathName, uint32_t pMask){
+void Notification::add(const char *pPathName, uint32_t pMask){
   LOG4CXX_TRACE(logger, "add file/directory: " << pPathName << " to list");
   if(this->mNotificationInstance >= 0){
     int wd = -1;
     // Add files or directories to the watch list
     if((wd = inotify_add_watch(this->mNotificationInstance, pPathName, pMask)) != 0){
       LOG4CXX_TRACE(logger, "trying to add watch descriptor " << wd << " to list");
-      this->addEntry(wd);
+      this->addEntry(wd, pMask, pPathName);
     }
   }
 }
@@ -78,7 +78,14 @@ void Notification::remove(const char* pPathName){
   }
 }
 
-void Notification::addEntry(int pWatchDescriptor){
+void Notification::addWatchDescriptorEntry(WatchDescriptorEntry pEntry){
+
+}
+
+void  Notification::addWatchDescriptorEntries(std::vector<WatchDescriptorEntry> pEntries){
+}
+
+void Notification::addEntry(int pWatchDescriptor, uint32_t pMask, const char *pPathName){
   watchDescriptor* newDescriptor = NULL;
 
   if(this->mFirst == NULL){
@@ -90,6 +97,9 @@ void Notification::addEntry(int pWatchDescriptor){
     }else{
       LOG4CXX_TRACE(logger, "adding watch descriptor " << pWatchDescriptor << " to list");
       this->mFirst->wd = pWatchDescriptor;
+      this->mFirst->mask = pMask;
+      this->mFirst->length = strlen(pPathName);
+      //this->mFirst->name = pPathName;
       this->mFirst->next   = NULL;
       this->mFirst->previous   = NULL;
       this->mCurrent = this->mFirst;
@@ -104,6 +114,9 @@ void Notification::addEntry(int pWatchDescriptor){
     }else{
       LOG4CXX_TRACE(logger, "adding watch descriptor " << pWatchDescriptor << " to list");
       newDescriptor->wd = pWatchDescriptor;
+      newDescriptor->mask = pMask;
+      newDescriptor->length = strlen(pPathName);
+      //newDescriptor->name = pPathName;
       newDescriptor->next   = NULL;
       newDescriptor->previous   = this->mLast;
       this->mLast->next = newDescriptor;
@@ -129,11 +142,21 @@ void Notification::run(){
     while(i < length){
       // Get event from buffer
       struct inotify_event *event = (struct inotify_event *) &buffer[i]; 
-      LOG4CXX_TRACE(logger, "read event from");
       //
       if(event->mask & IN_ACCESS){
         LOG4CXX_TRACE(logger, "file was accessed");
       }
+/*
+      }else if(event->mask & ){
+
+      }else if(event->mask & ){
+
+      }else if(event->mask & ){
+
+      }else if(event->mask & ){
+
+      }
+*/
       // Move the position to the next event
       i += EVENT_SIZE + event->len;
     }
