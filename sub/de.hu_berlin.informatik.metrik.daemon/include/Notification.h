@@ -25,35 +25,20 @@ namespace de {
     namespace informatik {
       namespace metrik {
         namespace daemon {
-
-          struct watchDescriptor {
-            // the watch descriptor
-            int wd;
-            // the length of the name field
-            uint32_t length;
-            // the name of the file/directory which will be watched (null terminated)
-            char name[];
-            // the mask of the watch descriptor 
-            uint32_t mask;
-            // a pointer to the previous entry
-	    watchDescriptor *previous;  
-            // a pointer to the next entry
-            watchDescriptor *next;  
-          };
-
           class Notification {
             private:
               static log4cxx::LoggerPtr logger;
               int mNotificationInstance;
-              watchDescriptor *mFirst;
-              watchDescriptor *mLast;
-	      watchDescriptor *mCurrent;
-              watchDescriptor *mPrevious;
+
+              std::vector<WatchDescriptorEntry> mList;
 
               boost::thread mThread;
 
               void addEntry(int, uint32_t, const char*);
               void removeEntry();
+              void closeWatchDescriptors();
+              void eraseWatchDescriptorList();
+              void closeInotifyInstance();
 
             public:
               Notification();

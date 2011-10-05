@@ -16,7 +16,7 @@ namespace de {
               /** a logger instance */
               static log4cxx::LoggerPtr logger;
               /** the watch descriptor */
-              int wd;
+              int mWd;
               /** the name of the file/directory which will be watched */
               std::string name;
               /** the mask of the watch descriptor */
@@ -24,9 +24,11 @@ namespace de {
 
             public:
 	      WatchDescriptorEntry();
-              WatchDescriptorEntry(std::string,uint32_t);
+              WatchDescriptorEntry(int, uint32_t, std::string);
               ~WatchDescriptorEntry();
               std::string getName();
+              int getId();
+              void setId(int);
               void setName(std::string);
               uint32_t getMask();
               void setMask(uint32_t);

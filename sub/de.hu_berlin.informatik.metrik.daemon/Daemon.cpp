@@ -3,6 +3,8 @@
 using namespace de::hu_berlin::informatik::metrik::daemon;
 using namespace log4cxx;
 
+LoggerPtr Daemon::logger(Logger::getLogger("de.hu_berlin.informatik.metrik.daemon.daemon"));
+
 Daemon::Daemon(){
 
 }

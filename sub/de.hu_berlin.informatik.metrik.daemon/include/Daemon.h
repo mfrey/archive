@@ -1,6 +1,8 @@
 #ifndef _DAEMON_H_
 #define _DAEMON_H_
 
+#include <vector>
+
 #include "log4cxx/logger.h"
 #include "Notification.h"
 #include "configuration.h"
@@ -12,6 +14,8 @@ namespace de {
         namespace daemon {
           class Daemon {
             private: 
+              static log4cxx::LoggerPtr logger;
+
               Configuration mConfiguration;
               Notification mNotification;
 

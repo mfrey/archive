@@ -7,7 +7,8 @@ WatchDescriptorEntry::WatchDescriptorEntry(){
 
 }
 
-WatchDescriptorEntry::WatchDescriptorEntry(std::string pName, uint32_t  pMask){
+WatchDescriptorEntry::WatchDescriptorEntry(int pWd, uint32_t  pMask, std::string pName){
+  this->mWd = pWd;
   this->mask = pMask;
   this->name = pName;
 }
@@ -30,4 +31,12 @@ void WatchDescriptorEntry::setMask(uint32_t pMask){
 
 uint32_t WatchDescriptorEntry::getMask(){
   return this->mask;
+}
+
+int WatchDescriptorEntry::getId(){
+  return this->mWd;
+}
+
+void WatchDescriptorEntry::setId(int pWd){
+  this->mWd = pWd;
 }

@@ -6,7 +6,7 @@ EXE = main
 all: Daemon shell configuration Notification settings WatchDescriptorEntry main 
 
 Daemon: Daemon.cpp 
-	$(CC) -c Daemon.cpp
+	$(CC) $(LOGGING) -c Daemon.cpp
 
 shell: shell.cpp
 	$(CC) -c shell.cpp
