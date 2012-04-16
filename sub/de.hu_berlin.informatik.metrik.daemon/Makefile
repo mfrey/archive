@@ -1,12 +1,12 @@
 CC = g++ -Wall -ansi -O3 -g 
-BOOST_THREAD = -lboost_thread-mt
+BOOST_THREAD = -lboost_thread
 LOGGING = -llog4cxx
 EXE = main
 
 all: Daemon shell Configuration ConfigurationSettings Notification WatchDescriptorEntry main 
 
 Daemon: Daemon.cpp 
-	$(CC) $(LOGGING) -c Daemon.cpp
+	$(CC) $(LOGGING) -c Daemon.cpp 
 
 shell: shell.cpp
 	$(CC) -c shell.cpp

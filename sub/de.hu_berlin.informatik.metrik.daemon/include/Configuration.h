@@ -11,6 +11,9 @@
 
 #include "ConfigurationSettings.h"
 
+#include <unistd.h>
+
+
 namespace de {
   namespace hu_berlin {
     namespace informatik {
