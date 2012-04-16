@@ -5,7 +5,7 @@
 
 #include "log4cxx/logger.h"
 #include "Notification.h"
-#include "configuration.h"
+#include "Configuration.h"
 
 namespace de {
   namespace hu_berlin {

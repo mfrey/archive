@@ -9,7 +9,7 @@
 
 #include "WatchDescriptorEntry.h"
 
-#include "settings.h"
+#include "ConfigurationSettings.h"
 
 namespace de {
   namespace hu_berlin {
@@ -19,7 +19,7 @@ namespace de {
           class Configuration {
             private: 
               const char *mOptions;
-              ConfigurationSetting mConfiguration;
+              ConfigurationSettings mConfiguration;
               std::string mLoggingFile;
               const char *mConfigurationFile;
 

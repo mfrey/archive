@@ -1,4 +1,4 @@
-#include "include/configuration.h"
+#include "include/Configuration.h"
 
 using namespace de::hu_berlin::informatik::metrik::daemon;
 
