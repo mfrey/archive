@@ -3,13 +3,22 @@ BOOST_THREAD = -lboost_thread
 LOGGING = -llog4cxx
 EXE = main
 
-all: Daemon shell Configuration ConfigurationSettings Notification WatchDescriptorEntry main 
+all: Daemon Shell ConfigurationSettings Configuration Notification WatchDescriptorEntry Actor Sensor Controller main 
 
 Daemon: Daemon.cpp 
 	$(CC) $(LOGGING) -c Daemon.cpp 
 
-shell: shell.cpp
-	$(CC) -c shell.cpp
+Shell: Shell.cpp
+	$(CC) -c Shell.cpp
+
+Actor: Actor.cpp
+	$(CC) -c Actor.cpp
+
+Sensor: Sensor.cpp
+	$(CC) -c Sensor.cpp
+
+Controller: Controller.cpp
+	$(CC) -c Controller.cpp
 
 Configuration: Configuration.cpp
 	$(CC) -c Configuration.cpp
@@ -23,8 +32,8 @@ Notification: Notification.cpp
 WatchDescriptorEntry: WatchDescriptorEntry.cpp
 	$(CC) $(LOGGING) -c WatchDescriptorEntry.cpp
 
-main: main.cpp Daemon.o Configuration.o shell.o Notification.o ConfigurationSettings.o WatchDescriptorEntry.o
-	$(CC) main.cpp -o main Daemon.o Configuration.o shell.o Notification.o ConfigurationSettings.o WatchDescriptorEntry.o $(BOOST_THREAD) $(LOGGING) 
+main: main.cpp Daemon.o Configuration.o Shell.o Notification.o ConfigurationSettings.o WatchDescriptorEntry.o Actor.o Sensor.o Controller.o
+	$(CC) main.cpp -o main Daemon.o Configuration.o Shell.o Notification.o ConfigurationSettings.o WatchDescriptorEntry.o Actor.o Sensor.o Controller.o $(BOOST_THREAD) $(LOGGING) 
 
 .cpp.obj:
 	$(CC) -c $<

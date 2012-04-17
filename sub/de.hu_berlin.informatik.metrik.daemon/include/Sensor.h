@@ -1,5 +1,5 @@
-#ifndef _CONFIGURATION_SETTINGS_H_ 
-#define _CONFIGURATION_SETTINGS_H_
+#ifndef _SENSOR_H_ 
+#define _SENSOR_H_
 
 #include <string>
 #include <fstream>
@@ -11,20 +11,18 @@
 
 #include <unistd.h>
 
+
 namespace de {
   namespace hu_berlin {
     namespace informatik {
       namespace metrik {
         namespace daemon {
-          class ConfigurationSettings {
+          class Sensor {
             private: 
-              std::string mLoggingFile;
 
             public:
-              ConfigurationSettings();
-              ~ConfigurationSettings();
-              std::string getLoggingFile();
-              void setLoggingFile(std::string);
+              Sensor();
+              ~Sensor();
           };
         }
       }

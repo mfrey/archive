@@ -1,5 +1,5 @@
-#ifndef _CONFIGURATION_SETTINGS_H_ 
-#define _CONFIGURATION_SETTINGS_H_
+#ifndef _ACTOR_H_
+#define _ACTOR_H_
 
 #include <string>
 #include <fstream>
@@ -16,15 +16,12 @@ namespace de {
     namespace informatik {
       namespace metrik {
         namespace daemon {
-          class ConfigurationSettings {
+          class Actor {
             private: 
-              std::string mLoggingFile;
 
             public:
-              ConfigurationSettings();
-              ~ConfigurationSettings();
-              std::string getLoggingFile();
-              void setLoggingFile(std::string);
+              Actor();
+              ~Actor();
           };
         }
       }

@@ -10,3 +10,11 @@ ConfigurationSettings::~ConfigurationSettings(){
 
 }
 
+std::string ConfigurationSettings::getLoggingFile(){
+  return this->mLoggingFile;
+}
+
+void ConfigurationSettings::setLoggingFile(std::string pLoggingFile){
+  this->mLoggingFile = pLoggingFile;
+}
+
