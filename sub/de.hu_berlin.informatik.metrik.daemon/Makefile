@@ -1,9 +1,16 @@
 CC = g++ -Wall -ansi -O3 -g 
 BOOST_THREAD = -lboost_thread
 LOGGING = -llog4cxx
+CPPUNIT = -lcppunit
 EXE = main
 
 all: Daemon Shell ConfigurationSettings Configuration Notification WatchDescriptorEntry Actor Sensor Controller main 
+
+Test: WatchDescriptorEntryTest.o Tests.o WatchDescriptorEntry.o
+	$(CC) -o test WatchDescriptorEntryTest.o Tests.o WatchDescriptorEntry.o $(CPPUNIT)
+
+Tests: Tests.cpp
+	$(CC) -c Tests.cpp $(CPPUNIT)
 
 Daemon: Daemon.cpp 
 	$(CC) $(LOGGING) -c Daemon.cpp 
