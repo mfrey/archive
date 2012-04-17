@@ -6,8 +6,8 @@ EXE = main
 
 all: Daemon Shell ConfigurationSettings Configuration Notification WatchDescriptorEntry Actor Sensor Controller main 
 
-Test: WatchDescriptorEntryTest.o Tests.o WatchDescriptorEntry.o
-	$(CC) -o test WatchDescriptorEntryTest.o Tests.o WatchDescriptorEntry.o $(CPPUNIT)
+Test: WatchDescriptorEntryTest.o Tests.o WatchDescriptorEntry.o Notification.o NotificationTest.o
+	$(CC) -o test WatchDescriptorEntryTest.o Tests.o WatchDescriptorEntry.o Notification.o NotificationTest.o $(CPPUNIT) $(LOGGING) $(BOOST_THREAD)
 
 Tests: Tests.cpp
 	$(CC) -c Tests.cpp $(CPPUNIT)

@@ -6,19 +6,19 @@ using namespace log4cxx;
 LoggerPtr Notification::logger(Logger::getLogger("de.hu_berlin.informatik.metrik.daemon.notification"));
 
 Notification::Notification(){
-  // An error occured while initializing inotify
-  if((this->mNotificationInstance = inotify_init()) < 0){
-    LOG4CXX_FATAL(logger, "initializing notification instance (inotify_init) was not successful");
-    // TODO: Error Handling
-  }
+// An error occured while initializing inotify
+if((this->mNotificationInstance = inotify_init()) < 0){
+LOG4CXX_FATAL(logger, "initializing notification instance (inotify_init) was not successful");
+// TODO: Error Handling
+}
 }
 
 Notification::~Notification(){
-  // Close the watch descriptors stored in the watch descriptor entry list
-  this->closeWatchDescriptors();
-  // Erase the watch descriptor list
-  this->eraseWatchDescriptorList();
-  // Close the file handle for the inotify instance
+// Close the watch descriptors stored in the watch descriptor entry list
+this->closeWatchDescriptors();
+// Erase the watch descriptor list
+this->eraseWatchDescriptorList();
+// Close the file handle for the inotify instance
   this->closeInotifyInstance();
 }
 
