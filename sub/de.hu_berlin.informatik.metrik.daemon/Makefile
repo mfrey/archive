@@ -4,9 +4,9 @@ LOGGING = -llog4cxx
 CPPUNIT = -lcppunit
 EXE = main
 
-all: Daemon Shell ConfigurationSettings Configuration Notification WatchDescriptorEntry Actor Sensor Controller main 
+all: Daemon Shell ConfigurationSettings Configuration Notification WatchDescriptorEntry Actor Sensor Controller ActorTelnet main 
 
-Test: WatchDescriptorEntryTest.o Tests.o WatchDescriptorEntry.o Notification.o NotificationTest.o
+test: WatchDescriptorEntryTest.o Tests.o WatchDescriptorEntry.o Notification.o NotificationTest.o
 	$(CC) -o test WatchDescriptorEntryTest.o Tests.o WatchDescriptorEntry.o Notification.o NotificationTest.o $(CPPUNIT) $(LOGGING) $(BOOST_THREAD)
 
 Tests: Tests.cpp
@@ -20,6 +20,9 @@ Shell: Shell.cpp
 
 Actor: Actor.cpp
 	$(CC) -c Actor.cpp
+
+ActorTelnet: ActorTelnet.cpp
+	$(CC) $(LOGGING) -c ActorTelnet.cpp
 
 Sensor: Sensor.cpp
 	$(CC) -c Sensor.cpp
@@ -39,8 +42,11 @@ Notification: Notification.cpp
 WatchDescriptorEntry: WatchDescriptorEntry.cpp
 	$(CC) $(LOGGING) -c WatchDescriptorEntry.cpp
 
-main: main.cpp Daemon.o Configuration.o Shell.o Notification.o ConfigurationSettings.o WatchDescriptorEntry.o Actor.o Sensor.o Controller.o 
-	$(CC) main.cpp -o main Daemon.o Configuration.o Shell.o Notification.o ConfigurationSettings.o WatchDescriptorEntry.o Actor.o Sensor.o Controller.o $(BOOST_THREAD) $(LOGGING) 
+WatchDescriptorEntryTest: WatchDescriptorEntryTest.cpp
+	$(CC) -c WatchDescriptorEntryTest.cpp
+
+main: main.cpp Daemon.o Configuration.o Shell.o Notification.o ConfigurationSettings.o WatchDescriptorEntry.o Actor.o Sensor.o Controller.o ActorTelnet.o
+	$(CC) main.cpp -o main Daemon.o Configuration.o Shell.o Notification.o ConfigurationSettings.o WatchDescriptorEntry.o Actor.o Sensor.o Controller.o ActorTelnet.o $(BOOST_THREAD) $(LOGGING) 
 
 .cpp.obj:
 	$(CC) -c $<
