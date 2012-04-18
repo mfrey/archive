@@ -10,6 +10,8 @@
 #include <iostream>
 #include <vector>
 #include <boost/thread.hpp>
+#include <boost/tr1/unordered_map.hpp>
+#include <utility>
 
 #include "WatchDescriptorEntry.h"
 
@@ -29,8 +31,9 @@ namespace de {
             private:
               static log4cxx::LoggerPtr logger;
               int mNotificationInstance;
-
-              std::vector<WatchDescriptorEntry> mList;
+              
+              typedef std::tr1::unordered_map<const char*, WatchDescriptorEntry> map;
+              map mList;
 
               boost::thread mThread;
 
@@ -43,13 +46,14 @@ namespace de {
             public:
               Notification();
               ~Notification();
-              void add(const char*, uint32_t);
-              void remove(const char*);
+              int getInotifyId();
+              bool add(const char*, uint32_t);
+              bool remove(const char*);
               void start();
               void run();
               void join();
-              void addWatchDescriptorEntry(WatchDescriptorEntry);
-              void addWatchDescriptorEntries(std::vector<WatchDescriptorEntry>);
+              bool addWatchDescriptorEntry(WatchDescriptorEntry);
+              void addWatchDescriptorEntries(map);
           };
         }
       }

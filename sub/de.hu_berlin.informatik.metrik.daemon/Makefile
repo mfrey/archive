@@ -39,7 +39,7 @@ Notification: Notification.cpp
 WatchDescriptorEntry: WatchDescriptorEntry.cpp
 	$(CC) $(LOGGING) -c WatchDescriptorEntry.cpp
 
-main: main.cpp Daemon.o Configuration.o Shell.o Notification.o ConfigurationSettings.o WatchDescriptorEntry.o Actor.o Sensor.o Controller.o
+main: main.cpp Daemon.o Configuration.o Shell.o Notification.o ConfigurationSettings.o WatchDescriptorEntry.o Actor.o Sensor.o Controller.o 
 	$(CC) main.cpp -o main Daemon.o Configuration.o Shell.o Notification.o ConfigurationSettings.o WatchDescriptorEntry.o Actor.o Sensor.o Controller.o $(BOOST_THREAD) $(LOGGING) 
 
 .cpp.obj:

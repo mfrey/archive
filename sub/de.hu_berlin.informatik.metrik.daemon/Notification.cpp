@@ -6,51 +6,84 @@ using namespace log4cxx;
 LoggerPtr Notification::logger(Logger::getLogger("de.hu_berlin.informatik.metrik.daemon.notification"));
 
 Notification::Notification(){
-// An error occured while initializing inotify
-if((this->mNotificationInstance = inotify_init()) < 0){
-LOG4CXX_FATAL(logger, "initializing notification instance (inotify_init) was not successful");
-// TODO: Error Handling
-}
+  // An error occured while initializing inotify
+  if((this->mNotificationInstance = inotify_init()) < 0){
+    LOG4CXX_FATAL(logger, "initializing notification instance (inotify_init) was not successful");
+    // TODO: Error Handling
+  }
 }
 
 Notification::~Notification(){
-// Close the watch descriptors stored in the watch descriptor entry list
-this->closeWatchDescriptors();
-// Erase the watch descriptor list
-this->eraseWatchDescriptorList();
-// Close the file handle for the inotify instance
+  // Close the watch descriptors stored in the watch descriptor entry list
+  this->closeWatchDescriptors();
+  // Erase the watch descriptor list
+  this->eraseWatchDescriptorList();
+  // Close the file handle for the inotify instance
   this->closeInotifyInstance();
 }
 
-void Notification::add(const char *pPathName, uint32_t pMask){
+bool Notification::add(const char *pPathName, uint32_t pMask){
   LOG4CXX_TRACE(logger, "add file/directory: " << pPathName << " to list");
   if(this->mNotificationInstance >= 0){
     int wd = -1;
     // Add files or directories to the watch list
     if((wd = inotify_add_watch(this->mNotificationInstance, pPathName, pMask)) != 0){
       LOG4CXX_TRACE(logger, "trying to add watch descriptor " << wd << " to list");
-      this->addEntry(wd, pMask, pPathName);
+      WatchDescriptorEntry entry(wd, pMask, pPathName);
+      this->mList[pPathName] = entry;
+      return true;
     }
   }
+  return false;
 }
 
-void Notification::remove(const char* pPathName){
+int Notification::getInotifyId(){
+  return this->mNotificationInstance;
+}
+/**
+ *
+ */
+bool Notification::remove(const char* pPathName){
   if(this->mNotificationInstance >= 0){
-/*
-    if(inotify_rm_watch(this->mNotificationInstance, ) != 0){
-      // Error handling
-    } 
-*/
+    WatchDescriptorEntry entry = this->mList[pPathName];
+
+    /**
+     *  If there is no entry for the given path name, the unordered map will create 
+     *  a new entry using the default constructor of the class. This leads to the
+     *  ridiculous check if the value of watch descriptor is -1 (which should never
+     *  be the case).
+     */
+    if(entry.getId() != -1){
+      LOG4CXX_TRACE(logger, "trying to remove watch descriptor " << entry.getId());
+
+      if(inotify_rm_watch(this->mNotificationInstance, entry.getId()) != 0){
+        // TODO: Fehlerbehandlung
+
+      }else{
+        int id = entry.getId();
+        this->mList.erase(pPathName);
+        LOG4CXX_TRACE(logger, "removed watch descriptor " << id);
+        return true;
+      }
+    }else{
+      LOG4CXX_FATAL(logger, "removing watch descriptor for file/directory " <<  pPathName << "  was not successful");
+      // TODO: Fehlerbehandlung
+    }
   }
+
+  return false;
 }
 
-void Notification::addWatchDescriptorEntry(WatchDescriptorEntry pEntry){
+bool Notification::addWatchDescriptorEntry(WatchDescriptorEntry pEntry){
   LOG4CXX_TRACE(logger, "add entry with watch descriptor " << pEntry.getId() << " mask " << pEntry.getMask() << " file/directory " << pEntry.getName() << " to list");
-  this->mList.insert(this->mList.end(), pEntry);
+  // TODO: This doesn't feel good
+  std::pair<map::iterator, bool> result;
+  result = mList.insert(std::pair<const char*,WatchDescriptorEntry>(pEntry.getName().c_str(), pEntry));
+  return result.second;
 }
 
-void  Notification::addWatchDescriptorEntries(std::vector<WatchDescriptorEntry> pEntries){
-  this->mList = pEntries;
+void  Notification::addWatchDescriptorEntries(map pEntries){
+  //this->mList.insert(pEntries);
 }
 
 void Notification::addEntry(int pWatchDescriptor, uint32_t pMask, const char *pPathName){
@@ -110,11 +143,11 @@ void Notification::join(){
 }
 
 void Notification::closeWatchDescriptors(){
-  for(std::vector<WatchDescriptorEntry>::iterator i = this->mList.begin(); i != this->mList.end(); i++){
-     if(inotify_rm_watch(this->mNotificationInstance, i->getId()) != 0){
-       LOG4CXX_FATAL(logger, "inotify_rm_watch() on watch descriptor " << i->getId() << " for file/directory " << i->getName() << " failed");
+  for(map::iterator i = this->mList.begin(); i != this->mList.end(); i++){
+     if(inotify_rm_watch(this->mNotificationInstance, i->second.getId()) != 0){
+       LOG4CXX_FATAL(logger, "inotify_rm_watch() on watch descriptor " << i->second.getId() << " for file/directory " << i->second.getName() << " failed");
      }else{
-       LOG4CXX_TRACE(logger, "inotify_rm_watch() on watch descriptor " << i->getId() << " for file/directory " << i->getName() << " was successful");
+       LOG4CXX_TRACE(logger, "inotify_rm_watch() on watch descriptor " << i->second.getId() << " for file/directory " << i->second.getName() << " was successful");
      }
   }
 }

@@ -18,11 +18,11 @@ Daemon::~Daemon(){
 }
 
 void Daemon::start(){
-  std::vector<WatchDescriptorEntry> list = this->mConfiguration.getWatchDescriptorEntries();
+  //std::vector<WatchDescriptorEntry> list = this->mConfiguration.getWatchDescriptorEntries();
   // Add watch directory entries from configuration file
-  this->mNotification.addWatchDescriptorEntries(list);
+  //this->mNotification.addWatchDescriptorEntries(list);
   // Initialize the notification thread 
-  this->mNotification.start();
+  //this->mNotification.start();
 
 }
 
