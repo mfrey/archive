@@ -1,5 +1,5 @@
-#ifndef _ACTORTELNET_H_
-#define _ACTORTELNET_H__
+#ifndef _TELNET_H_
+#define _TELNET_H__
 
 #include "Actor.h"
 
@@ -17,35 +17,48 @@ namespace de {
     namespace informatik {
       namespace metrik {
         namespace daemon {
-          class ActorTelnet : Actor {
+          class Telnet {
             private: 
+              /// Size of the buffer
+              static const int mBufferSize = 2048;
               ///
-              boost::asio::io_service mIOService;
+              boost::asio::io_service& mIOService;
               ///
               static log4cxx::LoggerPtr logger;
               /// The socket the telnet the instance is connected to
               tcp::socket mSocket; 
               ///
-	      char read_msg_[max_read_length]; 
+	      char read_msg_[mBufferSize]; 
               // data read from the socket
               deque<char> write_msgs_; // buffered write data
-              ///
-              boost::system::error_code mError;
 
               ///
-              void connect();
+              void connect(tcp::resolver::iterator);
+              ///
+              void read(void);
+              ///
+	      void readComplete(const boost::system::error_code&, size_t);
+              ///
+              void connectComplete(const boost::system::error_code& pError, tcp::resolver::iterator pEndpointIterator);
               ///
               void writeToSocket(const char);
               ///
               void closeSocket(void);
+              ///
+              void writeStart(); 
+              void writeComplete(const boost::system::error_code&);
 
             public:
-	      ActorTelnet(struct sockaddr_in, struct hostent*);
-              ActorTelnet();
+              /// The constructor of the telnet class
+              Telnet(boost::asio::io_service&, tcp::resolver::iterator);
+              /// The destructor of the telnet class
+              ~Telnet();
+              /// The method initializes a telnet connection
               void open();
-              void write(const char*);
+              /// The method writes data via an established telnet connection
+              void write(const char);
+              /// The method closes the telnet connection
               void close();
-              ~ActorTelnet();
           };
         }
       }

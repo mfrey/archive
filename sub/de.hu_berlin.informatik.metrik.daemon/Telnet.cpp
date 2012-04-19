@@ -8,9 +8,9 @@ LoggerPtr Telnet::logger(Logger::getLogger("de.hu_berlin.informatik.metrik.daemo
 /**
  *
  */
-Telnet::Telnet(boost::asio::io_service& pIOSservice, tcp::resolver::iterator pEndpointIterator) 
+Telnet::Telnet(boost::asio::io_service& pIOService, tcp::resolver::iterator pEndpointIterator) 
   : mIOService(pIOService), mSocket(pIOService) { 
-  connect(pEndpointIterator)
+  connect(pEndpointIterator);
 }
 
 Telnet::~Telnet(){
@@ -23,12 +23,12 @@ Telnet::~Telnet(){
 
 void Telnet::write(const char pMessage){
   //
-  this->mIOSservice.post(boost::bind(&Telnet::writeToSocket, this, pMessage));
+  this->mIOService.post(boost::bind(&Telnet::writeToSocket, this, pMessage));
 }
 
 void Telnet::close(){
   //
-  this->mIOSservice.post(boost::bind(&Telnet::closeSocket, this));
+  this->mIOService.post(boost::bind(&Telnet::closeSocket, this));
 }
 
 void Telnet::closeSocket(void){
@@ -37,22 +37,60 @@ void Telnet::closeSocket(void){
 }
 
 void Telnet::writeToSocket(const char pMessage){
-
+   //
+   bool progress = !write_msgs_.empty(); 
+   //
+   write_msgs_.push_back(pMessage); 
+   //
+   if(!progress){ 
+     writeStart();
+   }
 }
 
 void Telnet::connect(tcp::resolver::iterator pEndpointIterator){
   //
   tcp::endpoint endpoint = *pEndpointIterator;
   //
-  socket_.async_connect(endpoint, boost::bind(&telnet::connect_complete, this,
+  mSocket.async_connect(endpoint, boost::bind(&Telnet::connectComplete, this,
 				boost::asio::placeholders::error, ++pEndpointIterator));
 }
 
-void Telnet::connectComplete(){
-  if(!error){
-    read_start();
-  }else if(endpoint_iterator != tcp::resolver::iterator()){
-    this->socketClose();
-    connect_start(endpoint_iterator);
+void Telnet::connectComplete(const boost::system::error_code& pError, tcp::resolver::iterator pEndpointIterator){
+  if(!pError){
+    read();
+  }else if(pEndpointIterator != tcp::resolver::iterator()){
+    this->closeSocket();
+    connect(pEndpointIterator);
+  }
+}
+
+void Telnet::read(void){
+  this->mSocket.async_read_some(boost::asio::buffer(read_msg_, this->mBufferSize),
+    boost::bind(&Telnet::readComplete, this, boost::asio::placeholders::error,
+    boost::asio::placeholders::bytes_transferred));
+}
+
+void Telnet::readComplete(const boost::system::error_code& pError, size_t pTransferredBytes){
+  if(!pError){
+    // TODO: write read out, e.g. cout
+    read();
+  }else{
+    this->closeSocket();
+  }
+}
+
+void Telnet::writeStart(){
+  boost::asio::async_write(this->mSocket, boost::asio::buffer(&write_msgs_.front(), 1),
+    boost::bind(&Telnet::writeComplete, this, boost::asio::placeholders::error));
+}
+
+void Telnet::writeComplete(const boost::system::error_code& pError){
+  if(!pError){ 
+    write_msgs_.pop_front(); 
+    if(!write_msgs_.empty()){
+      writeStart(); 
+    }
+  }else{
+    this->closeSocket();
   }
 }
