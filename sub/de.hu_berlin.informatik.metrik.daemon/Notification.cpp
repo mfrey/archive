@@ -82,8 +82,15 @@ bool Notification::addWatchDescriptorEntry(WatchDescriptorEntry pEntry){
   return result.second;
 }
 
-void  Notification::addWatchDescriptorEntries(map pEntries){
-  //this->mList.insert(pEntries);
+bool Notification::addWatchDescriptorEntries(map pEntries){
+  // Current size of the hash map
+  unsigned int previousSize = mList.size();
+  // New size of the hash map (after successful addition of the new entries)
+  unsigned int expectedNewSize = previousSize + pEntries.size();
+  // Add new elements to the list
+  mList.insert(pEntries.begin(), pEntries.end());
+  // Compare new size versus expected size
+  return (mList.size() == expectedNewSize);
 }
 
 void Notification::addEntry(int pWatchDescriptor, uint32_t pMask, const char *pPathName){

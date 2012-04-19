@@ -6,48 +6,58 @@ void NotificationTest::setUp(){
   a = new Notification();
   // Initialize seed of random number generator
   srand(time(NULL));
+}
+
+void NotificationTest::tearDown(){
+  delete a; delete b;
+}
+
+void NotificationTest::testAddRemove(){
+  string fileName = createFileName();
+  createFile(fileName.c_str());
+  // Check if the object is initialized
+  CPPUNIT_ASSERT(a != NULL);
+  // Add an element to the watch descriptor entry list hold by the notification class
+  bool result = a->add(fileName.c_str(), IN_MODIFY);
+  // Check if the operation was successful
+  CPPUNIT_ASSERT(result == true);
+  // Remove an element of the watch descriptor entry list hold by the notification class
+  result =  a->remove(fileName.c_str());
+  // Check if the operation was successful
+  CPPUNIT_ASSERT(result == true);
+}  
+
+WatchDescriptorEntry NotificationTest::createWatchDescriptorEntry(const char* pFileName){
+  CPPUNIT_ASSERT(a->getInotifyId() != -1);
+  int wd = inotify_add_watch(a->getInotifyId(), pFileName, IN_MODIFY);
+  CPPUNIT_ASSERT(wd != -1);
+  return WatchDescriptorEntry(wd, IN_MODIFY, pFileName);
+}
+
+void NotificationTest::createFile(const char* pFileName){
+  ofstream file;
+  file.open(pFileName);
+  file.close();
+}
+
+string NotificationTest::createFileName(){
   // Create a string stream
   stringstream fileName;
   // Create file name
   fileName << "/tmp/CortexNotificationTest" << rand() << ".txt";
   // Set file name
-  mFileName = fileName.str();
-  // Create file
-  mFile.open(mFileName.c_str());
-}
-
-void NotificationTest::tearDown(){
-  delete a; delete b;
-  mFile.close();
-}
-
-void NotificationTest::testAddRemove(){
-  // Check if the object is initialized
-  CPPUNIT_ASSERT(a != NULL);
-  // Add an element to the watch descriptor entry list hold by the notification class
-  bool result = a->add(mFileName.c_str(), IN_MODIFY);
-  // Check if the operation was successful
-  CPPUNIT_ASSERT(result == true);
-  // Remove an element to the watch descriptor entry list hold by the notification class
-  result =  a->remove(mFileName.c_str());
-  // Check if the operation was successful
-  CPPUNIT_ASSERT(result == true);
-}  
-
-WatchDescriptorEntry NotificationTest::createWatchDescriptorEntry(){
-  CPPUNIT_ASSERT(a->getInotifyId() != -1);
-  int wd = inotify_add_watch(a->getInotifyId(), mFileName.c_str(), IN_MODIFY);
-  CPPUNIT_ASSERT(wd != -1);
-  return WatchDescriptorEntry(wd, IN_MODIFY, mFileName.c_str());
+  return fileName.str();
 }
 
 void NotificationTest::testAddRemoveWatchDescriptorEntry(){
+  string fileName = createFileName();
+  createFile(fileName.c_str());
   // Check if the object is initialized
   CPPUNIT_ASSERT(a != NULL);
   // Check if inotify is initialized
   CPPUNIT_ASSERT(a->getInotifyId() != -1);
   // Create watch descriptor entry 
-  WatchDescriptorEntry entry = createWatchDescriptorEntry();
+  WatchDescriptorEntry entry = createWatchDescriptorEntry(fileName.c_str());
   // Check if the object is initialized, TODO: Check if this is right
   CPPUNIT_ASSERT(&entry != NULL);
   // Add entry to the list
@@ -58,7 +68,23 @@ void NotificationTest::testAddRemoveWatchDescriptorEntry(){
   CPPUNIT_ASSERT(result == true);
 }  
 
-void NotificationTest::initialize(){
-
+void NotificationTest::testAddRemoveWatchDescriptorEntries(){
+  typedef std::tr1::unordered_map<const char*, WatchDescriptorEntry> map;
+  map entries;
+  // Create entries
+  for(int i = 0; i < 2; i++){
+     string fileName = createFileName();
+     createFile(fileName.c_str());
+     WatchDescriptorEntry entry = createWatchDescriptorEntry(fileName.c_str());
+     std::pair<map::iterator, bool> r = entries.insert(std::pair<const char*,WatchDescriptorEntry>(entry.getName().c_str(), entry));
+     CPPUNIT_ASSERT(r.second == true);
+  }
+  // Add entries to the list
+  bool result = a->addWatchDescriptorEntries(entries);
+  CPPUNIT_ASSERT(result == true);
+  // Remove entries from the list
+  for(map::iterator i = entries.begin(); i != entries.end(); ++i){
+    result = a->remove(i->second.getName().c_str());
+    CPPUNIT_ASSERT(result == true);
+  }
 }
-

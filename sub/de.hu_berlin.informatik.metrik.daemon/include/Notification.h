@@ -53,7 +53,7 @@ namespace de {
               void run();
               void join();
               bool addWatchDescriptorEntry(WatchDescriptorEntry);
-              void addWatchDescriptorEntries(map);
+              bool addWatchDescriptorEntries(map);
           };
         }
       }

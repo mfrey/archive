@@ -9,8 +9,6 @@ const std::string WatchDescriptorEntryTest::mName("WatchDescriptorEntryTest");
 void WatchDescriptorEntryTest::setUp(){
   a = new WatchDescriptorEntry();
   b = new WatchDescriptorEntry(mId, mMask, mName);
-  // Initialize random number generator
-  srand(time(NULL));
 }
 
 void WatchDescriptorEntryTest::tearDown(){

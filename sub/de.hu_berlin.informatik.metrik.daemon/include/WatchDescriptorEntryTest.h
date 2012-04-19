@@ -6,8 +6,6 @@
 
 #include "WatchDescriptorEntry.h" 
 
-#include <stdlib.h>
-
 using namespace de::hu_berlin::informatik::metrik::daemon;
 
 class WatchDescriptorEntryTest : public CppUnit::TestFixture {
