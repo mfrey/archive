@@ -21,32 +21,33 @@ namespace de {
             private: 
               /// Size of the buffer
               static const int mBufferSize = 2048;
-              ///
+              /// A 'handler' for asynchronous IO
               boost::asio::io_service& mIOService;
-              ///
+              /// An instance of the log4cxx logger
               static log4cxx::LoggerPtr logger;
               /// The socket the telnet the instance is connected to
               tcp::socket mSocket; 
-              ///
-	      char read_msg_[mBufferSize]; 
-              // data read from the socket
-              deque<char> write_msgs_; // buffered write data
+              /// A buffer for writing data
+	      char mBuffer[mBufferSize]; 
+              // A deque for reading data
+              deque<char> write_msgs_; 
 
-              ///
+              /// The method begins to opens a telnet connection
               void connect(tcp::resolver::iterator);
-              ///
-              void read(void);
-              ///
-	      void readComplete(const boost::system::error_code&, size_t);
-              ///
+              /// The method finishes to open a telnet connection, indepdent of success/failure
               void connectComplete(const boost::system::error_code& pError, tcp::resolver::iterator pEndpointIterator);
-              ///
-              void writeToSocket(const char);
-              ///
+              /// The method begins to read data from an established telnet connection
+              void readStart(void);
+              /// The method finishes to read data from an established telnet connection, independent of success/failure
+	      void readComplete(const boost::system::error_code&, size_t);
+              /// The method closes a socket
               void closeSocket(void);
-              ///
+              /// The method begins to write data to an established telnet connection
               void writeStart(); 
+              /// The method finishes to write data to an established telnet connection, independent of success/failure
               void writeComplete(const boost::system::error_code&);
+              /// The method fills the write buffer and initializes the transmission
+              void writeToSocket(const char);
 
             public:
               /// The constructor of the telnet class
