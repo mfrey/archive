@@ -8,7 +8,7 @@ const int test::WatchDescriptorEntryTest::mId = 42;
 const uint32_t test::WatchDescriptorEntryTest::mMask = 23;
 const std::string test::WatchDescriptorEntryTest::mName("WatchDescriptorEntryTest");
 
-LoggerPtr test::WatchDescriptorEntryTest::logger(Logger::getLogger("de::hu_berlin::informatik::metrik::daemon::test:: watchdescriptorentrytest"));
+LoggerPtr test::WatchDescriptorEntryTest::logger(Logger::getLogger("de.hu_berlin.informatik.metrik.daemon.test.watchdescriptorentrytest"));
 
 void test::WatchDescriptorEntryTest::setUp(){
   a = new WatchDescriptorEntry();

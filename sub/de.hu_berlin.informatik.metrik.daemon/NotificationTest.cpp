@@ -1,46 +1,53 @@
 #include "include/NotificationTest.h" 
 
-CPPUNIT_TEST_SUITE_REGISTRATION(NotificationTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(test::NotificationTest);
 
-void NotificationTest::setUp(){
+using namespace log4cxx;
+
+LoggerPtr test::NotificationTest::mLogger(Logger::getLogger("de.hu_berlin.informatik.metrik.daemon.test.notificationtest"));
+
+void test::NotificationTest::setUp(){
   a = new Notification();
   // Initialize seed of random number generator
   srand(time(NULL));
 }
 
-void NotificationTest::tearDown(){
+void test::NotificationTest::tearDown(){
   delete a; delete b;
 }
 
-void NotificationTest::testAddRemove(){
+void test::NotificationTest::testAddRemove(){
   string fileName = createFileName();
+  LOG4CXX_TRACE(mLogger, "create a file with file name: " << fileName);
   createFile(fileName.c_str());
   // Check if the object is initialized
   CPPUNIT_ASSERT(a != NULL);
+  LOG4CXX_TRACE(mLogger, "will add a file with file name: " << fileName << " to list");
   // Add an element to the watch descriptor entry list hold by the notification class
   bool result = a->add(fileName.c_str(), IN_MODIFY);
   // Check if the operation was successful
   CPPUNIT_ASSERT(result == true);
   // Remove an element of the watch descriptor entry list hold by the notification class
+  LOG4CXX_TRACE(mLogger, "will remove a file with file name: " << fileName << " to list");
   result =  a->remove(fileName.c_str());
   // Check if the operation was successful
   CPPUNIT_ASSERT(result == true);
 }  
 
-WatchDescriptorEntry NotificationTest::createWatchDescriptorEntry(const char* pFileName){
+WatchDescriptorEntry test::NotificationTest::createWatchDescriptorEntry(const char* pFileName){
   CPPUNIT_ASSERT(a->getInotifyId() != -1);
   int wd = inotify_add_watch(a->getInotifyId(), pFileName, IN_MODIFY);
   CPPUNIT_ASSERT(wd != -1);
   return WatchDescriptorEntry(wd, IN_MODIFY, pFileName);
 }
 
-void NotificationTest::createFile(const char* pFileName){
+void test::NotificationTest::createFile(const char* pFileName){
   ofstream file;
   file.open(pFileName);
   file.close();
 }
 
-string NotificationTest::createFileName(){
+string test::NotificationTest::createFileName(){
   // Create a string stream
   stringstream fileName;
   // Create file name
@@ -49,7 +56,7 @@ string NotificationTest::createFileName(){
   return fileName.str();
 }
 
-void NotificationTest::testAddRemoveWatchDescriptorEntry(){
+void test::NotificationTest::testAddRemoveWatchDescriptorEntry(){
   string fileName = createFileName();
   createFile(fileName.c_str());
   // Check if the object is initialized
@@ -68,7 +75,7 @@ void NotificationTest::testAddRemoveWatchDescriptorEntry(){
   CPPUNIT_ASSERT(result == true);
 }  
 
-void NotificationTest::testAddRemoveWatchDescriptorEntries(){
+void test::NotificationTest::testAddRemoveWatchDescriptorEntries(){
   typedef std::tr1::unordered_map<const char*, WatchDescriptorEntry> map;
   map entries;
   // Create entries
