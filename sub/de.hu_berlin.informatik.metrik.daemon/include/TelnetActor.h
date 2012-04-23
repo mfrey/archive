@@ -13,6 +13,9 @@
 #include <unistd.h>
 #include <termios.h>
 
+#include "log4cxx/logger.h"
+
+using namespace std;
 using namespace de::hu_berlin::informatik::metrik::daemon;
 
 namespace de {
@@ -25,10 +28,12 @@ namespace de {
            */
           class TelnetActor : Actor {
             private: 
+              /// A instance of the logger
+              static log4cxx::LoggerPtr mLogger;
               /// The name of host (which will be connected)
-              char *mHostName;
+              const char *mHostName;
               /// The port of the host (which will be connected)
-              char *mPort;
+              const char *mPort;
               /// The asynchronous IO service
               boost::asio::io_service mIOService;
               ///
@@ -41,7 +46,7 @@ namespace de {
 
             public:
               ///
-              TelnetActor(char*, char*);
+              TelnetActor(string, string);
               ///
               ~TelnetActor();
               ///

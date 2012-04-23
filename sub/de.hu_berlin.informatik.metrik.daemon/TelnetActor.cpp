@@ -1,6 +1,11 @@
 #include "include/TelnetActor.h"
 
-TelnetActor::TelnetActor(char *pHostName, char *pPort) : mHostName(pHostName), mPort(pPort) {
+using namespace log4cxx;
+using namespace de::hu_berlin::informatik::metrik::daemon;
+
+LoggerPtr TelnetActor::mLogger(Logger::getLogger("de.hu_berlin.informatik.metrik.daemon.telnetactor"));
+
+TelnetActor::TelnetActor(string pHostName, string pPort) : mHostName(pHostName.c_str()), mPort(pPort.c_str()) {
   /// Set up the terminal interface
   this->setup();
 }
@@ -23,7 +28,7 @@ void TelnetActor::setup(){
   this->mSettings.c_lflag &= (~ICANON);
   this->mSettings.c_lflag &= (~ISIG); 
   */
-  /// TODO: Verify if that's correc
+  /// TODO: Verify if that's correct
   this->mSettings.c_lflag &= ((~ICANON) | (~ISIG));
   /// Set new attributes
   tcsetattr(0, TCSANOW, &(this->mSettings));
@@ -41,7 +46,7 @@ void TelnetActor::run(void){
     /// Try to establish the connection
     Telnet telnet(this->mIOService, this->mEndpointIterator);
     /// The IO service will run as seperate thread 
-    boost::thread t(boost::bind(&boost::asio::io_service::run, &(this->mIOService)));
+    boost::thread thread(boost::bind(&boost::asio::io_service::run, &(this->mIOService)));
     /// TODO
     while(1){
       // TODO
@@ -49,8 +54,10 @@ void TelnetActor::run(void){
     /// Close the telnet connection 
     telnet.close();
     /// Join the thread
-    
+    thread.join();    
   }catch(exception& e){
+    string reason = "An exception occurred: " + string(e.what());
     // TODO: Catch exception
+    LOG4CXX_FATAL(mLogger, reason);
   }
 }
