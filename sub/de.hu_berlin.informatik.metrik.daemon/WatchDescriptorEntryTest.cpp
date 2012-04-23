@@ -1,60 +1,59 @@
 #include "include/WatchDescriptorEntryTest.h" 
 
-CPPUNIT_TEST_SUITE_REGISTRATION(WatchDescriptorEntryTest);
+using namespace log4cxx;
 
-const int WatchDescriptorEntryTest::mId = 42;
-const uint32_t WatchDescriptorEntryTest::mMask = 23;
-const std::string WatchDescriptorEntryTest::mName("WatchDescriptorEntryTest");
+CPPUNIT_TEST_SUITE_REGISTRATION(test::WatchDescriptorEntryTest);
 
-void WatchDescriptorEntryTest::setUp(){
+const int test::WatchDescriptorEntryTest::mId = 42;
+const uint32_t test::WatchDescriptorEntryTest::mMask = 23;
+const std::string test::WatchDescriptorEntryTest::mName("WatchDescriptorEntryTest");
+
+LoggerPtr test::WatchDescriptorEntryTest::logger(Logger::getLogger("de::hu_berlin::informatik::metrik::daemon::test:: watchdescriptorentrytest"));
+
+void test::WatchDescriptorEntryTest::setUp(){
   a = new WatchDescriptorEntry();
   b = new WatchDescriptorEntry(mId, mMask, mName);
 }
 
-void WatchDescriptorEntryTest::tearDown(){
+void test::WatchDescriptorEntryTest::tearDown(){
   delete a; delete b;
 }
 
-void WatchDescriptorEntryTest::testGetId(){
+void test::WatchDescriptorEntryTest::testGetId(){
+  LOG4CXX_TRACE(logger, "get id");
   CPPUNIT_ASSERT(b != NULL);
   CPPUNIT_ASSERT(b->getId() == mId);
 }
 
-void WatchDescriptorEntryTest::testSetId(){
+void test::WatchDescriptorEntryTest::testSetId(){
+  LOG4CXX_TRACE(logger, "set id");
   CPPUNIT_ASSERT(a != NULL);
   a->setId(mId);
   CPPUNIT_ASSERT(a->getId() == mId);
 }
 
-void WatchDescriptorEntryTest::testGetName(){
+void test::WatchDescriptorEntryTest::testGetName(){
+  LOG4CXX_TRACE(logger, "get name");
   CPPUNIT_ASSERT(b != NULL);
   CPPUNIT_ASSERT(b->getName() == mName);
 }
 
-void WatchDescriptorEntryTest::testSetName(){
+void test::WatchDescriptorEntryTest::testSetName(){
+  LOG4CXX_TRACE(logger, "set name");
   CPPUNIT_ASSERT(a != NULL);
   a->setName(mName);
   CPPUNIT_ASSERT(((a->getName()).compare(mName)) == 0);
 }
 
-void WatchDescriptorEntryTest::testGetMask(){
+void test::WatchDescriptorEntryTest::testGetMask(){
+  LOG4CXX_TRACE(logger, "get mask");
   CPPUNIT_ASSERT(b != NULL);
   CPPUNIT_ASSERT(b->getMask() == mMask);
 }
 
-void WatchDescriptorEntryTest::testSetMask(){
+void test::WatchDescriptorEntryTest::testSetMask(){
+  LOG4CXX_TRACE(logger, "set mask");
   CPPUNIT_ASSERT(a != NULL);
   a->setMask(mMask);
   CPPUNIT_ASSERT(a->getMask() == mMask);
 }
-
-/*
-void WatchDescriptorEntryTest::init(){
-
-}
-*/
-
-void WatchDescriptorEntryTest::initialize(){
-
-}
-
