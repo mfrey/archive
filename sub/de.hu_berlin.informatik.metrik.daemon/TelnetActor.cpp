@@ -51,7 +51,6 @@ void TelnetActor::run(void){
     /// Join the thread
     
   }catch(exception& e){
-
+    // TODO: Catch exception
   }
-
 }

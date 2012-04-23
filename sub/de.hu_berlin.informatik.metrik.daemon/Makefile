@@ -5,57 +5,57 @@ LOGGING = -llog4cxx
 CPPUNIT = -lcppunit
 EXE = main
 
-all: Daemon Shell ConfigurationSettings Configuration Notification WatchDescriptorEntry Actor Sensor Controller TelnetActor Telnet main 
+all: main 
 
 test: WatchDescriptorEntryTest.o Tests.o WatchDescriptorEntry.o Notification.o NotificationTest.o
 	$(CC) -o test WatchDescriptorEntryTest.o Tests.o WatchDescriptorEntry.o Notification.o NotificationTest.o $(CPPUNIT) $(LOGGING) $(BOOST_THREAD)
 
-Tests: Tests.cpp
+Tests.o: Tests.cpp
 	$(CC) -c Tests.cpp $(CPPUNIT)
 
-Daemon: Daemon.cpp 
+Daemon.o: Daemon.cpp 
 	$(CC) $(LOGGING) -c Daemon.cpp 
 
-Shell: Shell.cpp
+Shell.o: Shell.cpp
 	$(CC) -c Shell.cpp
 
-Actor: Actor.cpp
+Actor.o: Actor.cpp
 	$(CC) -c Actor.cpp
 
-TelnetActor: TelnetActor.cpp
+TelnetActor.o: TelnetActor.cpp
 	$(CC) $(LOGGING) -c TelnetActor.cpp
 
-Telnet: Telnet.cpp
+Telnet.o: Telnet.cpp
 	$(CC) $(LOGGING) -c Telnet.cpp
 
-Sensor: Sensor.cpp
+Sensor.o: Sensor.cpp
 	$(CC) -c Sensor.cpp
 
-Controller: Controller.cpp
+Controller.o: Controller.cpp
 	$(CC) -c Controller.cpp
 
-Configuration: Configuration.cpp
+Configuration.o: Configuration.cpp
 	$(CC) -c Configuration.cpp
 
-ConfigurationSettings: ConfigurationSettings.cpp
+ConfigurationSettings.o: ConfigurationSettings.cpp
 	$(CC) $(LOGGING) -c ConfigurationSettings.cpp
 
-Notification: Notification.cpp
+Notification.o: Notification.cpp
 	$(CC) $(LOGGING) -c Notification.cpp
 
-WatchDescriptorEntry: WatchDescriptorEntry.cpp
+WatchDescriptorEntry.o: WatchDescriptorEntry.cpp
 	$(CC) $(LOGGING) -c WatchDescriptorEntry.cpp
 
-WatchDescriptorEntryTest: WatchDescriptorEntryTest.cpp
+WatchDescriptorEntryTest.o: WatchDescriptorEntryTest.cpp
 	$(CC) -c WatchDescriptorEntryTest.cpp
 
 main: main.cpp Daemon.o Configuration.o Shell.o Notification.o ConfigurationSettings.o WatchDescriptorEntry.o Actor.o Sensor.o Controller.o TelnetActor.o Telnet.o
-	$(CC) main.cpp -o main Daemon.o Configuration.o Shell.o Notification.o ConfigurationSettings.o WatchDescriptorEntry.o Actor.o Sensor.o Controller.o TelnetActor.o Telnet.o $(BOOST_THREAD) $(LOGGING) $(BOOST_SYSTEM) 
+	$(CC) main.cpp -o $(EXE) Daemon.o Configuration.o Shell.o Notification.o ConfigurationSettings.o WatchDescriptorEntry.o Actor.o Sensor.o Controller.o TelnetActor.o Telnet.o $(BOOST_THREAD) $(LOGGING) $(BOOST_SYSTEM) -lpthread
 
 .cpp.obj:
 	$(CC) -c $<
 
 clean:
-	rm *.o
-	rm $(EXE)
+	rm -f *.o
+	rm -f $(EXE)
 
