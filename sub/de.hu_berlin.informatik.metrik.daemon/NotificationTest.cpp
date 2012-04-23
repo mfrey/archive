@@ -35,7 +35,9 @@ void test::NotificationTest::testAddRemove(){
 }  
 
 WatchDescriptorEntry test::NotificationTest::createWatchDescriptorEntry(const char* pFileName){
+  LOG4CXX_TRACE(mLogger, "create a watch descriptor entry for file " << pFileName);
   CPPUNIT_ASSERT(a->getInotifyId() != -1);
+  LOG4CXX_TRACE(mLogger, "add " << pFileName << " to watched files (via inotify)");
   int wd = inotify_add_watch(a->getInotifyId(), pFileName, IN_MODIFY);
   CPPUNIT_ASSERT(wd != -1);
   return WatchDescriptorEntry(wd, IN_MODIFY, pFileName);
@@ -58,16 +60,19 @@ string test::NotificationTest::createFileName(){
 
 void test::NotificationTest::testAddRemoveWatchDescriptorEntry(){
   string fileName = createFileName();
+  LOG4CXX_TRACE(mLogger, "create file " << fileName);
   createFile(fileName.c_str());
   // Check if the object is initialized
   CPPUNIT_ASSERT(a != NULL);
   // Check if inotify is initialized
   CPPUNIT_ASSERT(a->getInotifyId() != -1);
   // Create watch descriptor entry 
+  LOG4CXX_TRACE(mLogger, "create watch descriptor entry for file " << fileName);
   WatchDescriptorEntry entry = createWatchDescriptorEntry(fileName.c_str());
   // Check if the object is initialized, TODO: Check if this is right
   CPPUNIT_ASSERT(&entry != NULL);
   // Add entry to the list
+  LOG4CXX_TRACE(mLogger, "add watch descriptor entry for file " << fileName << " to list");
   bool result = a->addWatchDescriptorEntry(entry);
   CPPUNIT_ASSERT(result == true);
   // Remove entry from list

@@ -61,3 +61,7 @@ void TelnetActor::run(void){
     LOG4CXX_FATAL(mLogger, reason);
   }
 }
+
+void TelnetActor::send(string pMessage){
+
+}

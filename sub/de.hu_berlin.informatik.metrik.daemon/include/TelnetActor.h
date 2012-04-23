@@ -40,18 +40,24 @@ namespace de {
               tcp::resolver::iterator mEndpointIterator;
               /// The structure hold the settings for the terminal interface
               termios mSettings;
-              
+              /// The write buffer
+              deque<string> mWriteBuffer;
+              /// The read buffer
+              deque<string> mReadBuffer;
               /// The method sets up the settings for the terminal interface
               void setup(void);
 
             public:
-              ///
+              /// The constructor of the class
               TelnetActor(string, string);
-              ///
+              /// The destructor of the class
               ~TelnetActor();
-              ///
+              /// A method which runs a thread (which in turn reads/write data via telnet)
               void run(void);
-              
+              /// A method to send data (via telnet)
+              void send(string);
+              /// A method to receive data (via telnet)
+              string recv(void);
           };
         }
       }

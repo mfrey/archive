@@ -12,4 +12,7 @@ void TelnetActorTest::tearDown(){
 
 void TelnetActorTest::testRun(){
   CPPUNIT_ASSERT(t != NULL);
+
+  //t.run();
+
 }
