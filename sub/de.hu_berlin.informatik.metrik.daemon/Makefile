@@ -27,7 +27,7 @@ TelnetActor.o: TelnetActor.cpp
 	$(CC) $(LOGGING) -c TelnetActor.cpp
 
 TelnetActorTest.o: TelnetActorTest.cpp
-	$(CC) -c TelnetActorTest.cpp
+	$(CC) $(LOGGING) -c TelnetActorTest.cpp
 
 Telnet.o: Telnet.cpp
 	$(CC) $(LOGGING) -c Telnet.cpp
