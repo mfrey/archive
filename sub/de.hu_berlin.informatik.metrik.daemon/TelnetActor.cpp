@@ -23,12 +23,7 @@ void TelnetActor::setup(){
   tcgetattr(0, &stored_settings);
   /// Save the previous settings
   this->mSettings = stored_settings;
-  /// Set local modes
-  /*
-  this->mSettings.c_lflag &= (~ICANON);
-  this->mSettings.c_lflag &= (~ISIG); 
-  */
-  /// TODO: Verify if that's correct
+  /// Set settings
   this->mSettings.c_lflag &= ((~ICANON) | (~ISIG));
   /// Set new attributes
   tcsetattr(0, TCSANOW, &(this->mSettings));
@@ -47,9 +42,21 @@ void TelnetActor::run(void){
     Telnet telnet(this->mIOService, this->mEndpointIterator);
     /// The IO service will run as seperate thread 
     boost::thread thread(boost::bind(&boost::asio::io_service::run, &(this->mIOService)));
-    /// TODO
+   
     while(1){
-      // TODO
+      /// Check if there is data available to write
+      /// Acquire lock
+
+      /// Write data
+
+      /// Check if data contains control command
+
+      /// Release lock
+/*
+      if(this->mWriteBuffer){
+        break;
+      }
+*/
     }
     /// Close the telnet connection 
     telnet.close();

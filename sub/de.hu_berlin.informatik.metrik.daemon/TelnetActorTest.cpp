@@ -18,5 +18,5 @@ void test::TelnetActorTest::testRun(){
   CPPUNIT_ASSERT(t != NULL);
 
   //t.run();
-
 }
+
