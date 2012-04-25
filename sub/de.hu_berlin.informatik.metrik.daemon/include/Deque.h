@@ -21,23 +21,86 @@ namespace de {
 
             public:
               /// The method adds an element at the front of the deque
-              void pushFront(Data const&);
+              void pushFront(Data const& pValue){
+                boost::mutex::scoped_lock lock(this->mMutex);
+                this->mData.push_front(pValue);
+                lock.unlock();
+                this->mStatus.notify_one();
+              }
+
               /// The method adds an element at the back of the deque
-              void pushBack(Data const&);
+              void pushBack(Data const& pValue){
+                boost::mutex::scoped_lock lock(this->mMutex);
+                this->mData.push_back(pValue);
+                lock.unlock();
+                this->mStatus.notify_one();
+              }
+
               /// The method checks if the deque contains no element
-              bool empty() const;
+              bool empty() const {
+                boost::mutex::scoped_lock lock(this->mMutex);
+                return this->mData.empty();
+              }
+               
               /// The method removes an element at the front of the deque
-              bool tryPopFront(Data&);
+              bool tryPopFront(Data& pValue){
+                boost::mutex::scoped_lock lock(this->mMutex);
+                if(this->mData.empty()){
+                  return false;
+                }
+        
+                pValue = this->mData.front();
+                this->mData.pop_front();
+                return true;
+              }
+
               /// The method removes an element at the back of the deque
-              bool tryPopBack(Data&);
+              bool tryPopBack(Data& pValue){
+                boost::mutex::scoped_lock lock(this->mMutex);
+                if(this->mData.empty()){
+                  return false;
+                }
+        
+                pValue = this->mData.back();
+                this->mData.pop_back();
+                return true;
+              }
+
               /// The method returns the size of the deque
-              int size();
+              int size(){
+                boost::mutex::scoped_lock lock(this->mMutex);
+                return this->mData.size();
+              }
+
               /// The method clears the content of the deque
-              void clear();
+              void clear(){
+                boost::mutex::scoped_lock lock(this->mMutex);
+                this->mData.clear();
+              }
+
               /// The method
-	      void waitAndPopFront(Data&);
+	      void waitAndPopFront(Data& pValue){
+                boost::mutex::scoped_lock lock(this->mMutex);
+
+                while(this->mData.empty()){
+                  this->mStatus.wait(lock);
+                }
+        
+                pValue = this->mData.front();
+                this->mData.pop_front();
+              }
+
               /// The method
-              void waitAndPopBack(Data&);
+              void waitAndPopBack(Data& pValue){
+                boost::mutex::scoped_lock lock(this->mMutex);
+
+                while(this->mData.empty()){
+                  this->mStatus.wait(lock);
+               }  
+        
+               pValue = this->mData.back();
+               this->mData.pop_back();
+             }
           };
         }
       }

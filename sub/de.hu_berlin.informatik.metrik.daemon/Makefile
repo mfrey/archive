@@ -4,8 +4,8 @@ BOOST_SYSTEM = -lboost_system
 LOGGING = -llog4cxx
 CPPUNIT = -lcppunit
 PTHREAD = -lpthread
-OBJECTS = Daemon.o Configuration.o Shell.o Notification.o ConfigurationSettings.o WatchDescriptorEntry.o Actor.o Sensor.o Controller.o TelnetActor.o Telnet.o Deque.o
-TEST_OBJECTS = WatchDescriptorEntryTest.o Tests.o WatchDescriptorEntry.o Notification.o NotificationTest.o Actor.o Telnet.o TelnetActor.o TelnetActorTest.o
+OBJECTS = Daemon.o Configuration.o Shell.o Notification.o ConfigurationSettings.o WatchDescriptorEntry.o Actor.o Sensor.o Controller.o TelnetActor.o Telnet.o
+TEST_OBJECTS = WatchDescriptorEntryTest.o Tests.o WatchDescriptorEntry.o Notification.o NotificationTest.o Actor.o Telnet.o TelnetActor.o TelnetActorTest.o DequeTest.o
 EXE = main
 TEST_EXE = test
 
@@ -20,14 +20,14 @@ Tests.o: Tests.cpp
 Daemon.o: Daemon.cpp 
 	$(CC) $(LOGGING) -c Daemon.cpp 
 
+DequeTest.o: DequeTest.cpp
+	$(CC)-c DequeTest.cpp $(BOOST_THREAD)
+
 Shell.o: Shell.cpp
 	$(CC) -c Shell.cpp
 
 Actor.o: Actor.cpp
 	$(CC) -c Actor.cpp
-
-Deque.o: Deque.cpp
-	$(CC) -c Deque.cpp $(LOGGING) $(BOOST_THREAD)
 
 TelnetActor.o: TelnetActor.cpp
 	$(CC) $(LOGGING) -c TelnetActor.cpp

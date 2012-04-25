@@ -7,8 +7,9 @@
 
 #include <vector>
 
-#include "Telnet.h"
 #include "Actor.h"
+#include "Telnet.h"
+#include "Deque.h"
 
 #include <unistd.h>
 #include <termios.h>
@@ -41,9 +42,9 @@ namespace de {
               /// The structure hold the settings for the terminal interface
               termios mSettings;
               /// The write buffer
-              deque<string> mWriteBuffer;
+              Deque<string> mWriteBuffer;
               /// The read buffer
-              deque<string> mReadBuffer;
+              Deque<string> mReadBuffer;
               /// The method sets up the settings for the terminal interface
               void setup(void);
 
