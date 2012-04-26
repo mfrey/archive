@@ -26,9 +26,9 @@ namespace de {
               private:
                 CPPUNIT_TEST_SUITE(DequeTest);
                 CPPUNIT_TEST(pushFrontTest);
-//		CPPUNIT_TEST(pushFrontReaderWriterTest);
+		CPPUNIT_TEST(pushFrontReaderWriterTest);
                 CPPUNIT_TEST(pushBackTest);
-//                CPPUNIT_TEST(pushBackReaderWriterTest);
+                CPPUNIT_TEST(pushBackReaderWriterTest);
                 CPPUNIT_TEST_SUITE_END();
 
                 /// A instance of the deque class 
@@ -46,6 +46,8 @@ namespace de {
                 void pushFrontTestWriterThread(void);
                 ///
                 void pushBackTestWriterThread(void);
+                /// 
+                std::vector<std::string> splitString(std::string);
 
               public:
                 /// The set up method of the unit test
