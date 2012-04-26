@@ -24,7 +24,7 @@ namespace de {
               /// A 'handler' for asynchronous IO
               boost::asio::io_service& mIOService;
               /// An instance of the log4cxx logger
-              static log4cxx::LoggerPtr logger;
+              static log4cxx::LoggerPtr mLogger;
               /// The socket the telnet the instance is connected to
               tcp::socket mSocket; 
               /// A buffer for writing data

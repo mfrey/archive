@@ -7,7 +7,9 @@ CPPUNIT_TEST_SUITE_REGISTRATION(test::TelnetActorTest);
 LoggerPtr test::TelnetActorTest::mLogger(Logger::getLogger("de.hu_berlin.informatik.metrik.daemon.test.telnetactortest"));
 
 void test::TelnetActorTest::setUp(){
-  t = new TelnetActor("localhost","4519");
+//  t = new TelnetActor("localhost","4519");
+// TODO: Find a suitable public telnet service or start a minimal telnet daemon
+  t = new TelnetActor("nethack.alt.org","23");
 }
 
 void test::TelnetActorTest::tearDown(){
@@ -15,8 +17,16 @@ void test::TelnetActorTest::tearDown(){
 }
 
 void test::TelnetActorTest::testRun(){
-  CPPUNIT_ASSERT(t != NULL);
-
-  //t.run();
+  LOG4CXX_TRACE(mLogger, "run thread");
+  // Run the thread in class telnet actor
+  t->run();
+  LOG4CXX_TRACE(mLogger, "send w");
+  t->send("w");
+  LOG4CXX_TRACE(mLogger, "send q");
+  t->send("q");
+  LOG4CXX_TRACE(mLogger, "send q");
+  t->send("q");
+  LOG4CXX_TRACE(mLogger, "send #stop");
+  t->send("#stop");
 }
 

@@ -3,7 +3,7 @@
 using namespace log4cxx;
 using namespace de::hu_berlin::informatik::metrik::daemon;
 
-LoggerPtr Telnet::logger(Logger::getLogger("de.hu_berlin.informatik.metrik.daemon.telnet"));
+LoggerPtr Telnet::mLogger(Logger::getLogger("de.hu_berlin.informatik.metrik.daemon.telnet"));
 
 /**
  * 
@@ -57,6 +57,7 @@ void Telnet::writeToSocket(string pMessage){
    bool progress = !this->mWriteBuffer.empty(); 
    //
    this->mWriteBuffer.push_back(pMessage); 
+   //
    if(!progress){ 
      writeStart();
    }
@@ -73,7 +74,7 @@ void Telnet::connect(tcp::resolver::iterator pEndpointIterator){
   tcp::endpoint endpoint = *pEndpointIterator;
   ///
   mSocket.async_connect(endpoint, boost::bind(&Telnet::connectComplete, this,
-				boost::asio::placeholders::error, ++pEndpointIterator));
+    boost::asio::placeholders::error, ++pEndpointIterator));
 }
 
 /**
@@ -125,6 +126,7 @@ void Telnet::readComplete(const boost::system::error_code& pError, size_t pTrans
  * the operation completes or fails, the method writeComplete() is called.
  */
 void Telnet::writeStart(){
+  LOG4CXX_TRACE(mLogger, "will write" << this->mWriteBuffer.front() << " to socket");
   boost::asio::async_write(this->mSocket, boost::asio::buffer(&(this->mWriteBuffer.front()) ,this->mWriteBuffer.front().size()),
     boost::bind(&Telnet::writeComplete, this, boost::asio::placeholders::error));
 }
