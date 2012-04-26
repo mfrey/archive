@@ -43,20 +43,16 @@ void TelnetActor::run(void){
     /// The IO service will run as seperate thread 
     boost::thread thread(boost::bind(&boost::asio::io_service::run, &(this->mIOService)));
    
+    std::string command;
+
     while(1){
-      /// Check if there is data available to write
-      /// Acquire lock
+      this->mWriteBuffer.waitAndPopFront(command);
 
-      /// Write data
-
-      /// Check if data contains control command
-
-      /// Release lock
-/*
-      if(this->mWriteBuffer){
+      if(command.compare("#stop") == 0){
         break;
+      }else{
+        telnet.write(command);
       }
-*/
     }
     /// Close the telnet connection 
     telnet.close();

@@ -25,14 +25,14 @@ Telnet::~Telnet(){
 }
 
 /**
- * The methods writes a character via an established telnet
+ * The methods writes a string via an established telnet
  * connection.
  *
- * @param pMessage The byte which should be writtenparam pMessage The byte which should be written
+ * @param pMessage The string which should be written
  */
-void Telnet::write(const char pMessage){
+void Telnet::write(string pMessage){
   /// Writing the message is delegated to the method writeToSocket
-  this->mIOService.post(boost::bind(&Telnet::writeToSocket, this, pMessage));
+ this->mIOService.post(boost::bind(&Telnet::writeToSocket, this, pMessage));
 }
 
 /**
@@ -52,12 +52,11 @@ void Telnet::closeSocket(void){
   this->mSocket.close();
 }
 
-void Telnet::writeToSocket(const char pMessage){
+void Telnet::writeToSocket(string pMessage){
    //
-   bool progress = !write_msgs_.empty(); 
+   bool progress = !this->mWriteBuffer.empty(); 
    //
-   write_msgs_.push_back(pMessage); 
-   // TODO: verify
+   this->mWriteBuffer.push_back(pMessage); 
    if(!progress){ 
      writeStart();
    }
@@ -126,9 +125,10 @@ void Telnet::readComplete(const boost::system::error_code& pError, size_t pTrans
  * the operation completes or fails, the method writeComplete() is called.
  */
 void Telnet::writeStart(){
-  boost::asio::async_write(this->mSocket, boost::asio::buffer(&write_msgs_.front(), 1),
+  boost::asio::async_write(this->mSocket, boost::asio::buffer(&(this->mWriteBuffer.front()) ,this->mWriteBuffer.front().size()),
     boost::bind(&Telnet::writeComplete, this, boost::asio::placeholders::error));
 }
+
 
 /**
  * The method is called if writing asynchronously data to an established telnet 
@@ -139,8 +139,8 @@ void Telnet::writeStart(){
  */
 void Telnet::writeComplete(const boost::system::error_code& pError){
   if(!pError){ 
-    write_msgs_.pop_front(); 
-    if(!write_msgs_.empty()){
+    this->mWriteBuffer.pop_front(); 
+    if(!(this->mWriteBuffer.empty())){
       writeStart(); 
     }
   }else{

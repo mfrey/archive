@@ -30,7 +30,9 @@ namespace de {
               /// A buffer for writing data
 	      char mBuffer[mBufferSize]; 
               // A deque for reading data
-              deque<char> write_msgs_; 
+
+              // A deque for writing data
+              deque<string> mWriteBuffer; 
 
               /// The method begins to opens a telnet connection
               void connect(tcp::resolver::iterator);
@@ -47,7 +49,7 @@ namespace de {
               /// The method finishes to write data to an established telnet connection, independent of success/failure
               void writeComplete(const boost::system::error_code&);
               /// The method fills the write buffer and initializes the transmission
-              void writeToSocket(const char);
+              void writeToSocket(string);
 
             public:
               /// The constructor of the telnet class
@@ -56,8 +58,8 @@ namespace de {
               ~Telnet();
               /// The method initializes a telnet connection
               void open();
-              /// The method writes data via an established telnet connection
-              void write(const char);
+              /// The method writes a string via an established telnet connection
+              void write(string);
               /// The method closes the telnet connection
               void close();
           };
