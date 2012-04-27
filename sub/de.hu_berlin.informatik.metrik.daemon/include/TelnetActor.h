@@ -32,9 +32,9 @@ namespace de {
               /// A instance of the logger
               static log4cxx::LoggerPtr mLogger;
               /// The name of host (which will be connected)
-              const char *mHostName;
+              std::string mHostName;
               /// The port of the host (which will be connected)
-              const char *mPort;
+              std::string mPort;
               /// The asynchronous IO service
               boost::asio::io_service mIOService;
               ///

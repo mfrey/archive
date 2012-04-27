@@ -8,7 +8,7 @@ LoggerPtr TelnetActor::mLogger(Logger::getLogger("de.hu_berlin.informatik.metrik
 /**
  *
  */
-TelnetActor::TelnetActor(string pHostName, string pPort) : mHostName(pHostName.c_str()), mPort(pPort.c_str()) {
+TelnetActor::TelnetActor(string pHostName, string pPort) : mHostName(pHostName), mPort(pPort) {
   /// Set up the terminal interface
   this->setup();
 }
@@ -43,6 +43,7 @@ void TelnetActor::run(void){
     ///
     tcp::resolver resolver(this->mIOService);
     ///
+    LOG4CXX_TRACE(mLogger, "Try to connect to host " << this->mHostName << " and port "  << this->mPort);
     tcp::resolver::query query(this->mHostName, this->mPort);
     ///
     this->mEndpointIterator = resolver.resolve(query);
