@@ -43,7 +43,7 @@ void TelnetActor::run(void){
     ///
     tcp::resolver resolver(this->mIOService);
     ///
-    LOG4CXX_TRACE(mLogger, "Try to connect to host " << this->mHostName << " and port "  << this->mPort);
+    LOG4CXX_TRACE(mLogger, "try to connect to host " << this->mHostName << " and port "  << this->mPort);
     tcp::resolver::query query(this->mHostName, this->mPort);
     ///
     this->mEndpointIterator = resolver.resolve(query);
@@ -57,22 +57,29 @@ void TelnetActor::run(void){
     std::string command;
 
     while(1){
+      LOG4CXX_TRACE(mLogger, "wait for data to write to the connection");
       /// Read from write buffer
       this->mWriteBuffer.waitAndPopFront(command);
+      LOG4CXX_TRACE(mLogger, "received data: " << command);
       /// If the command '#stop' is received, the thread will be shutdown
       if(command.compare("#stop") == 0){
+        LOG4CXX_TRACE(mLogger, "received stop command");
         break;
       }else{
+        LOG4CXX_TRACE(mLogger, "write data " << command << " to the socket");
         /// Write data to the established telnet connection
         telnet.write(command);
       }
     }
+    LOG4CXX_TRACE(mLogger, "waiting for data to write stopped");
     /// Close the telnet connection 
     telnet.close();
+    LOG4CXX_TRACE(mLogger, "closed connection");
     /// Join the thread
     thread.join();    
+    LOG4CXX_TRACE(mLogger, "joined thread");
   }catch(exception& e){
-    string reason = "An exception occurred: " + string(e.what());
+    string reason = "an exception occurred: " + string(e.what());
     LOG4CXX_FATAL(mLogger, reason);
   }
 }

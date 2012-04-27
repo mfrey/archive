@@ -27,9 +27,16 @@ namespace de {
                 CPPUNIT_TEST_SUITE_END();
                 /// A logger instance 
                 static log4cxx::LoggerPtr mLogger;
+                boost::thread mActor;
+                ///
+                boost::thread mWriter;
 
                 // Instance of the class which will be tested
                 TelnetActor *t;
+                /// A method which will be run by a thread which in turn will write data to the telnet actor  
+		void writeDataThread(void);
+                ///
+                void telnetActorThread(void);
 
               public:
                 /// The set up method of the unit test

@@ -59,6 +59,7 @@ void Telnet::writeToSocket(string pMessage){
    this->mWriteBuffer.push_back(pMessage); 
    //
    if(!progress){ 
+     LOG4CXX_TRACE(mLogger, "start to write data to socket"); 
      writeStart();
    }
 }
@@ -86,8 +87,12 @@ void Telnet::connect(tcp::resolver::iterator pEndpointIterator){
  */
 void Telnet::connectComplete(const boost::system::error_code& pError, tcp::resolver::iterator pEndpointIterator){
   if(!pError){
+    LOG4CXX_TRACE(mLogger, "start to read data from socket"); 
     readStart();
   }else if(pEndpointIterator != tcp::resolver::iterator()){
+    LOG4CXX_FATAL(mLogger, "error " << pError.value() << " of type "  << pError.category().name() << " occured while reading data from socket");
+    boost::system::system_error reason(pError);
+    LOG4CXX_FATAL(mLogger, "reason " << reason.what());
     this->closeSocket();
     connect(pEndpointIterator);
   }
@@ -98,6 +103,7 @@ void Telnet::connectComplete(const boost::system::error_code& pError, tcp::resol
  * the operation completes or fails, the method readComplete() is called.
  */
 void Telnet::readStart(void){
+  LOG4CXX_TRACE(mLogger, "will read data from socket");
   this->mSocket.async_read_some(boost::asio::buffer(mBuffer, this->mBufferSize),
     boost::bind(&Telnet::readComplete, this, boost::asio::placeholders::error,
     boost::asio::placeholders::bytes_transferred));
@@ -114,9 +120,15 @@ void Telnet::readStart(void){
  */
 void Telnet::readComplete(const boost::system::error_code& pError, size_t pTransferredBytes){
   if(!pError){
+    stringstream data;
+    data << this->mBuffer;
+    LOG4CXX_TRACE(mLogger, "read " << data.str() << " from socket");
     // TODO: write read out, e.g. cout
     readStart();
   }else{
+    LOG4CXX_FATAL(mLogger, "error " << pError.value() << " of type "  << pError.category().name() << " occured while reading data from socket");
+    boost::system::system_error reason(pError);
+    LOG4CXX_FATAL(mLogger, "reason " << reason.what());
     this->closeSocket();
   }
 }
@@ -126,7 +138,7 @@ void Telnet::readComplete(const boost::system::error_code& pError, size_t pTrans
  * the operation completes or fails, the method writeComplete() is called.
  */
 void Telnet::writeStart(){
-  LOG4CXX_TRACE(mLogger, "will write" << this->mWriteBuffer.front() << " to socket");
+  LOG4CXX_TRACE(mLogger, "will write " << this->mWriteBuffer.front() << " to socket");
   boost::asio::async_write(this->mSocket, boost::asio::buffer(&(this->mWriteBuffer.front()) ,this->mWriteBuffer.front().size()),
     boost::bind(&Telnet::writeComplete, this, boost::asio::placeholders::error));
 }
@@ -141,11 +153,16 @@ void Telnet::writeStart(){
  */
 void Telnet::writeComplete(const boost::system::error_code& pError){
   if(!pError){ 
+    LOG4CXX_TRACE(mLogger, "prepare to remove data from write queue");
     this->mWriteBuffer.pop_front(); 
+    LOG4CXX_TRACE(mLogger, "removed data from write queue");
     if(!(this->mWriteBuffer.empty())){
       writeStart(); 
     }
   }else{
+    LOG4CXX_FATAL(mLogger, "error " << pError.value() << " of type "  << pError.category().name() << " occured while reading data from socket");
+    boost::system::system_error reason(pError);
+    LOG4CXX_FATAL(mLogger, "reason " << reason.what());
     this->closeSocket();
   }
 }

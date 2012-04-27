@@ -30,10 +30,10 @@ Actor.o: Actor.cpp
 	$(CC) -c Actor.cpp
 
 TelnetActor.o: TelnetActor.cpp
-	$(CC) $(LOGGING) -c TelnetActor.cpp
+	$(CC) $(LOGGING) -c TelnetActor.cpp 
 
 TelnetActorTest.o: TelnetActorTest.cpp
-	$(CC) $(LOGGING) -c TelnetActorTest.cpp
+	$(CC) $(LOGGING) -c TelnetActorTest.cpp $(BOOST_THREAD)
 
 Telnet.o: Telnet.cpp
 	$(CC) $(LOGGING) -c Telnet.cpp

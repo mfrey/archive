@@ -18,8 +18,23 @@ void test::TelnetActorTest::tearDown(){
 
 void test::TelnetActorTest::testRun(){
   LOG4CXX_TRACE(mLogger, "run thread");
-  // Run the thread in class telnet actor
+  mActor = boost::thread(&test::TelnetActorTest::telnetActorThread, this); 
+  // Create a writer thread
+  mWriter = boost::thread(&test::TelnetActorTest::writeDataThread, this); 
+  mActor.join();
+  mWriter.join();
+  LOG4CXX_TRACE(mLogger, "writer thread finished");
+}
+
+void test::TelnetActorTest::telnetActorThread(void){
+  // Initialize thread in telnet actor class
   t->run();
+  //
+  LOG4CXX_TRACE(mLogger, "create writer thread");
+}
+
+void test::TelnetActorTest::writeDataThread(void){
+  // Run the thread in class telnet actor
   LOG4CXX_TRACE(mLogger, "send w");
   t->send("w");
   LOG4CXX_TRACE(mLogger, "send q");
