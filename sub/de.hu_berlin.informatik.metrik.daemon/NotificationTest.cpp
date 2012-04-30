@@ -70,7 +70,7 @@ void test::NotificationTest::testAddRemoveWatchDescriptorEntry(){
   LOG4CXX_TRACE(mLogger, "create watch descriptor entry for file " << fileName);
   WatchDescriptorEntry entry = createWatchDescriptorEntry(fileName.c_str());
   // Check if the object is initialized, TODO: Check if this is right
-  CPPUNIT_ASSERT(&entry != NULL);
+
   // Add entry to the list
   LOG4CXX_TRACE(mLogger, "add watch descriptor entry for file " << fileName << " to list");
   bool result = a->addWatchDescriptorEntry(entry);

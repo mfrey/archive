@@ -25,10 +25,10 @@ namespace de {
             class DequeTest : public CppUnit::TestFixture {
               private:
                 CPPUNIT_TEST_SUITE(DequeTest);
-                CPPUNIT_TEST(pushFrontTest);
-		CPPUNIT_TEST(pushFrontReaderWriterTest);
-                CPPUNIT_TEST(pushBackTest);
-                CPPUNIT_TEST(pushBackReaderWriterTest);
+//                CPPUNIT_TEST(pushFrontTest);
+//		CPPUNIT_TEST(pushFrontReaderWriterTest);
+//                CPPUNIT_TEST(pushBackTest);
+//                CPPUNIT_TEST(pushBackReaderWriterTest);
                 CPPUNIT_TEST_SUITE_END();
 
                 /// A instance of the deque class 
