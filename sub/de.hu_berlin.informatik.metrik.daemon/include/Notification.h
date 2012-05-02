@@ -42,9 +42,11 @@ namespace de {
               void closeWatchDescriptors();
               void eraseWatchDescriptorList();
               void closeInotifyInstance();
+              void initializeInotify();
 
             public:
               Notification();
+              Notification(std::vector<std::string>);
               ~Notification();
               int getInotifyId();
               bool add(const char*, uint32_t);
@@ -52,6 +54,7 @@ namespace de {
               void start();
               void run();
               void join();
+              void createWatchDescriptorEntries(std::vector<std::string>);
               bool addWatchDescriptorEntry(WatchDescriptorEntry);
               bool addWatchDescriptorEntries(map);
           };

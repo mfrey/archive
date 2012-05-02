@@ -1,12 +1,29 @@
 #include "include/Configuration.h"
 
 using namespace log4cxx;
+using namespace log4cxx::helpers;
+
 using namespace de::hu_berlin::informatik::metrik::daemon;
 
 LoggerPtr Configuration::mLogger(Logger::getLogger("de.hu_berlin.informatik.metrik.daemon.configuration"));
 
 Configuration::Configuration(){
 
+}
+
+/**
+ * The constructor sets the configuration file, reads it and
+ * enables logging.
+ *
+ * @param pConfigurationFile The name of the configuration file
+ */
+Configuration::Configuration(std::string pConfigurationFile){
+  // set the configuration file  
+  this->setConfigurationFile(pConfigurationFile);
+  // read configuration file
+  this->readConfigurationFile();
+  // enable logging
+  this->enableLogging();
 }
 
 Configuration::Configuration(int pArgc, char **pArgv){
@@ -41,9 +58,26 @@ void Configuration::setConfigurationFile(std::string pConfigurationFile){
   this->mConfiguration.insert(std::pair<std::string, std::string>(std::string("configuration_file"), pConfigurationFile));
 }
 
+std::vector<std::string> Configuration::getEntries(){
+  std::vector<std::string> files = this->getFilesToWatch();
+  std::vector<std::string> directories = this->getDirectoriesToWatch();
+  files.insert(files.end(), directories.begin(), directories.end());
+  return files;
+}
+
+void Configuration::enableLogging(){
+  try {
+    // Read log4cxx property file
+    PropertyConfigurator::configure("logging.properties");
+    // Print a first dummy line
+    LOG4CXX_TRACE(mLogger, "starting application");
+  }catch(Exception&){
+    std::cerr << "An exception has occurred initializing the logging framework" << std::endl;
+  }
+}
+
 /**
- * The method reads a configuration file and stores the settings
- * in a ConfigurationSettings object.
+ * The method reads a configuration file.
  */
 void Configuration::readConfigurationFile(){
   std::string configuration = getConfigurationFile();
@@ -95,7 +129,7 @@ void Configuration::parseConfigurationFileLine(std::vector<std::string> pLine){
 bool Configuration::findConfigurationOption(std::string pOption){
   std::map<std::string,std::string>::iterator iterator;
   iterator = this->mConfiguration.find(pOption);
-  return (iterator != this->mConfiguration.end();
+  return (iterator != this->mConfiguration.end());
 }
 
 std::string Configuration::getLoggingFile(){
@@ -106,12 +140,19 @@ std::string Configuration::getConfigurationFile(){
   return getOption("configuration_file");
 }
 
-std::string Configuration::getFilesToWatch(){
-  return getOption("watch_files");
+// TODO: Redundant code, see DequeTest.cpp
+std::vector<std::string> Configuration::splitString(std::string pList){
+  std::vector<std::string> result;
+  boost::split(result, pList, boost::is_space());
+  return result;
 }
 
-std::string Configuration::getDirectoriesToWatch(){
-  return getOption("watch_directories");
+std::vector<std::string> Configuration::getFilesToWatch(){
+  return splitString(getOption("watch_files"));
+}
+
+std::vector<std::string> Configuration::getDirectoriesToWatch(){
+  return splitString(getOption("watch_directories"));
 }
 
 std::string Configuration::getOption(std::string pOption){

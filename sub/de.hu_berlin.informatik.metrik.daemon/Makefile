@@ -45,7 +45,7 @@ Controller.o: Controller.cpp
 	$(CC) -c Controller.cpp
 
 Configuration.o: Configuration.cpp
-	$(CC) -c Configuration.cpp 
+	$(CC) -c Configuration.cpp $(BOOST_SYSTEM)
 
 ConfigurationTest.o: ConfigurationTest.cpp
 	$(CC) -c ConfigurationTest.cpp $(LOGGING)

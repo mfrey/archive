@@ -13,6 +13,9 @@
 #include <boost/algorithm/string.hpp>
 
 #include "log4cxx/logger.h"
+#include "log4cxx/basicconfigurator.h"
+#include "log4cxx/propertyconfigurator.h"
+#include "log4cxx/helpers/exception.h"
 
 namespace de {
   namespace hu_berlin {
@@ -31,20 +34,36 @@ namespace de {
               bool findConfigurationOption(std::string);
               /// The method returns an option set in the configuration file
               std::string getOption(std::string);
+              /// The method reads a line of a configuration file and sets the corresponding options
+              void parseConfigurationFileLine(std::vector<std::string>);
+              ///
+              std::vector<std::string> splitString(std::string);
 
             public:
               Configuration();
+              /// The constructor reads a configuration (by calling th corresponding methods of the class)
+              Configuration(std::string);
               Configuration(int, char **);
               ~Configuration();
+              /// The method returns the location of the logging file
               std::string getLoggingFile();
+              /// The method returns the location of the configuration file
               std::string getConfigurationFile();
-              std::string getFilesToWatch();
-              std::string getDirectoriesToWatch();
+              /// The method returns a list of file which should be watched 
+              std::vector<std::string> getFilesToWatch();
+              /// The method returns a list of directories which should be watched 
+              std::vector<std::string> getDirectoriesToWatch();
               void parseOptions(int, char **);
+              /// The method reads a configuration file
               void readConfigurationFile();
+              /// The method sets the name (full path) of the configuration file
               void setConfigurationFile(std::string);
+              /// The method enables the log4cxx logging
+              void enableLogging(void);
+              /// The method returns a list of files/directories to watch (represented as watch descriptors)
               std::vector<WatchDescriptorEntry> getWatchDescriptorEntries();
-              void parseConfigurationFileLine(std::vector<std::string>);
+              /// The method returns a list of files and directories which should be watched
+              std::vector<std::string> getEntries();
           };
         }
       }

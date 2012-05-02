@@ -13,6 +13,36 @@ Notification::Notification(){
   }
 }
 
+/**
+ * The constructor initializes the watch descriptor entries and adds
+ */
+Notification::Notification(std::vector<std::string> pEntries){
+  // Initialize inotify
+  this->initializeInotify();
+  // Create watch descriptor entries
+  this->createWatchDescriptorEntries(pEntries);
+  //
+
+}
+
+void Notification::initializeInotify(){
+  // An error occured while initializing inotify
+  if((this->mNotificationInstance = inotify_init()) < 0){
+    LOG4CXX_FATAL(logger, "initializing notification instance (inotify_init) was not successful");
+    // TODO: Error Handling
+  }
+}
+
+void Notification::createWatchDescriptorEntries(std::vector<std::string> pEntries){
+  // Iterate over the array and create for each entry a WatchDescriptorEntry object
+  for(unsigned int i = 0; i < pEntries.size(); i++){
+    // TODO: This is subject to change (should it be more flexible in terms of mask?)
+    WatchDescriptorEntry entry(this->mNotificationInstance, IN_ACCESS, pEntries[i]);
+    // Add entry to the list
+    this->addWatchDescriptorEntry(entry);
+  }
+}
+
 Notification::~Notification(){
   // Close the watch descriptors stored in the watch descriptor entry list
   this->closeWatchDescriptors();
