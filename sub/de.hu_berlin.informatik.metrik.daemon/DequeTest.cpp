@@ -24,7 +24,7 @@ void test::DequeTest::pushFrontTest(){
   CPPUNIT_ASSERT(d->size() == 0);
   LOG4CXX_TRACE(mLogger, "create writer thread (pushFrontTestWriterThread) which pushes strings up front");
   // Create the writer thread
-  mWriter = boost::thread(&test::DequeTest::pushFrontTestWriterThread, this); 
+  mWriter = boost::thread(&test::DequeTest::pushFrontThread, this); 
   LOG4CXX_TRACE(mLogger, "waiting for thread to finish");
   // Wait for writer thread to finish
   mWriter.join();
@@ -43,7 +43,7 @@ void test::DequeTest::pushBackTest(){
   CPPUNIT_ASSERT(d->size() == 0);
   LOG4CXX_TRACE(mLogger, "create thread (pushBackTestWriterThread) which pushes data up back");
   // Create the writer thread
-  mWriter = boost::thread(&test::DequeTest::pushBackTestWriterThread, this); 
+  mWriter = boost::thread(&test::DequeTest::pushBackThread, this); 
   LOG4CXX_TRACE(mLogger, "wait for thread (pushBackTestWriterThread) to finish");
   // Wait for writer thread to finish
   mWriter.join();
@@ -65,7 +65,7 @@ void test::DequeTest::pushFrontReaderWriterTest(){
   mReader = boost::thread(&test::DequeTest::popBackThread, this); 
   LOG4CXX_TRACE(mLogger, "create thread (pushFrontTestWriterThread) which writes via push_front from deque");
   // Create the writer thread
-  mWriter = boost::thread(&test::DequeTest::pushFrontTestWriterThread, this); 
+  mWriter = boost::thread(&test::DequeTest::pushFrontThread, this); 
   LOG4CXX_TRACE(mLogger, "waiting for thread (pushFrontReaderTestThread) to finish");
   // Wait for reader thread to finish
   mReader.join(); 
@@ -90,11 +90,11 @@ void test::DequeTest::pushBackReaderWriterTest(){
   mReader = boost::thread(&test::DequeTest::popFrontThread, this); 
   LOG4CXX_TRACE(mLogger, "create thread (pushBackTestWriterThread) which writes data via push_back");
   // Create the writer thread
-  mWriter = boost::thread(&test::DequeTest::pushBackTestWriterThread, this); 
-  LOG4CXX_TRACE(mLogger, "wait for thread (pushBackTestWriterThread) to finish");
+  mWriter = boost::thread(&test::DequeTest::pushBackThread, this); 
+  LOG4CXX_TRACE(mLogger, "wait for thread (pushBackThread) to finish");
   // Wait for reader thread to finish
   mReader.join(); 
-  LOG4CXX_TRACE(mLogger, "wait for thread (pushBackTestWriterThread) to finish");
+  LOG4CXX_TRACE(mLogger, "wait for thread (popFrontThread) to finish");
   // Wait for writer thread to finish
   mWriter.join();
   LOG4CXX_TRACE(mLogger, "size of deque is " << d->size());
@@ -111,13 +111,13 @@ void test::DequeTest::multipleReaderMultipleWriteTest(){
 std::vector<std::string> test::DequeTest::splitString(std::string pString){
   // Create an array which holds a splitted citation
   std::vector<std::string> array;
-  // Split a citation from Shakespears Henry V 
+  // Split a string 
   boost::split(array, pString, boost::is_space());
   // Return the result
   return array;
 }
 
-void test::DequeTest::pushFrontTestWriterThread(){
+void test::DequeTest::pushFrontThread(){
   LOG4CXX_TRACE(mLogger, "start pushFrontTestWriterThread()");
   // Create an array which holds a splitted citation
   std::vector<std::string> array = splitString("We few, we happy few, we band of brothers. For he today that sheds his blood with me shall be my brother; be never so vile.");
@@ -130,7 +130,7 @@ void test::DequeTest::pushFrontTestWriterThread(){
   LOG4CXX_TRACE(mLogger, "stop pushFrontTestWriterThread()");
 }
 
-void test::DequeTest::pushBackTestWriterThread(){
+void test::DequeTest::pushBackThread(){
   LOG4CXX_TRACE(mLogger, "start pushBackTestWriterThread()");
   // Create an array which holds a splitted citation
   std::vector<std::string> array = splitString("My hands are of your colour; but I shame/To wear a heart so white");

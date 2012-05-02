@@ -48,13 +48,11 @@ namespace de {
                 ///
                 void popBackThread(void);
                 ///
-                void pushFrontTestWriterThread(void);
+                void pushFrontThread(void);
                 ///
-                void pushBackTestWriterThread(void);
+                void pushBackThread(void);
                 /// 
                 std::vector<std::string> splitString(std::string);
-
-
 
               public:
                 /// The set up method of the unit test
