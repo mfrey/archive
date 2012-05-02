@@ -16,7 +16,7 @@ void test::ConfigurationTest::tearDown(void){
 
 void test::ConfigurationTest::testReadConfigurationFile(void){
   // A configuration file for testing the readConfigurationFile() method of the Configuration class 
-  //std::string configurationFile("test_configurationfile.conf");
+  //std::string configurationFile("test_configurationfile.conf"){}
   std::string configurationFile("settings/test/test_1.conf");
 
   LOG4CXX_TRACE(mLogger, "attempt to set location of configuration file to " << configurationFile);
@@ -25,3 +25,15 @@ void test::ConfigurationTest::testReadConfigurationFile(void){
   LOG4CXX_TRACE(mLogger, "attempt to read configuration file");
   c->readConfigurationFile();
 }
+
+void test::ConfigurationTest::testGetLoggingFile(){}
+void test::ConfigurationTest::testGetConfigurationFile(){}
+void test::ConfigurationTest::testGetTelnetActorHost(){}
+void test::ConfigurationTest::testGetTelnetActorPort(){}
+void test::ConfigurationTest::testGetFilesToWatch(){}
+void test::ConfigurationTest::testGetDirectoriesToWatch(){}
+void test::ConfigurationTest::parseOptions(){}
+void test::ConfigurationTest::testSetConfigurationFile(){}
+void test::ConfigurationTest::enableLogging(){}
+void test::ConfigurationTest::testGetWatchDescriptorEntries(){}
+void test::ConfigurationTest::testGetEntries(){}

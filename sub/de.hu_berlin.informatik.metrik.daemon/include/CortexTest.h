@@ -1,5 +1,5 @@
-#ifndef _STUB_TEST_H_
-#define _STUB_TEST_H_ 
+#ifndef _CORTEX_TEST_H_
+#define _CORTEX_TEST_H_ 
 
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
@@ -16,9 +16,9 @@ namespace de {
       namespace metrik {
 	namespace daemon {
           namespace test {
-            class StubTest : public CppUnit::TestFixture {
+            class CortexTest : public CppUnit::TestFixture {
               private:
-                CPPUNIT_TEST_SUITE(StubTest);
+                CPPUNIT_TEST_SUITE(CortexTest);
                 // CPPUNIT_TEST(testAddRemove);
                 CPPUNIT_TEST_SUITE_END();
 

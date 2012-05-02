@@ -38,6 +38,28 @@ namespace de {
                 void tearDown(void);
                 ///
                 void testReadConfigurationFile();
+                ///
+                void testGetLoggingFile();
+                ///
+                void testGetConfigurationFile();
+                ///
+                void testGetTelnetActorHost();
+                ///
+                void testGetTelnetActorPort();
+                ///
+                void testGetFilesToWatch();
+                ///
+                void testGetDirectoriesToWatch();
+                ///
+                void parseOptions();
+                ///
+                void testSetConfigurationFile(void);
+                ///
+                void enableLogging(void);
+                ///
+                void testGetWatchDescriptorEntries();
+                ///
+                void testGetEntries();
             };
           }
         }
