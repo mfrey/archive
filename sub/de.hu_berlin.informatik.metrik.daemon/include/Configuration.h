@@ -49,10 +49,15 @@ namespace de {
               std::string getLoggingFile();
               /// The method returns the location of the configuration file
               std::string getConfigurationFile();
+              /// The method returns the hostname of the telnet actor set in the configuration file
+              std::string getTelnetActorHost();
+              /// The method returns the port of the telnet actor set in the configuration file
+              std::string getTelnetActorPort();
               /// The method returns a list of file which should be watched 
               std::vector<std::string> getFilesToWatch();
               /// The method returns a list of directories which should be watched 
               std::vector<std::string> getDirectoriesToWatch();
+              /// ?
               void parseOptions(int, char **);
               /// The method reads a configuration file
               void readConfigurationFile();

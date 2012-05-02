@@ -16,7 +16,7 @@ namespace de {
               std::deque<Data> mData;
               /// A mutex for controlling several operations on the deque
               mutable boost::mutex mMutex;
-              /// A condition variable which allows to notify a thread if the status of the deque has changes
+              /// A condition variable which allows to notify a thread if the status of the deque has changed
               boost::condition_variable mStatus;
 
             public:

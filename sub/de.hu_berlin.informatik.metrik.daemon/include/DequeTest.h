@@ -13,6 +13,8 @@
 
 #include "Deque.h"
 
+#include "log4cxx/logger.h"
+
 using namespace std;
 using namespace de::hu_berlin::informatik::metrik::daemon;
 
@@ -24,11 +26,14 @@ namespace de {
           namespace test {
             class DequeTest : public CppUnit::TestFixture {
               private:
+                /// A instance of the logger
+                static log4cxx::LoggerPtr mLogger;
+
                 CPPUNIT_TEST_SUITE(DequeTest);
-//                CPPUNIT_TEST(pushFrontTest);
-//		CPPUNIT_TEST(pushFrontReaderWriterTest);
-//                CPPUNIT_TEST(pushBackTest);
-//                CPPUNIT_TEST(pushBackReaderWriterTest);
+                CPPUNIT_TEST(pushFrontTest);
+		CPPUNIT_TEST(pushFrontReaderWriterTest);
+                CPPUNIT_TEST(pushBackTest);
+                CPPUNIT_TEST(pushBackReaderWriterTest);
                 CPPUNIT_TEST_SUITE_END();
 
                 /// A instance of the deque class 
@@ -39,15 +44,17 @@ namespace de {
                 boost::thread mWriter;
                 
                 ///
-                void pushFrontTestReaderThread(void);
+                void popFrontThread(void);
                 ///
-                void pushBackTestReaderThread(void);
+                void popBackThread(void);
                 ///
                 void pushFrontTestWriterThread(void);
                 ///
                 void pushBackTestWriterThread(void);
                 /// 
                 std::vector<std::string> splitString(std::string);
+
+
 
               public:
                 /// The set up method of the unit test
@@ -62,7 +69,6 @@ namespace de {
                 void pushBackTest(void);
                 ///
                 void pushBackReaderWriterTest(void);
-                
             };
           }
         }

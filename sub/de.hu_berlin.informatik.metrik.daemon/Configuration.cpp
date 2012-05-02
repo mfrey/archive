@@ -140,6 +140,14 @@ std::string Configuration::getConfigurationFile(){
   return getOption("configuration_file");
 }
 
+std::string Configuration::getTelnetActorHost(){
+  return getOption("telnet_actor_host");
+}
+
+std::string Configuration::getTelnetActorPort(){
+  return getOption("telnet_actor_port");
+}
+
 // TODO: Redundant code, see DequeTest.cpp
 std::vector<std::string> Configuration::splitString(std::string pList){
   std::vector<std::string> result;

@@ -20,7 +20,7 @@ int main(int argc, char **argv){
 
   try {
     // Read log4cxx property file for unit tests
-    PropertyConfigurator::configure("logging_cppunit.properties");
+    PropertyConfigurator::configure("settings/logging/logging_cppunit.properties");
     LOG4CXX_TRACE(logger, "starting unit test");
     //
     CppUnit::Test *suite = CppUnit::TestFactoryRegistry::getRegistry().makeTest();

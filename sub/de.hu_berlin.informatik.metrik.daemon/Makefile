@@ -21,7 +21,7 @@ Daemon.o: Daemon.cpp
 	$(CC) $(LOGGING) -c Daemon.cpp 
 
 DequeTest.o: DequeTest.cpp
-	$(CC) -c DequeTest.cpp $(BOOST_THREAD)
+	$(CC) -c DequeTest.cpp
 
 Shell.o: Shell.cpp
 	$(CC) -c Shell.cpp
@@ -69,7 +69,7 @@ main: main.cpp $(OBJECTS)
 	$(CC) -c $<
 
 clean:
-	rm -f *.o
+	rm -f *.o *.log
 	rm -f $(EXE)
 	rm -f $(TEST_EXE)
 
