@@ -35,6 +35,7 @@ void test::TelnetActorTest::telnetActorThread(void){
 
 void test::TelnetActorTest::writeDataThread(void){
   // Run the thread in class telnet actor
+  /*
   LOG4CXX_TRACE(mLogger, "send w");
   t->send("w");
   LOG4CXX_TRACE(mLogger, "send q");
@@ -43,5 +44,13 @@ void test::TelnetActorTest::writeDataThread(void){
   t->send("q");
   LOG4CXX_TRACE(mLogger, "send #stop");
   t->send("#stop");
+  */
 }
 
+void test::TelnetActorTest::testRecv(){
+
+}
+
+void test::TelnetActorTest::testSend(){
+
+}

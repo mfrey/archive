@@ -52,9 +52,17 @@ void test::ConfigurationTest::testGetTelnetActorPort(){
   CPPUNIT_ASSERT(port.compare("23") == 0);
 }
 
-void test::ConfigurationTest::testGetFilesToWatch(){}
+void test::ConfigurationTest::testGetFilesToWatch(){
+  std::vector<std::string> files = d->getFilesToWatch();
+  LOG4CXX_TRACE(mLogger, "list with files to watch seems to be of size  " << files.size());
+  CPPUNIT_ASSERT(files.size() == 4);
+}
 
-void test::ConfigurationTest::testGetDirectoriesToWatch(){}
+void test::ConfigurationTest::testGetDirectoriesToWatch(){
+  std::vector<std::string> directories = d->getDirectoriesToWatch();
+  LOG4CXX_TRACE(mLogger, "list with directories to watch seems to be of size  " << directories.size());
+  CPPUNIT_ASSERT(directories.size() == 3);
+}
 
 void test::ConfigurationTest::parseOptions(){}
 

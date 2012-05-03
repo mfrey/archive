@@ -28,6 +28,8 @@ namespace de {
                 CPPUNIT_TEST(testGetConfigurationFile);
                 CPPUNIT_TEST(testGetTelnetActorHost);
                 CPPUNIT_TEST(testGetTelnetActorPort);
+                CPPUNIT_TEST(testGetFilesToWatch);
+                CPPUNIT_TEST(testGetDirectoriesToWatch);
                 CPPUNIT_TEST_SUITE_END();
 
                 /// A logging instance

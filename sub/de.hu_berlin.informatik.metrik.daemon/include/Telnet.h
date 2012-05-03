@@ -20,7 +20,7 @@ namespace de {
           class Telnet {
             private: 
               /// Size of the buffer
-              static const int mBufferSize = 2048;
+              static const int mBufferSize = 128;
               /// A 'handler' for asynchronous IO
               boost::asio::io_service& mIOService;
               /// An instance of the log4cxx logger
@@ -50,6 +50,53 @@ namespace de {
               void writeComplete(const boost::system::error_code&);
               /// The method fills the write buffer and initializes the transmission
               void writeToSocket(string);
+
+              /**
+               * The enumeration holds different telnet commands as specifid in RFC 854. For
+               * further details of the command please be referred to:
+               *
+               *   https://www.ietf.org/rfc/rfc854.txt
+               **/
+              enum TelnetCommands {
+                 /// 'Abort Output' command
+                 AO    = 245,
+                 /// 'Are You There' command
+                 AYT   = 246,
+                 /// 'Break' command
+                 BREAK = 243,
+                 /// 'Data Mark' command
+                 DM    = 242,
+                 /** 
+                  * Command indicates the request that the other party perform, or confirmation that you're 
+                  * expecting the other party to perform, the indicated option
+                  */
+                 DO    = 253,
+                 /** 
+                  * Command indicates the demand that the other party perform, or confirmation that you're 
+                  * expecting the other party to perform, the indicated option
+                  */
+                 DONT  = 254,
+                 /// 'Erase Character' command
+                 EC    = 247,
+                 /// 'Erase Line' command
+                 EL    = 248,
+                 /// 'Go Ahead' command 
+                 GA    = 249,
+                 /// Data Byte 255
+                 IAC   = 255,
+                 /// 'Interrupt Process' command
+                 IP    = 244,
+                 /// 'No Operation' command
+                 NOP   = 241,
+                 /// Command indiciates that what follows is subnegotioation of the indicated options
+                 SB    = 250,
+                 /// Command indicates the end of subnegotiation
+                 SE    = 240,
+                 /// Command indicates the desire to begin performing, or confirmation that you are now perfoming an indicated option
+                 WILL  = 251,
+                 /// Command indicates the refusal to begin performing, or confirmation that you are now perfoming an indicated option
+                 WONT  = 252
+              };
 
             public:
               /// The constructor of the telnet class
