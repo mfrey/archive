@@ -109,6 +109,15 @@ namespace de {
               void write(string);
               /// The method closes the telnet connection
               void close();
+
+              /// 
+              void processTelnetCommand(void);
+              void processTelnetData(void);
+              void processTelnetSubnegotiation(void);
+              void processTelnetOption(void);
+
+              void writeData(std::string);
+              void writeCommand(std::string, int);
           };
         }
       }

@@ -166,3 +166,56 @@ void Telnet::writeComplete(const boost::system::error_code& pError){
     this->closeSocket();
   }
 }
+
+void Telnet::processTelnetCommand(){
+  int command = 0;
+  switch(command){
+    // Received data
+    case IAC: 
+      this->processTelnetData();
+    case DO: 
+      //
+    case DONT: 
+      //
+    case SB: 
+      this->processTelnetSubnegotiation();
+    case WILL: 
+      this->processTelnetOption();
+    case WONT: 
+      //
+    default:
+      return;
+  }
+}
+
+void Telnet::processTelnetData(){
+
+}
+
+void Telnet::processTelnetSubnegotiation(){
+
+}
+
+void Telnet::processTelnetOption(){
+
+}
+
+/** 
+ * The method puts a byte before plain data, in order to 
+ * indicate a telnet server that the upcoming data is 
+ * plain data. In particular, the first byte is set to the
+ * value of the IAC command. 
+ */
+void Telnet::writeData(std::string pData){
+  // Write data
+  writeCommand(pData, IAC);
+}
+
+void Telnet::writeCommand(std::string pData, int pCommand){
+  std::stringstream stream;
+  stream << pCommand;
+  // Insert a IAC byte at the beginning of the string
+  pData.insert(0, stream.str()); 
+  // Write data
+  write(pData);
+}
