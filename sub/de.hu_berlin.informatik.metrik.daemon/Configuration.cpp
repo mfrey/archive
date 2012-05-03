@@ -68,7 +68,7 @@ std::vector<std::string> Configuration::getEntries(){
 void Configuration::enableLogging(){
   try {
     // Read log4cxx property file
-    PropertyConfigurator::configure("logging.properties");
+    PropertyConfigurator::configure(this->getLoggingFile());
     // Print a first dummy line
     LOG4CXX_TRACE(mLogger, "starting application");
   }catch(Exception&){
@@ -121,6 +121,11 @@ void Configuration::parseConfigurationFileLine(std::vector<std::string> pLine){
   if(pLine.size() > 1){
     // No additional operation on the arguments of the option are required
     if(pLine.size() == 2){
+      // Trim the key string
+      boost::algorithm::trim(pLine[0]);
+      // Trim the value string
+      boost::algorithm::trim(pLine[1]);
+      // Add key/value to the list
       this->mConfiguration.insert(std::pair<std::string, std::string>(pLine[0], pLine[1]));
     }
   }

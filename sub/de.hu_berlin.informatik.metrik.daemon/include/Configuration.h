@@ -11,6 +11,7 @@
 
 #include <unistd.h>
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "log4cxx/logger.h"
 #include "log4cxx/basicconfigurator.h"

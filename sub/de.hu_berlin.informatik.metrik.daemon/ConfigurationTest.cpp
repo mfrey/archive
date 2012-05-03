@@ -8,10 +8,12 @@ LoggerPtr test::ConfigurationTest::mLogger(Logger::getLogger("de.hu_berlin.infor
 
 void test::ConfigurationTest::setUp(void){
   c = new Configuration();
+  d = new Configuration(std::string("settings/test/test_1.conf"));
 }
 
 void test::ConfigurationTest::tearDown(void){
-  delete c;
+  delete c; 
+  delete d;
 }
 
 void test::ConfigurationTest::testReadConfigurationFile(void){
@@ -26,14 +28,40 @@ void test::ConfigurationTest::testReadConfigurationFile(void){
   c->readConfigurationFile();
 }
 
-void test::ConfigurationTest::testGetLoggingFile(){}
-void test::ConfigurationTest::testGetConfigurationFile(){}
-void test::ConfigurationTest::testGetTelnetActorHost(){}
-void test::ConfigurationTest::testGetTelnetActorPort(){}
+void test::ConfigurationTest::testGetLoggingFile(){
+  std::string loggingFile = d->getLoggingFile();
+  LOG4CXX_TRACE(mLogger, "logging file seems to be " << loggingFile);
+  CPPUNIT_ASSERT(loggingFile.compare("settings/logging/logging_cppunit.properties") == 0);
+}
+
+void test::ConfigurationTest::testGetConfigurationFile(){
+  std::string configurationFile = d->getConfigurationFile();
+  LOG4CXX_TRACE(mLogger, "configuration file seems to be " << configurationFile);
+  CPPUNIT_ASSERT(configurationFile.compare("settings/test/test_1.conf") == 0);
+}
+
+void test::ConfigurationTest::testGetTelnetActorHost(){
+  std::string host = d->getTelnetActorHost();
+  LOG4CXX_TRACE(mLogger, "telnet host seems to be " << host);
+  CPPUNIT_ASSERT(host.compare("localhost") == 0);
+}
+
+void test::ConfigurationTest::testGetTelnetActorPort(){
+  std::string port = d->getTelnetActorPort();
+  LOG4CXX_TRACE(mLogger, "telnet port seems to be " << port);
+  CPPUNIT_ASSERT(port.compare("23") == 0);
+}
+
 void test::ConfigurationTest::testGetFilesToWatch(){}
+
 void test::ConfigurationTest::testGetDirectoriesToWatch(){}
+
 void test::ConfigurationTest::parseOptions(){}
+
 void test::ConfigurationTest::testSetConfigurationFile(){}
+
 void test::ConfigurationTest::enableLogging(){}
+
 void test::ConfigurationTest::testGetWatchDescriptorEntries(){}
+
 void test::ConfigurationTest::testGetEntries(){}

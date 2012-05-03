@@ -24,12 +24,16 @@ namespace de {
               private:
                 CPPUNIT_TEST_SUITE(ConfigurationTest);
                 CPPUNIT_TEST(testReadConfigurationFile);
+                CPPUNIT_TEST(testGetLoggingFile);
+                CPPUNIT_TEST(testGetConfigurationFile);
+                CPPUNIT_TEST(testGetTelnetActorHost);
+                CPPUNIT_TEST(testGetTelnetActorPort);
                 CPPUNIT_TEST_SUITE_END();
 
                 /// A logging instance
                 static log4cxx::LoggerPtr mLogger;
                 // Instances of the class which will be tested
-                Configuration *c;
+                Configuration *c, *d;
 
               public:
                 /// The set up method of the unit test
