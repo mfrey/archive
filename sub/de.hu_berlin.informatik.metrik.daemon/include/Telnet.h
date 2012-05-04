@@ -53,6 +53,7 @@ namespace de {
               void writeToSocket(string);
 
               void __hexdump(const char*, string);
+              string __hex_dump(const char*, string);
 
               /**
                * The enumeration holds different telnet commands as specifid in RFC 854. For
