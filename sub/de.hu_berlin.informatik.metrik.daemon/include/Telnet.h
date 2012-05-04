@@ -2,6 +2,7 @@
 #define _TELNET_H__
 
 #include "Actor.h"
+#include <stdio.h>
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -19,6 +20,8 @@ namespace de {
         namespace daemon {
           class Telnet {
             private: 
+              /// An internal data structure for holding received data in order to build up blocks
+              deque<string> mReadBuffer; 
               /// Size of the buffer
               static const int mBufferSize = 128;
               /// A 'handler' for asynchronous IO
@@ -29,12 +32,10 @@ namespace de {
               tcp::socket mSocket; 
               /// A buffer for writing data
 	      char mBuffer[mBufferSize]; 
-              // A deque for reading data
-
               // A deque for writing data
               deque<string> mWriteBuffer; 
 
-              /// The method begins to opens a telnet connection
+              /// The method begins to open a telnet connection
               void connect(tcp::resolver::iterator);
               /// The method finishes to open a telnet connection, indepdent of success/failure
               void connectComplete(const boost::system::error_code& pError, tcp::resolver::iterator pEndpointIterator);
@@ -50,6 +51,8 @@ namespace de {
               void writeComplete(const boost::system::error_code&);
               /// The method fills the write buffer and initializes the transmission
               void writeToSocket(string);
+
+              void __hexdump(const char*, string);
 
               /**
                * The enumeration holds different telnet commands as specifid in RFC 854. For
@@ -92,10 +95,67 @@ namespace de {
                  SB    = 250,
                  /// Command indicates the end of subnegotiation
                  SE    = 240,
-                 /// Command indicates the desire to begin performing, or confirmation that you are now perfoming an indicated option
+                 /**
+                  * Command indicates the desire to begin performing, or confirmation that you are now 
+                  * perfoming an indicated option
+                  */
                  WILL  = 251,
-                 /// Command indicates the refusal to begin performing, or confirmation that you are now perfoming an indicated option
+                 /**
+                  * Command indicates the refusal to begin performing, or confirmation that you are now 
+                  * perfoming an indicated option
+                  */
                  WONT  = 252
+              };
+
+              /**
+               * The enumeration holds different telnet options as specifid in multiple RFCs. The
+               * corresponding is set as comment above the option.
+               **/
+              enum TelnetOptions {
+                 /// Binary Transmission, RFC 856
+                 BT    = 0,
+                 /// Echo, RFC 857
+                 ECH   = 1,
+                 /// Reconnection, NIC 50005
+                 R     = 2, 
+                 /// Suppress Go Ahead, RFC 858
+                 SGA   = 3, 
+                 /// Approx Message Size Negotiation, ETHERNET
+                 AMSN  = 4, 
+                 /// Status, RFC 859
+                 STAT  = 5, 
+                 /// Timing Mark, RFC 860
+                 TM    = 6, 
+                 /// Remote Controlled Trans and Echo, RFC 726
+                 RCTE  = 7, 
+                 /// Output Line Width, NIC 50005
+                 OLW   = 8, 
+                 /// Output Page Size, NIC 50005
+                 OPS   = 9, 
+                 /// Output Carriage-Return Disposition, RFC 652
+                 OCRD  = 10, 
+                 /// Output Horizontal Tab Stops, RFC 653
+                 OHTS  = 11, 
+                 /// Output Horizontal Tab Disposition, RFC 654
+                 OHTD  = 12, 
+                 /// Output Formfeed Disposition, RFC 655
+                 OFD   = 13, 
+                 /// Output Vertical Tabstops, RFC 656
+                 OVT   = 14, 
+                 /// Output Vertical Tab Disposition, RFC 657
+                 OVTD  = 15, 
+                 /// Output Linefeed Disposition, RFC 658
+                 OLD   = 16,
+                 /// Extended ASCII, RFC 698
+                 EA    = 17,
+                 /// Logout, RFC 727
+                 LOGO  = 18,
+                 /// Data Entry Terminal, RFC 1043 and RFC 732
+                 DET   = 20,
+                 /// Send Location, RFC 749
+                 SL    = 23,
+                 /// Output Marking, RFC 933 
+                 OM    = 27
               };
 
             public:

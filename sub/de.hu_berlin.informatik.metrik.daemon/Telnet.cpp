@@ -109,6 +109,19 @@ void Telnet::readStart(void){
     boost::asio::placeholders::bytes_transferred));
 }
 
+void Telnet::__hexdump(const char *title, string s){
+ size_t n=0;
+
+    fprintf(stdout,"%s",title);
+
+        for(; n < s.size(); ++n)
+        {
+            if((n%16) == 0)
+                fprintf(stdout,"\n    ");
+            fprintf(stdout,"%02x:",(unsigned char) s.at(n));
+        }
+        fprintf(stdout,"\n");
+} 	  
 
 /**
  * The method is called if reading asynchronously data from an established telnet 
@@ -122,7 +135,8 @@ void Telnet::readComplete(const boost::system::error_code& pError, size_t pTrans
   if(!pError){
     stringstream data;
     data << this->mBuffer;
-    LOG4CXX_TRACE(mLogger, "read " << data.str() << " from socket");
+    __hexdump("read ", data.str());
+    LOG4CXX_TRACE(mLogger, "read " << hex << data.str() << " from socket, transferred bytes " << pTransferredBytes);
     // TODO: write read out, e.g. cout
     readStart();
   }else{
