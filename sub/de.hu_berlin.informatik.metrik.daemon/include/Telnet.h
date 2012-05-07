@@ -117,58 +117,64 @@ namespace de {
                **/
               enum TelnetOptions {
                  /// Binary Transmission, RFC 856
-                 BT    = 0,
+                 BT     = 0,
                  /// Echo, RFC 857
-                 ECH   = 1,
+                 ECH    = 1,
                  /// Reconnection, NIC 50005
-                 R     = 2, 
+                 R      = 2, 
                  /// Suppress Go Ahead, RFC 858
-                 SGA   = 3, 
+                 SGA    = 3, 
                  /// Approx Message Size Negotiation, ETHERNET
-                 AMSN  = 4, 
+                 AMSN   = 4, 
                  /// Status, RFC 859
-                 STAT  = 5, 
+                 STAT   = 5, 
                  /// Timing Mark, RFC 860
-                 TM    = 6, 
+                 TM     = 6, 
                  /// Remote Controlled Trans and Echo, RFC 726
-                 RCTE  = 7, 
+                 RCTE   = 7, 
                  /// Output Line Width, NIC 50005
-                 OLW   = 8, 
+                 OLW    = 8, 
                  /// Output Page Size, NIC 50005
-                 OPS   = 9, 
+                 OPS    = 9, 
                  /// Output Carriage-Return Disposition, RFC 652
-                 OCRD  = 10, 
+                 OCRD   = 10, 
                  /// Output Horizontal Tab Stops, RFC 653
-                 OHTS  = 11, 
+                 OHTS   = 11, 
                  /// Output Horizontal Tab Disposition, RFC 654
-                 OHTD  = 12, 
+                 NAOHTD = 12, 
                  /// Output Formfeed Disposition, RFC 655
-                 OFD   = 13, 
+                 OFD    = 13, 
                  /// Output Vertical Tabstops, RFC 656
-                 OVT   = 14, 
+                 OVT    = 14, 
                  /// Output Vertical Tab Disposition, RFC 657
-                 OVTD  = 15, 
+                 OVTD   = 15, 
                  /// Output Linefeed Disposition, RFC 658
-                 OLD   = 16,
+                 OLD    = 16,
                  /// Extended ASCII, RFC 698
-                 EA    = 17,
+                 EA     = 17,
                  /// Logout, RFC 727
-                 LOGO  = 18,
+                 LOGO   = 18,
                  /// Data Entry Terminal, RFC 1043 and RFC 732
-                 DET   = 20,
+                 DET    = 20,
                  /// Send Location, RFC 749
-                 SL    = 23,
+                 SL     = 23,
                  /// Terminal Type
-                 TT    = 24,
+                 TTYPE  = 24,
                  /// Output Marking, RFC 933 
-                 OM    = 27,
+                 OM     = 27,
                  /// Negotiate Window Size
-                 NWS   = 31
+                 NAWS   = 31,
+                 ///
+                 TSPEED = 32
+
               };
 
-              bool **mSupportedLocalOperations;
-
-              bool **mSupportedRemoteOperations;
+              /// An array of bools which holds the supported local operations
+              bool *mSupportedLocalOptions;
+              /// An array of bools which holds the supported remote operations
+              bool *mSupportedRemoteOptions;
+              /// The 'type' of the terminal
+              std::string mTerminalType;
 
             public:
               /// The constructor of the telnet class
@@ -197,6 +203,15 @@ namespace de {
               void sendOption(int, int, bool);
               bool isSupportedRemoteOption(int);
               bool isSupportedLocalOption(int);
+
+              void handleSubnegotiation(int);
+
+              // The method sends the terminal type
+              void sendTerminalType(void);
+              // The method sends the terminal speed
+              void sendTerminalSpeed(void);
+              // The method sends the the horizontal tab disposition
+              void sendHorizontalTabDisposition(void);
           };
         }
       }

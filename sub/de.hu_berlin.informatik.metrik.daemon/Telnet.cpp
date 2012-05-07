@@ -10,6 +10,14 @@ LoggerPtr Telnet::mLogger(Logger::getLogger("de.hu_berlin.informatik.metrik.daem
  */
 Telnet::Telnet(boost::asio::io_service& pIOService, tcp::resolver::iterator pEndpointIterator) 
   : mIOService(pIOService), mSocket(pIOService) { 
+  /// Set 
+  this->mTerminalType = string("DUMB");
+
+  /// Initialize local options array
+  this->mSupportedLocalOptions = new bool[64];
+  /// Initialize remote options array
+  this->mSupportedRemoteOptions = new bool[64];
+  /// Connect
   connect(pEndpointIterator);
 }
 
@@ -22,6 +30,10 @@ Telnet::~Telnet(){
     // Close the socket
     this->closeSocket(); 
   }
+  // Free the local option array
+  delete[] this->mSupportedLocalOptions;
+  // Free the remote option array
+  delete[] this->mSupportedRemoteOptions;
 }
 
 /**
@@ -243,12 +255,12 @@ void Telnet::handleOption(int pCommand, int pOption){
     }else{
       this->sendOption(WILL, pOption, false);
 
-      if(pOption == NWS){
+      if(pOption == NAWS){
     //    this->sendNWS();
-      }else if(pOption == TT){
-
-      }else if(pOption == OHTD){
-  //      this->sendNAOTHD();
+      }else if(pOption == TTYPE){
+        this->sendTerminalType();
+      }else if(pOption == NAOHTD){
+        this->sendHorizontalTabDisposition();
       }else{
 
       }
@@ -302,4 +314,104 @@ bool Telnet::isSupportedLocalOption(int pOption){
 
 bool Telnet::isSupportedRemoteOption(int pOption){
   return false;
+}
+
+void Telnet::handleSubnegotiation(int pOption){
+  /// Is option of type 'terminal type'
+  if(pOption == TTYPE){
+    sendTerminalType();
+  /// Is option of type ' '
+  }else if(pOption == TSPEED){
+
+  /// Operation not supported
+  }else{
+    
+  }
+}
+
+/** 
+ * The method prepares a message for setting the terminal type. 
+ */
+void Telnet::sendTerminalType(){
+  // A variable in order to fill the message string
+  int i = 0;
+  // The size calculates as follows: length of terminal type + six control bytes (IAC, SB, TTYPE, IAC, IAC, SE) 
+  int size = this->mTerminalType.size() + 6; 
+  // The buffer which will be filled and sent
+  unsigned char *message = new unsigned char[size];
+
+  /// Indicate data will be sent
+  message[i++] = IAC;
+  /// Write begin of subnegotiation
+  message[i++] = SB;
+  /// Subnegotiation concerns setting the terminal type
+  message[i++] = TTYPE;
+  message[i++] = IAC;
+  // Set the terminal type
+  for(unsigned int j = 0; j < this->mTerminalType.size(); j++){
+    message[i++] = (unsigned char)this->mTerminalType.at(j);
+  }
+
+  message[i++] = IAC;
+  /// Write end of subnegotiation
+  message[i++] = SE;
+
+  /// Write data
+//  this->mWriteBuffer(string(message));
+  /// Free buffer
+  delete[] message;
+}
+
+void Telnet::sendTerminalSpeed(){
+  // A variable in order to fill the message string
+  int i = 0;
+  // Construct a message
+  unsigned char *message = new unsigned char[20]; 
+
+  message[i++] = IAC;
+  message[i++] = SB;
+  message[i++] = TSPEED;
+
+  /// Set the baud rate to 52000
+  message[i++] = 0;
+  message[i++] = (unsigned char) '5';
+  message[i++] = (unsigned char) '2';
+  message[i++] = (unsigned char) '0';
+  message[i++] = (unsigned char) '0';
+  message[i++] = (unsigned char) '0';
+  message[i++] = (unsigned char) ',';
+  message[i++] = (unsigned char) '5';
+  message[i++] = (unsigned char) '2';
+  message[i++] = (unsigned char) '0';
+  message[i++] = (unsigned char) '0';
+  message[i++] = (unsigned char) '0';
+
+  message[i++] = IAC;
+  message[i++] = SE;
+
+  /// Write data
+//  this->mWriteBuffer(string(message));
+  // Free buffer
+  delete[] message;
+}
+
+void Telnet::sendHorizontalTabDisposition(){
+  // A variable in order to fill the message string
+  int i = 0;
+  // Construct a message
+  unsigned char *message = new unsigned char[20]; 
+
+  message[i++] = IAC;
+  message[i++] = SB;
+  message[i++] = NAOHTD;
+  message[i++] = 0;
+  message[i++] = 0;
+
+  message[i++] = IAC;
+  message[i++] = SE;
+
+  /// Write data
+//  this->mWriteBuffer(string(message));
+  // Free buffer
+  delete[] message;
 }
