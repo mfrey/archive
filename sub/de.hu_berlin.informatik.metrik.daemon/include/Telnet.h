@@ -18,6 +18,9 @@ namespace de {
     namespace informatik {
       namespace metrik {
         namespace daemon {
+          /**
+           * The class
+           */
           class Telnet {
             private: 
               /// An internal data structure for holding received data in order to build up blocks
@@ -31,7 +34,7 @@ namespace de {
               /// The socket the telnet the instance is connected to
               tcp::socket mSocket; 
               /// A buffer for writing data
-	      char mBuffer[mBufferSize]; 
+	      unsigned char mBuffer[mBufferSize]; 
               // A deque for writing data
               deque<string> mWriteBuffer; 
 
@@ -179,6 +182,8 @@ namespace de {
 
               void writeData(std::string);
               void writeCommand(std::string, int);
+
+              void handle(size_t);
           };
         }
       }

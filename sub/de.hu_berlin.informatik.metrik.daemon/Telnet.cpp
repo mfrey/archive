@@ -122,11 +122,12 @@ void Telnet::__hexdump(const char *title, string s){
         }
         fprintf(stdout,"\n");
 } 	  
+
 string Telnet::__hex_dump(const char *title, string s){
   stringstream result;
 
   for(size_t i = 0; i < s.size(); i++){
-    result << internal << setw(4) << setfill('0') << hex << (int) s.at(i); 
+    result << internal << setw(2) << setfill('0') << hex << (int) s.at(i); 
   }
 
   return result.str();
@@ -147,6 +148,9 @@ void Telnet::readComplete(const boost::system::error_code& pError, size_t pTrans
     __hexdump("read ", data.str());
 
     LOG4CXX_TRACE(mLogger, "read " << hex << data.str() << " from socket " << __hex_dump(NULL, data.str()));
+    LOG4CXX_TRACE(mLogger, "bytes " << pTransferredBytes);
+    // Parse received data
+    this->handle(pTransferredBytes);
     // TODO: write read out, e.g. cout
     readStart();
   }else{
@@ -189,6 +193,41 @@ void Telnet::writeComplete(const boost::system::error_code& pError){
     LOG4CXX_FATAL(mLogger, "reason " << reason.what());
     this->closeSocket();
   }
+}
+
+/**
+ * The method tries to process a given input of data received via telnet. Telnet
+ * uses different commands and options as defined in the header of the class. 
+ * However, at present not all commands and options are supported.
+ * 
+ * @param pTransferredBytes The number of bytes which will be processed
+ */
+void Telnet::handle(size_t pTransferredBytes){
+  LOG4CXX_TRACE(mLogger, "try to process" << pTransferredBytes << " bytes of data");
+  /// Create a private buffer
+  unsigned char *buffer = new unsigned char[pTransferredBytes];
+  /// Save the content of the internal (receive) buffer in a local buffer 
+  memcpy(buffer, this->mBuffer, pTransferredBytes);
+
+  /// Iterate over the content of the buffer
+  for(unsigned int i = 0; i < pTransferredBytes; i++){
+     LOG4CXX_TRACE(mLogger, "read " << setw(2) << hex << (int)buffer[i]);
+     
+     /// Process commands (which is not really nice to do in this manner)
+     if(((int)buffer[i]) == IAC){
+       LOG4CXX_TRACE(mLogger, "received option IAC (data)");
+     }else if(((int)buffer[i]) == DO){
+       LOG4CXX_TRACE(mLogger, "received option DO (request/confirmation to perform)");
+
+     }else if(((int)buffer[i]) == DONT){
+       LOG4CXX_TRACE(mLogger, "received option DONT (demand/confirmation to perform)");
+     }else{
+       LOG4CXX_TRACE(mLogger, "at present unsupported operation");
+     }
+  }
+ 
+  // Delete the previosusly created buffer
+  delete[] buffer;
 }
 
 void Telnet::processTelnetCommand(){
