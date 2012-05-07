@@ -14,8 +14,7 @@ TelnetActor::TelnetActor(string pHostName, string pPort) : mHostName(pHostName),
 }
 
 TelnetActor::~TelnetActor(){
-  //TODO: Fixme
-  this->mIOService.stop();
+
 }
 
 /**
@@ -41,18 +40,11 @@ void TelnetActor::setup(){
 void TelnetActor::run(void){
   try{
     ///
-    tcp::resolver resolver(this->mIOService);
     ///
     LOG4CXX_TRACE(mLogger, "try to connect to host " << this->mHostName << " and port "  << this->mPort);
-    tcp::resolver::query query(this->mHostName, this->mPort);
     ///
-    this->mEndpointIterator = resolver.resolve(query);
     /// Try to establish the connection
-    Telnet telnet(this->mIOService, this->mEndpointIterator);
-    /// The IO service will run as seperate thread 
-    boost::thread thread(boost::bind(&boost::asio::io_service::run, &(this->mIOService)));
-
-    boost::asio::io_service::work work(this->mIOService);
+    Telnet telnet();
     /// The data/command which will be transmitted
     std::string command;
 
@@ -68,15 +60,15 @@ void TelnetActor::run(void){
       }else{
         LOG4CXX_TRACE(mLogger, "write data " << command << " to the socket");
         /// Write data to the established telnet connection
-        telnet.write(command);
+        //telnet.write(command);
       }
     }
     LOG4CXX_TRACE(mLogger, "waiting for data to write stopped");
     /// Close the telnet connection 
-    telnet.close();
+   // telnet.close();
     LOG4CXX_TRACE(mLogger, "closed connection");
     /// Join the thread
-    thread.join();    
+///    thread.join();    
     LOG4CXX_TRACE(mLogger, "joined thread");
   }catch(exception& e){
     string reason = "an exception occurred: " + string(e.what());

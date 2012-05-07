@@ -4,14 +4,14 @@
 #include "Actor.h"
 #include <stdio.h>
 
-#include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <boost/asio.hpp>
 #include <boost/thread.hpp>
 
 #include "log4cxx/logger.h"
 
+
 using namespace std;
-using boost::asio::ip::tcp;
 
 namespace de {
   namespace hu_berlin {
@@ -25,35 +25,10 @@ namespace de {
             private: 
               /// An internal data structure for holding received data in order to build up blocks
               deque<string> mReadBuffer; 
-              /// Size of the buffer
-              static const int mBufferSize = 128;
-              /// A 'handler' for asynchronous IO
-              boost::asio::io_service& mIOService;
               /// An instance of the log4cxx logger
               static log4cxx::LoggerPtr mLogger;
-              /// The socket the telnet the instance is connected to
-              tcp::socket mSocket; 
-              /// A buffer for writing data
-	      unsigned char mBuffer[mBufferSize]; 
               // A deque for writing data
               deque<string> mWriteBuffer; 
-
-              /// The method begins to open a telnet connection
-              void connect(tcp::resolver::iterator);
-              /// The method finishes to open a telnet connection, indepdent of success/failure
-              void connectComplete(const boost::system::error_code& pError, tcp::resolver::iterator pEndpointIterator);
-              /// The method begins to read data from an established telnet connection
-              void readStart(void);
-              /// The method finishes to read data from an established telnet connection, independent of success/failure
-	      void readComplete(const boost::system::error_code&, size_t);
-              /// The method closes a socket
-              void closeSocket(void);
-              /// The method begins to write data to an established telnet connection
-              void writeStart(); 
-              /// The method finishes to write data to an established telnet connection, independent of success/failure
-              void writeComplete(const boost::system::error_code&);
-              /// The method fills the write buffer and initializes the transmission
-              void writeToSocket(string);
 
               void __hexdump(const char*, string);
               string __hex_dump(const char*, string);
@@ -178,7 +153,7 @@ namespace de {
 
             public:
               /// The constructor of the telnet class
-              Telnet(boost::asio::io_service&, tcp::resolver::iterator);
+              Telnet();
               /// The destructor of the telnet class
               ~Telnet();
               /// The method initializes a telnet connection
@@ -187,12 +162,6 @@ namespace de {
               void write(string);
               /// The method closes the telnet connection
               void close();
-
-              /// 
-              void processTelnetCommand(void);
-              void processTelnetData(void);
-              void processTelnetSubnegotiation(void);
-              void processTelnetOption(void);
 
               void writeData(std::string);
               void writeCommand(std::string, int);

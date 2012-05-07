@@ -44,82 +44,8 @@ Telnet::~Telnet(){
  */
 void Telnet::write(string pMessage){
   /// Writing the message is delegated to the method writeToSocket
- this->mIOService.post(boost::bind(&Telnet::writeToSocket, this, pMessage));
 }
 
-/**
- * The method closes the socket of an established telnet
- * connection.
- */
-void Telnet::close(){
-  /// Closing the socket is delegated to the method closeSocket 
-  this->mIOService.post(boost::bind(&Telnet::closeSocket, this));
-}
-
-/**
- * The method closes an socket.
- */
-void Telnet::closeSocket(void){
-  // Try to close the open socket
-  this->mSocket.close();
-}
-
-void Telnet::writeToSocket(string pMessage){
-   //
-   bool progress = !this->mWriteBuffer.empty(); 
-   //
-   this->mWriteBuffer.push_back(pMessage); 
-   //
-   if(!progress){ 
-     LOG4CXX_TRACE(mLogger, "start to write data to socket"); 
-     writeStart();
-   }
-}
-
-/**
- * The method establishes a telnet connection. If the connection was established or failed
- * the connectComplete() method is called.
- *
- * @param pEndpointIterator
- */
-void Telnet::connect(tcp::resolver::iterator pEndpointIterator){
-  ///
-  tcp::endpoint endpoint = *pEndpointIterator;
-  ///
-  mSocket.async_connect(endpoint, boost::bind(&Telnet::connectComplete, this,
-    boost::asio::placeholders::error, ++pEndpointIterator));
-}
-
-/**
- * The method is called via the connect() method if a telnet connection could be established
- * or if establishing a connection failed.
- *
- * @param pError If an error has occured it is set accordingly. The parameter indicates the type of the error
- * @param pEndpointIterator
- */
-void Telnet::connectComplete(const boost::system::error_code& pError, tcp::resolver::iterator pEndpointIterator){
-  if(!pError){
-    LOG4CXX_TRACE(mLogger, "start to read data from socket"); 
-    readStart();
-  }else if(pEndpointIterator != tcp::resolver::iterator()){
-    LOG4CXX_FATAL(mLogger, "error " << pError.value() << " of type "  << pError.category().name() << " occured while reading data from socket");
-    boost::system::system_error reason(pError);
-    LOG4CXX_FATAL(mLogger, "reason " << reason.what());
-    this->closeSocket();
-    connect(pEndpointIterator);
-  }
-}
-
-/**
- * The method reads asynchronously data from an established telnet connection. If
- * the operation completes or fails, the method readComplete() is called.
- */
-void Telnet::readStart(void){
-  LOG4CXX_TRACE(mLogger, "will read data from socket");
-  this->mSocket.async_read_some(boost::asio::buffer(mBuffer, this->mBufferSize),
-    boost::bind(&Telnet::readComplete, this, boost::asio::placeholders::error,
-    boost::asio::placeholders::bytes_transferred));
-}
 
 void Telnet::__hexdump(const char *title, string s){
  size_t n=0;
