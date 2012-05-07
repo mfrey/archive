@@ -230,38 +230,47 @@ void Telnet::handle(size_t pTransferredBytes){
   delete[] buffer;
 }
 
-void Telnet::processTelnetCommand(){
-  int command = 0;
-  switch(command){
-    // Received data
-    case IAC: 
-      this->processTelnetData();
-    case DO: 
-      //
-    case DONT: 
-      //
-    case SB: 
-      this->processTelnetSubnegotiation();
-    case WILL: 
-      this->processTelnetOption();
-    case WONT: 
-      //
-    default:
-      return;
+void Telnet::handleCommand(){
+
+}
+
+void Telnet::handleOption(int pCommand, int pOption){
+  /// check if this is a 'DO' request 
+  if(pCommand == DO){
+    /// check if the option is supported
+    if(!(this->isSupportedLocalOption(pOption))){
+      this->sendOption(WONT, pOption, true);
+    }else{
+      this->sendOption(WILL, pOption, false);
+
+      if(pOption == NWS){
+    //    this->sendNWS();
+      }else if(pOption == TT){
+
+      }else if(pOption == OHTD){
+  //      this->sendNAOTHD();
+      }else{
+
+      }
+    }
+  }else if(pCommand == DONT){
+    this->sendOption(WONT, pOption, false);
+  /// check if this is a 'WILL' request
+  }else if(pCommand == WILL){
+    /// check if the option is supported
+    if(!(this->isSupportedRemoteOption(pOption))){
+      this->sendOption(WONT, pOption, true);
+    }else{
+      this->sendOption(DO, pOption, false);
+    }
+  /// check if this is a 'WONT' request and turn of the option
+  }else if(pCommand == WONT){
+    this->sendOption(DONT, pOption, false);
+  }else{
+ 
   }
 }
 
-void Telnet::processTelnetData(){
-
-}
-
-void Telnet::processTelnetSubnegotiation(){
-
-}
-
-void Telnet::processTelnetOption(){
-
-}
 
 /** 
  * The method puts a byte before plain data, in order to 
@@ -281,4 +290,16 @@ void Telnet::writeCommand(std::string pData, int pCommand){
   pData.insert(0, stream.str()); 
   // Write data
   write(pData);
+}
+
+void Telnet::sendOption(int pCommand, int pOption, bool flag){
+
+}
+
+bool Telnet::isSupportedLocalOption(int pOption){
+  return false;
+}
+
+bool Telnet::isSupportedRemoteOption(int pOption){
+  return false;
 }

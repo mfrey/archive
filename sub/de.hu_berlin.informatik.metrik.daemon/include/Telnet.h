@@ -158,9 +158,17 @@ namespace de {
                  DET   = 20,
                  /// Send Location, RFC 749
                  SL    = 23,
+                 /// Terminal Type
+                 TT    = 24,
                  /// Output Marking, RFC 933 
-                 OM    = 27
+                 OM    = 27,
+                 /// Negotiate Window Size
+                 NWS   = 31
               };
+
+              bool **mSupportedLocalOperations;
+
+              bool **mSupportedRemoteOperations;
 
             public:
               /// The constructor of the telnet class
@@ -184,6 +192,11 @@ namespace de {
               void writeCommand(std::string, int);
 
               void handle(size_t);
+              void handleCommand();
+              void handleOption(int, int);
+              void sendOption(int, int, bool);
+              bool isSupportedRemoteOption(int);
+              bool isSupportedLocalOption(int);
           };
         }
       }
