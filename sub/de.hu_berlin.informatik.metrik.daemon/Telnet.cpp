@@ -10,9 +10,8 @@ LoggerPtr Telnet::mLogger(Logger::getLogger("de.hu_berlin.informatik.metrik.daem
  */
 Telnet::Telnet(boost::asio::io_service& pIOService, tcp::resolver::iterator pEndpointIterator) 
   : mIOService(pIOService), mSocket(pIOService) { 
-  /// Set 
+  /// Set the type of the terminal
   this->mTerminalType = string("DUMB");
-
   /// Initialize local options array
   this->mSupportedLocalOptions = new bool[64];
   /// Initialize remote options array
@@ -72,6 +71,17 @@ string Telnet::__hex_dump(const char *title, string s){
 }
 
 /**
+* The method reads asynchronously data from an established telnet connection. If
+* the operation completes or fails, the method readComplete() is called.
+*/
+void Telnet::readStart(void){
+  LOG4CXX_TRACE(mLogger, "will read data from socket");
+  this->mSocket.async_read_some(boost::asio::buffer(mBuffer, this->mBufferSize),
+    boost::bind(&Telnet::readComplete, this, boost::asio::placeholders::error,
+    boost::asio::placeholders::bytes_transferred));
+}
+
+/**
  * The method is called if reading asynchronously data from an established telnet 
  * connection has completed or failed. The method is called via the readStart()
  * method.
@@ -97,6 +107,50 @@ void Telnet::readComplete(const boost::system::error_code& pError, size_t pTrans
     LOG4CXX_FATAL(mLogger, "reason " << reason.what());
     this->closeSocket();
   }
+}
+
+/**
+* The method establishes a telnet connection. If the connection was established or failed
+* the connectComplete() method is called.
+*
+* @param pEndpointIterator
+*/
+void Telnet::connect(tcp::resolver::iterator pEndpointIterator){
+  ///
+  tcp::endpoint endpoint = *pEndpointIterator;
+  ///
+  mSocket.async_connect(endpoint, boost::bind(&Telnet::connectComplete, this,
+    boost::asio::placeholders::error, ++pEndpointIterator));
+}
+
+/**
+* The method is called via the connect() method if a telnet connection could be established
+* or if establishing a connection failed.
+*
+* @param pError If an error has occured it is set accordingly. The parameter indicates the type of the error
+* @param pEndpointIterator
+*/
+void Telnet::connectComplete(const boost::system::error_code& pError, tcp::resolver::iterator pEndpointIterator){
+  if(!pError){
+    LOG4CXX_TRACE(mLogger, "start to read data from socket");
+    readStart();
+  }else if(pEndpointIterator != tcp::resolver::iterator()){
+    LOG4CXX_FATAL(mLogger, "error " << pError.value() << " of type " << pError.category().name() << " occured while reading data from socket");
+    boost::system::system_error reason(pError);
+    LOG4CXX_FATAL(mLogger, "reason " << reason.what());
+    this->closeSocket();
+    connect(pEndpointIterator);
+  }
+}
+
+
+
+/**
+* The method closes an socket.
+*/
+void Telnet::closeSocket(void){
+  // Try to close the open socket
+  this->mSocket.close();
 }
 
 /**
@@ -166,10 +220,6 @@ void Telnet::handle(size_t pTransferredBytes){
  
   // Delete the previosusly created buffer
   delete[] buffer;
-}
-
-void Telnet::handleCommand(){
-
 }
 
 void Telnet::handleOption(int pCommand, int pOption){
@@ -245,14 +295,49 @@ bool Telnet::isSupportedRemoteOption(int pOption){
 void Telnet::handleSubnegotiation(int pOption){
   /// Is option of type 'terminal type'
   if(pOption == TTYPE){
-    sendTerminalType();
+    LOG4CXX_TRACE(mLogger, "handle subnegotiation: send terminal type");
+    this->sendTerminalType();
   /// Is option of type ' '
   }else if(pOption == TSPEED){
-
+    LOG4CXX_TRACE(mLogger, "handle subnegotiation: send terminal speed");
+    this->sendTerminalSpeed();
   /// Operation not supported
   }else{
-    
+    LOG4CXX_TRACE(mLogger, "handle subnegotiation: send terminal speed");
   }
+}
+
+void Telnet::handleData(int pCommand){
+
+}
+
+void Telnet::handleCommand(int pCommand){
+  int option = -1;
+
+  switch(pCommand){
+    case DO: /** do nothing*/
+    case DONT: /** do nothing*/
+    case IAC:
+      handleData(pCommand);
+      break;
+    case SB:
+      /// Read option TODO: FIXME
+     // option = this->mRead.tryPopFront();
+      /// Handle command 'SB' 
+      this->handleSubnegotiation(option);
+      break;
+    case WILL:
+      /// Read option
+     // option = this->mRead.tryPopFront();
+      /// Handle command 'WILL' 
+      this->handleOption(pCommand, option);
+      break;
+    case WONT: /** do nothing*/
+    default:
+      return;
+  }
+
+  // Send data (if initialized for the first time)
 }
 
 /** 
