@@ -35,10 +35,6 @@ namespace de {
               std::string mHostName;
               /// The port of the host (which will be connected)
               std::string mPort;
-              /// The asynchronous IO service
-              boost::asio::io_service mIOService;
-              ///
-              tcp::resolver::iterator mEndpointIterator;
               /// The structure hold the settings for the terminal interface
               termios mSettings;
               /// The write buffer

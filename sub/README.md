@@ -12,6 +12,7 @@ Installation from git
 		* boost::thread
 		* cppunit
 		* log4cxx
+		* lib-curl
 
 3. Build application by executing the makefile in the project directory
 
