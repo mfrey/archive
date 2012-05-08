@@ -216,23 +216,32 @@ void Telnet::handle(size_t pTransferredBytes){
   unsigned char byte;
   /// Get the front element
   this->mInternalRead.front(byte);
-
-  // If the first byte is a IAC byte, the following bytes are commands (and options)
-  if(((int)byte) == IAC){
-    LOG4CXX_TRACE(mLogger, "prepare to handle commands/options");
-    // Remove the first element (IAC) and do nothing with it
-    this->mInternalRead.waitAndPopFront(byte);
-    // Get the element after the first element
-    this->mInternalRead.waitAndPopFront(byte);
-    // Pass the element to the handleCommand() method
-    this->handleCommand(((int)byte)); 
-  }else{
-    LOG4CXX_TRACE(mLogger, "prepare to handle data");
-    // Pass over the data to the appropiate method
-    handleData(pTransferredBytes);
-  }     
+  
+  for(int i = 0; i < this->mInternalRead.size(); i++){
+    // If the first byte is a IAC byte, the following bytes are commands (and options)
+    if(((int)byte) == IAC){
+      LOG4CXX_TRACE(mLogger, "prepare to handle commands/options");
+      // Remove the first element (IAC) and do nothing with it
+      this->mInternalRead.waitAndPopFront(byte);
+      // Get the element after the first element
+      this->mInternalRead.waitAndPopFront(byte);
+      // Pass the element to the handleCommand() method
+      this->handleCommand(((int)byte)); 
+    }else{
+      LOG4CXX_TRACE(mLogger, "prepare to handle data");
+      // Pass over the data to the appropiate method
+      handleData(pTransferredBytes);
+    }     
+  }
 }
 
+/**
+ * The method copies data from the internal read buffer to the
+ * external read buffer. The paramter determines the number of
+ * bytes which will be copied.
+ *
+ * @param pSize The number of bytes which will be copied from one buffer to another buffer
+ */
 void Telnet::handleData(int pSize){
   stringstream result;
   unsigned char byte;
@@ -242,12 +251,14 @@ void Telnet::handleData(int pSize){
     LOG4CXX_TRACE(mLogger, "read byte " << byte);
     result << byte; 
   }
+  LOG4CXX_TRACE(mLogger, "pushed " << pSize << " bytes of data to the external read buffer");
   this->mRead.pushBack(result.str());
 }
 
 void Telnet::handleOption(int pCommand, int pOption){
   /// check if this is a 'DO' request 
-  if(pCommand == DO){
+  if(pCommand == DO){ 
+    LOG4CXX_TRACE(mLogger, "command is a DO request");
     /// check if the option is supported
     if(!(this->isSupportedLocalOption(pOption))){
       this->sendOption(WONT, pOption, true);
@@ -270,9 +281,11 @@ void Telnet::handleOption(int pCommand, int pOption){
       }
     }
   }else if(pCommand == DONT){
+    LOG4CXX_TRACE(mLogger, "command is a DONT request");
     this->sendOption(WONT, pOption, false);
   /// check if this is a 'WILL' request
   }else if(pCommand == WILL){
+    LOG4CXX_TRACE(mLogger, "command is a WILL request");
     /// check if the option is supported
     if(!(this->isSupportedRemoteOption(pOption))){
       this->sendOption(WONT, pOption, true);
@@ -281,6 +294,7 @@ void Telnet::handleOption(int pCommand, int pOption){
     }
   /// check if this is a 'WONT' request and turn of the option
   }else if(pCommand == WONT){
+    LOG4CXX_TRACE(mLogger, "command is a WANT request");
     this->sendOption(DONT, pOption, false);
   }else{
  
@@ -308,7 +322,19 @@ void Telnet::writeCommand(std::string pData, int pCommand){
 }
 
 void Telnet::sendOption(int pCommand, int pOption, bool flag){
+  LOG4CXX_TRACE(mLogger, "prepare to send a IAC message with command " << pCommand << " and option " << pOption);
+  // Build up a message consisting of IAC byte, command and option
+  unsigned char *message = new unsigned char[3];
 
+  message[0] = IAC;
+  message[1] = pCommand;
+  message[2] = pOption;
+
+  /// Write data
+  this->mWriteBuffer.pushBack(this->unsignedCharToString(message));
+  LOG4CXX_TRACE(mLogger, "put IAC message with command " << pCommand << " and option " << pOption << " to write buffer");
+  /// Free the message
+  delete[] message;
 }
 
 bool Telnet::isSupportedLocalOption(int pOption){
@@ -339,7 +365,7 @@ void Telnet::handleSubnegotiation(int pOption){
  * The method processes the given command
  */
 void Telnet::handleCommand(int pCommand){
-  int option = -1;
+  unsigned char option;
 
   switch(pCommand){
     case DO: /** do nothing*/
@@ -348,16 +374,15 @@ void Telnet::handleCommand(int pCommand){
       // TODO: handleData(pCommand);
       break;
     case SB:
-      /// Read option TODO: FIXME
-     // option = this->mRead.tryPopFront();
+      this->mInternalRead.waitAndPopFront(option);
       /// Handle command 'SB' 
-      this->handleSubnegotiation(option);
+      this->handleSubnegotiation((int)option);
       break;
     case WILL:
       /// Read option
-     // option = this->mRead.tryPopFront();
+      this->mInternalRead.waitAndPopFront(option);
       /// Handle command 'WILL' 
-      this->handleOption(pCommand, option);
+      this->handleOption(pCommand, (int)option);
       break;
     case WONT: /** do nothing*/
     default:
