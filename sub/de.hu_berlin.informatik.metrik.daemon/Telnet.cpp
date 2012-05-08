@@ -13,6 +13,7 @@ Telnet::Telnet(boost::asio::io_service& pIOService, tcp::resolver::iterator pEnd
   : mIOService(pIOService), mSocket(pIOService) { 
   /// Set the type of the terminal
   this->mTerminalType = string("DUMB");
+  LOG4CXX_TRACE(mLogger, "set terminal type to " << this->mTerminalType);
   /// Initialize local options array
   this->mSupportedLocalOptions = new bool[64];
   /// Initialize remote options array
@@ -149,6 +150,15 @@ void Telnet::connectComplete(const boost::system::error_code& pError, tcp::resol
 void Telnet::closeSocket(void){
   // Try to close the open socket
   this->mSocket.close();
+}
+
+/**
+* The method closes the socket of an established telnet
+* connection.
+*/
+void Telnet::close(){
+  /// Closing the socket is delegated to the method closeSocket
+  this->mIOService.post(boost::bind(&Telnet::closeSocket, this));
 }
 
 /**

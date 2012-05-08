@@ -29,6 +29,10 @@ namespace de {
            */
           class TelnetActor : Actor {
             private: 
+              /// The asynchronous IO service
+              boost::asio::io_service mIOService;
+              ///
+              tcp::resolver::iterator mEndpointIterator;
               /// A instance of the logger
               static log4cxx::LoggerPtr mLogger;
               /// The name of host (which will be connected)
