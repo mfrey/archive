@@ -72,6 +72,18 @@ namespace de {
                 return this->mData.size();
               }
 
+              /// The method returns the first element of the deque
+              void front(Data& pValue){
+                boost::mutex::scoped_lock lock(this->mMutex);
+                pValue = this->mData.front();
+              }
+
+              /// The method returns the last element of the deque
+              void back(Data& pValue){
+                boost::mutex::scoped_lock lock(this->mMutex);
+                pValue = this->mData.back();
+              }
+
               /// The method clears the content of the deque
               void clear(){
                 boost::mutex::scoped_lock lock(this->mMutex);

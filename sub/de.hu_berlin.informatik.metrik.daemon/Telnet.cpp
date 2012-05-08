@@ -1,5 +1,6 @@
 #include "include/Telnet.h"
 
+using namespace std;
 using namespace log4cxx;
 using namespace de::hu_berlin::informatik::metrik::daemon;
 
@@ -143,8 +144,6 @@ void Telnet::connectComplete(const boost::system::error_code& pError, tcp::resol
   }
 }
 
-
-
 /**
 * The method closes an socket.
 */
@@ -158,11 +157,15 @@ void Telnet::closeSocket(void){
  * the operation completes or fails, the method writeComplete() is called.
  */
 void Telnet::writeStart(){
-  LOG4CXX_TRACE(mLogger, "will write " << this->mWriteBuffer.front() << " to socket");
-  boost::asio::async_write(this->mSocket, boost::asio::buffer(&(this->mWriteBuffer.front()) ,this->mWriteBuffer.front().size()),
+  /// A variable to read from the (concurrent) deque
+  string write;
+  /// Fetch the first element in the (concurrent) deque
+  this->mWriteBuffer.front(write);
+  /// Write the element
+  LOG4CXX_TRACE(mLogger, "will write " << write << " to socket");
+  boost::asio::async_write(this->mSocket, boost::asio::buffer(&(write), write.size()),
     boost::bind(&Telnet::writeComplete, this, boost::asio::placeholders::error));
 }
-
 
 /**
  * The method is called if writing asynchronously data to an established telnet 
@@ -174,7 +177,7 @@ void Telnet::writeStart(){
 void Telnet::writeComplete(const boost::system::error_code& pError){
   if(!pError){ 
     LOG4CXX_TRACE(mLogger, "prepare to remove data from write queue");
-    this->mWriteBuffer.pop_front(); 
+// TODO    this->mWriteBuffer.waitAndPopFront(); 
     LOG4CXX_TRACE(mLogger, "removed data from write queue");
     if(!(this->mWriteBuffer.empty())){
       writeStart(); 
@@ -201,25 +204,28 @@ void Telnet::handle(size_t pTransferredBytes){
   /// Save the content of the internal (receive) buffer in a local buffer 
   memcpy(buffer, this->mBuffer, pTransferredBytes);
 
-  /// Iterate over the content of the buffer
-  for(unsigned int i = 0; i < pTransferredBytes; i++){
-     LOG4CXX_TRACE(mLogger, "read " << setw(2) << hex << (int)buffer[i]);
-     
-     /// Process commands (which is not really nice to do in this manner)
-     if(((int)buffer[i]) == IAC){
-       LOG4CXX_TRACE(mLogger, "received option IAC (data)");
-     }else if(((int)buffer[i]) == DO){
-       LOG4CXX_TRACE(mLogger, "received option DO (request/confirmation to perform)");
-
-     }else if(((int)buffer[i]) == DONT){
-       LOG4CXX_TRACE(mLogger, "received option DONT (demand/confirmation to perform)");
-     }else{
-       LOG4CXX_TRACE(mLogger, "at present unsupported operation");
-     }
-  }
+  // If the first byte is a IAC byte, the following bytes are commands (and options)
+  if(((int)buffer[0]) == IAC){
+    LOG4CXX_TRACE(mLogger, "prepare to handle commands/options");
+    
+  }else{
+    LOG4CXX_TRACE(mLogger, "prepare to handle data");
+    // Pass over the data to the appropiate method
+    handleData(buffer);
+  }     
  
   // Delete the previosusly created buffer
   delete[] buffer;
+}
+
+void Telnet::handleData(unsigned char *mBuffer){
+  if(mBuffer != NULL){
+    stringstream stream;
+    stream << mBuffer;
+    this->mRead.pushFront(stream.str());
+  }else{
+    LOG4CXX_FATAL(mLogger, "buffer points to null");
+  }
 }
 
 void Telnet::handleOption(int pCommand, int pOption){
@@ -232,7 +238,12 @@ void Telnet::handleOption(int pCommand, int pOption){
       this->sendOption(WILL, pOption, false);
 
       if(pOption == NAWS){
-    //    this->sendNWS();
+        /**
+         * Usually the size of the terminal window should not be fix. Since, this
+         * class only provides a rough implementation and visual feedback in terms
+         * of a real terminal, we set the size static (it doesn't matter). 
+         */
+        this->sendWindowSizeNegotiation(132, 43);
       }else if(pOption == TTYPE){
         this->sendTerminalType();
       }else if(pOption == NAOHTD){
@@ -297,20 +308,20 @@ void Telnet::handleSubnegotiation(int pOption){
   if(pOption == TTYPE){
     LOG4CXX_TRACE(mLogger, "handle subnegotiation: send terminal type");
     this->sendTerminalType();
-  /// Is option of type ' '
+  /// Is option of type 'terminal speed'
   }else if(pOption == TSPEED){
     LOG4CXX_TRACE(mLogger, "handle subnegotiation: send terminal speed");
     this->sendTerminalSpeed();
   /// Operation not supported
   }else{
-    LOG4CXX_TRACE(mLogger, "handle subnegotiation: send terminal speed");
+    LOG4CXX_TRACE(mLogger, "handle subnegotiation: operation not supported");
   }
 }
 
-void Telnet::handleData(int pCommand){
 
-}
-
+/**
+ *
+ */
 void Telnet::handleCommand(int pCommand){
   int option = -1;
 
@@ -318,7 +329,7 @@ void Telnet::handleCommand(int pCommand){
     case DO: /** do nothing*/
     case DONT: /** do nothing*/
     case IAC:
-      handleData(pCommand);
+      // TODO: handleData(pCommand);
       break;
     case SB:
       /// Read option TODO: FIXME
@@ -421,6 +432,34 @@ void Telnet::sendHorizontalTabDisposition(){
   message[i++] = IAC;
   message[i++] = SE;
 
+  /// Write data
+//  this->mWriteBuffer(string(message));
+  // Free buffer
+  delete[] message;
+}
+
+void Telnet::sendWindowSizeNegotiation(int pWidth, int pHeight){
+  // A variable in order to fill the message string
+  int i = 0;
+  // Construct a message
+  unsigned char *message = new unsigned char[14]; 
+
+  message[i++] = IAC;
+  message[i++] = SB;
+  message[i++] = NAWS;
+  // Set the width
+  message[i++] = IAC;
+  message[i++] = (pWidth >> 8) & 0xFF;
+  message[i++] = IAC;
+  message[i++] = pWidth & 0xFF;
+  message[i++] = IAC;
+  // Set the height
+  message[i++] = (pHeight >> 8) & 0xFF;
+  message[i++] = IAC;
+  message[i++] = pHeight & 0xFF;
+
+  message[i++] = IAC;
+  message[i++] = SE;
   /// Write data
 //  this->mWriteBuffer(string(message));
   // Free buffer

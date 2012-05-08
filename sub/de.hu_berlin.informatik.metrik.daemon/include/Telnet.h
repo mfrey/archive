@@ -2,6 +2,8 @@
 #define _TELNET_H__
 
 #include "Actor.h"
+#include "Deque.h"
+
 #include <stdio.h>
 
 #include <boost/bind.hpp>
@@ -11,7 +13,6 @@
 #include "log4cxx/logger.h"
 
 
-using namespace std;
 using boost::asio::ip::tcp;
 
 namespace de {
@@ -20,22 +21,23 @@ namespace de {
       namespace metrik {
         namespace daemon {
           /**
-           * The class
+           * The class provides a rough and incomplete implementation of the telnet protocol
+           * as specified in RFC 854.
            */
           class Telnet {
             private: 
               /// An internal data structure for holding received data in order to build up blocks
-	      deque<string> mRead;
+	      Deque<std::string> mRead;
 	      /// An instance of the log4cxx logger
 	      static log4cxx::LoggerPtr mLogger;
 	      // A deque for writing data
-	      deque<string> mWriteBuffer; 
+	      Deque<std::string> mWriteBuffer; 
 	      /// Size of the buffer
 	      static const int mBufferSize = 128;
 	      /// A 'handler' for asynchronous IO
 	      boost::asio::io_service& mIOService;
-	      void __hexdump(const char*, string);
-	      string __hex_dump(const char*, string);
+	      void __hexdump(const char*, std::string);
+	      std::string __hex_dump(const char*, std::string);
 
 	      /// The socket the telnet the instance is connected to
 	      tcp::socket mSocket;
@@ -157,6 +159,7 @@ namespace de {
 	      bool *mSupportedRemoteOptions;
 	      /// The 'type' of the terminal
 	      std::string mTerminalType;
+
 	      /// The method begins to open a telnet connection
 	      void connect(tcp::resolver::iterator);
 	      /// The method finishes to open a telnet connection, indepdent of success/failure
@@ -172,7 +175,7 @@ namespace de {
 	      /// The method finishes to write data to an established telnet connection, independent of success/failure
 	      void writeComplete(const boost::system::error_code&);
 	      /// The method fills the write buffer and initializes the transmission
-	      void writeToSocket(string);
+	      void writeToSocket(std::string);
 
             public:
 	      /// The constructor of the telnet class
@@ -182,7 +185,7 @@ namespace de {
 	      /// The method initializes a telnet connection
 	      void open();
 	      /// The method writes a string via an established telnet connection
-	      void write(string);
+	      void write(std::string);
 	      /// The method closes the telnet connection
 	      void close();
 
@@ -197,13 +200,15 @@ namespace de {
 	      bool isSupportedLocalOption(int);
 
 	      void handleSubnegotiation(int);
-	      void handleData(int);
+	      void handleData(unsigned char*);
               // The method sends the terminal type
               void sendTerminalType(void);
-              // The method sends the terminal speed
+              // The method negotiates the terminal speed
               void sendTerminalSpeed(void);
-              // The method sends the the horizontal tab disposition
+              // The method negotiates the the horizontal tab disposition
               void sendHorizontalTabDisposition(void);
+              // The method negotiate the window size 
+              void sendWindowSizeNegotiation(int, int);
           };
         }
       }
