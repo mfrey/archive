@@ -26,6 +26,8 @@ namespace de {
            */
           class Telnet {
             private: 
+              Deque<unsigned char> mInternalRead;
+
               /// An internal data structure for holding received data in order to build up blocks
 	      Deque<std::string> mRead;
 	      /// An instance of the log4cxx logger
@@ -177,6 +179,9 @@ namespace de {
 	      /// The method fills the write buffer and initializes the transmission
 	      void writeToSocket(std::string);
 
+              /// A helper method to transform a unsigned char buffer into a string
+              std::string unsignedCharToString(unsigned char*);
+
             public:
 	      /// The constructor of the telnet class
 	      Telnet(boost::asio::io_service&, tcp::resolver::iterator);              
@@ -200,14 +205,15 @@ namespace de {
 	      bool isSupportedLocalOption(int);
 
 	      void handleSubnegotiation(int);
-	      void handleData(unsigned char*);
-              // The method sends the terminal type
+              /// The method copies data from the internal read buffer to the external read buffer 
+	      void handleData(int);
+              /// The method sends the terminal type
               void sendTerminalType(void);
-              // The method negotiates the terminal speed
+              /// The method negotiates the terminal speed
               void sendTerminalSpeed(void);
-              // The method negotiates the the horizontal tab disposition
+              /// The method negotiates the the horizontal tab disposition
               void sendHorizontalTabDisposition(void);
-              // The method negotiate the window size 
+              /// The method negotiate the window size 
               void sendWindowSizeNegotiation(int, int);
           };
         }
