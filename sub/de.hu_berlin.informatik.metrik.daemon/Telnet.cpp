@@ -209,7 +209,7 @@ void Telnet::writeComplete(const boost::system::error_code& pError){
  * @param pTransferredBytes The number of bytes which will be processed
  */
 void Telnet::handle(size_t pTransferredBytes){
-  LOG4CXX_TRACE(mLogger, "try to process" << pTransferredBytes << " bytes of data");
+  LOG4CXX_TRACE(mLogger, "try to process " << pTransferredBytes << " bytes of data");
 
   // Get a chunk of data and store it in a temporary buffer
   unsigned char *buffer = new unsigned char[pTransferredBytes];
@@ -230,11 +230,12 @@ void Telnet::handle(size_t pTransferredBytes){
   for(int i = 0; i < this->mInternalRead.size(); i++){
     // If the first byte is a IAC byte, the following bytes are commands (and options)
     if(((int)byte) == IAC){
-      LOG4CXX_TRACE(mLogger, "prepare to handle commands/options");
+      LOG4CXX_TRACE(mLogger, "read IAC byte, prepare to handle commands/options");
       // Remove the first element (IAC) and do nothing with it
       this->mInternalRead.waitAndPopFront(byte);
       // Get the element after the first element
       this->mInternalRead.waitAndPopFront(byte);
+      LOG4CXX_TRACE(mLogger, "will command with of type (byte representation)" << ((int)byte));
       // Pass the element to the handleCommand() method
       this->handleCommand(((int)byte)); 
     }else{
@@ -266,6 +267,19 @@ void Telnet::handleData(int pSize){
 }
 
 void Telnet::handleOption(int pCommand, int pOption){
+  LOG4CXX_TRACE(mLogger, "try to handle command " << (int)pCommand << " with option "  << (int)pOption);
+
+  if(pCommand == DO){ 
+    if(pOption == TTYPE){
+      LOG4CXX_TRACE(mLogger, "option is terminal type (TTYPE)");
+      this->sendTerminalType();
+    }else if(pOption == TSPEED){
+      LOG4CXX_TRACE(mLogger, "option is terminal speed (TSPEED)");
+      this->sendTerminalSpeed();
+    }
+  }
+/*
+
   /// check if this is a 'DO' request 
   if(pCommand == DO){ 
     LOG4CXX_TRACE(mLogger, "command is a DO request");
@@ -274,13 +288,14 @@ void Telnet::handleOption(int pCommand, int pOption){
       this->sendOption(WONT, pOption, true);
     }else{
       this->sendOption(WILL, pOption, false);
-
-      if(pOption == NAWS){
+*/
+ //     if(pOption == NAWS){
         /**
          * Usually the size of the terminal window should not be fix. Since, this
          * class only provides a rough implementation and there is no visual feedback in terms
          * of a virtual terminal, we set the size of the terminal to static values (it doesn't matter). 
          */
+/*
         this->sendWindowSizeNegotiation(132, 43);
       }else if(pOption == TTYPE){
         this->sendTerminalType();
@@ -309,6 +324,7 @@ void Telnet::handleOption(int pCommand, int pOption){
   }else{
  
   }
+*/
 }
 
 /** 
@@ -375,22 +391,35 @@ void Telnet::handleSubnegotiation(int pOption){
  * The method processes the given command
  */
 void Telnet::handleCommand(int pCommand){
+  LOG4CXX_TRACE(mLogger, "handle command of type (byte representation) " << pCommand);
   unsigned char option;
 
   switch(pCommand){
-    case DO: /** do nothing*/
-    case DONT: /** do nothing*/
+    case DO: 
+      // TODO
+      this->mInternalRead.waitAndPopFront(option);
+      LOG4CXX_TRACE(mLogger, "command is of type DO and option is (byte representation) " << (int)option);
+      handleOption(pCommand, option);
+    case DONT: 
+      //this->mInternalRead.waitAndPopFront(option);
+      // TODO
+      //LOG4CXX_TRACE(mLogger, "command is of type DONT and option is (byte representation) " << (int)option);
     case IAC:
-      // TODO: handleData(pCommand);
+      LOG4CXX_TRACE(mLogger, "command is of type IAC");
+      this->mInternalRead.waitAndPopFront(option);
+      // TODO: if that is really smart
+      handleCommand(option);
       break;
     case SB:
       this->mInternalRead.waitAndPopFront(option);
       /// Handle command 'SB' 
+      LOG4CXX_TRACE(mLogger, "command is of type SB and option is (byte representation) " << (int)option);
       this->handleSubnegotiation((int)option);
       break;
     case WILL:
       /// Read option
       this->mInternalRead.waitAndPopFront(option);
+      LOG4CXX_TRACE(mLogger, "command is of type WILL and options is (byte representation) " << (int)option);
       /// Handle command 'WILL' 
       this->handleOption(pCommand, (int)option);
       break;
@@ -406,6 +435,7 @@ void Telnet::handleCommand(int pCommand){
  * The method prepares a message for setting the terminal type. 
  */
 void Telnet::sendTerminalType(){
+  LOG4CXX_TRACE(mLogger, "prepare to send terminal type (TTYPE)");
   // A variable in order to fill the message string
   int i = 0;
   // The size calculates as follows: length of terminal type + six control bytes (IAC, SB, TTYPE, IAC, IAC, SE) 
@@ -430,6 +460,7 @@ void Telnet::sendTerminalType(){
   /// Write end of subnegotiation
   message[i++] = SE;
 
+  LOG4CXX_TRACE(mLogger, "write terminal type (TTYPE) message to write buffer");
   /// Write data
   this->mWriteBuffer.pushBack(this->unsignedCharToString(message));
   /// Free buffer
