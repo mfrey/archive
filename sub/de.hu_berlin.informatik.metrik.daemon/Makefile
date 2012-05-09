@@ -5,7 +5,7 @@ LOGGING = -llog4cxx
 CPPUNIT = -lcppunit
 PTHREAD = -lpthread
 OBJECTS = Daemon.o Configuration.o Shell.o Notification.o WatchDescriptorEntry.o Actor.o Sensor.o Controller.o TelnetActor.o Telnet.o Socket.o
-TEST_OBJECTS = WatchDescriptorEntryTest.o Tests.o WatchDescriptorEntry.o Notification.o NotificationTest.o Actor.o Telnet.o TelnetActor.o TelnetActorTest.o DequeTest.o Configuration.o ConfigurationTest.o
+TEST_OBJECTS = WatchDescriptorEntryTest.o Tests.o WatchDescriptorEntry.o Notification.o NotificationTest.o Actor.o Telnet.o TelnetActor.o TelnetActorTest.o DequeTest.o Configuration.o ConfigurationTest.o SocketTest.o
 EXE = main
 TEST_EXE = test
 
@@ -22,6 +22,9 @@ Daemon.o: Daemon.cpp
 
 Socket.o: Socket.cpp 
 	$(CC) -c Socket.cpp $(LOGGING)
+
+SocketTest.o: SocketTest.cpp 
+	$(CC) -c SocketTest.cpp $(LOGGING)
 
 DequeTest.o: DequeTest.cpp
 	$(CC) -c DequeTest.cpp
