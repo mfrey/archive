@@ -1,11 +1,19 @@
 #include "include/Socket.h"
 
+using namespace log4cxx;
 using namespace de::hu_berlin::informatik::metrik::daemon;
-//using namespace log4cxx;
+
+LoggerPtr Socket::mLogger(Logger::getLogger("de.hu_berlin.informatik.metrik.daemon.socket"));
 
 Socket::Socket(){}
 
 Socket::Socket(std::string pHostName, std::string pPort):mHostName(pHostName),mPort(pPort){
+  /// Setup the member variables of the class
+  this->setup();
+  /// Open a socket
+  if(this->open() == 0){
+    /// If opening a socket was successful, initialize thread
+  }
 
 }
 
@@ -18,13 +26,33 @@ void Socket::setup(){
   this->mHints.ai_socktype = SOCK_STREAM;
 }
 
-Socket::~Socket(){}
+Socket::~Socket(){
+  /// Close the socket
+  this->closeSocket();
+}
+
+std::string Socket::getHostName(){
+  return this->mHostName;
+}
+
+void Socket::setHostName(std::string pHostName){
+  this->mHostName = pHostName;
+}
+
+std::string Socket::getPort(){
+  return this->mPort;
+}
+
+void Socket::setPort(std::string pPort){
+  this->mPort = pPort;
+}
 
 int Socket::open(){
   struct addrinfo *server;
   struct addrinfo *serverRessource;
 
   int result = -1;
+
   ///
   if((result = getaddrinfo(this->mHostName.c_str(), this->mPort.c_str(), &(this->mHints), &(serverRessource))) != 0){
     error("");
@@ -68,13 +96,14 @@ void Socket::closeSocket(){
 }
 
 void Socket::error(const char *pMessage){
-
+  LOG4CXX_FATAL(mLogger, "an error occurred " << pMessage);
+  perror(pMessage);
 }
 
 void Socket::run(){
   int received = 0;
-  while((received = recv(this->mSocket, this->mBuffer, this->mBufferSize, 0)) > 0){
 
+  while((received = recv(this->mSocket, this->mBuffer, this->mBufferSize, 0)) > 0){
   }
 }
 
