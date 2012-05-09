@@ -44,14 +44,27 @@ Telnet::~Telnet(){
  * @param pMessage The string which should be written
  */
 void Telnet::write(string pMessage){
+  LOG4CXX_TRACE(mLogger, "prepare to write message to socket");
   /// Writing the message is delegated to the method writeToSocket
+  this->mIOService.post(boost::bind(&Telnet::writeToSocket, this, pMessage));
 }
 
+void Telnet::writeToSocket(string pMessage){
+   // Check if write buffer is empty
+   bool progress = !this->mWriteBuffer.empty();
+   LOG4CXX_TRACE(mLogger, "write buffer is empty (true/false) " << progress);
+   // Add message to write buffer queue
+   this->mWriteBuffer.pushBack(pMessage);
+   // Write message if buffer is empty
+   if(!progress){
+     LOG4CXX_TRACE(mLogger, "start to write data to socket");
+     writeStart();
+   }
+}
 
-void Telnet::__hexdump(const char *title, string s){
+void Telnet::__hexdump(string s){
  size_t n=0;
 
-    fprintf(stdout,"%s",title);
 
         for(; n < s.size(); ++n)
         {
@@ -94,7 +107,7 @@ void Telnet::readStart(void){
 void Telnet::readComplete(const boost::system::error_code& pError, size_t pTransferredBytes){
   if(!pError){
     string message = this->unsignedCharToString(this->mBuffer);
-    __hexdump("read ", message);
+    __hexdump(message);
 
     LOG4CXX_TRACE(mLogger, "read " << hex << message << " from socket " << __hex_dump(NULL, message));
     LOG4CXX_TRACE(mLogger, "bytes " << pTransferredBytes);
@@ -184,6 +197,7 @@ void Telnet::writeStart(){
  * @param pError If an error has occured it is set accordingly. The parameter indicates the type of the error
  */
 void Telnet::writeComplete(const boost::system::error_code& pError){
+  LOG4CXX_TRACE(mLogger, "wrote data to socket");
   if(!pError){ 
     string write;
     LOG4CXX_TRACE(mLogger, "prepare to remove data from write queue");
@@ -357,7 +371,7 @@ void Telnet::sendOption(int pCommand, int pOption, bool flag){
   message[2] = pOption;
 
   /// Write data
-  this->mWriteBuffer.pushBack(this->unsignedCharToString(message));
+  this->write(this->unsignedCharToString(message));
   LOG4CXX_TRACE(mLogger, "put IAC message with command " << pCommand << " and option " << pOption << " to write buffer");
   /// Free the message
   delete[] message;
@@ -462,7 +476,7 @@ void Telnet::sendTerminalType(){
 
   LOG4CXX_TRACE(mLogger, "write terminal type (TTYPE) message to write buffer");
   /// Write data
-  this->mWriteBuffer.pushBack(this->unsignedCharToString(message));
+  this->write(this->unsignedCharToString(message));
   /// Free buffer
   delete[] message;
 }
@@ -495,7 +509,7 @@ void Telnet::sendTerminalSpeed(){
   message[i++] = SE;
 
   /// Write data
-  this->mWriteBuffer.pushBack(this->unsignedCharToString(message));
+  this->write(this->unsignedCharToString(message));
   // Free buffer
   delete[] message;
 }
@@ -516,7 +530,7 @@ void Telnet::sendHorizontalTabDisposition(){
   message[i++] = SE;
 
   /// Write data
-  this->mWriteBuffer.pushBack(this->unsignedCharToString(message));
+  this->write(this->unsignedCharToString(message));
   // Free buffer
   delete[] message;
 }
@@ -561,7 +575,7 @@ void Telnet::sendWindowSizeNegotiation(int pWidth, int pHeight){
   message[i++] = IAC;
   message[i++] = SE;
   /// Write data
-  this->mWriteBuffer.pushBack(this->unsignedCharToString(message));
+  this->write(this->unsignedCharToString(message));
   // Free buffer
   delete[] message;
 }

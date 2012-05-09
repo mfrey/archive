@@ -38,7 +38,7 @@ namespace de {
 	      static const int mBufferSize = 128;
 	      /// A 'handler' for asynchronous IO
 	      boost::asio::io_service& mIOService;
-	      void __hexdump(const char*, std::string);
+	      void __hexdump(std::string);
 	      std::string __hex_dump(const char*, std::string);
 
 	      /// The socket the telnet the instance is connected to
