@@ -10,10 +10,6 @@ Socket::Socket(){}
 Socket::Socket(std::string pHostName, std::string pPort):mHostName(pHostName),mPort(pPort){
   /// Setup the member variables of the class
   this->setup();
-  /// Open a socket
-  if(this->open() == 0){
-    /// If opening a socket was successful, initialize thread
-  }
 
 }
 

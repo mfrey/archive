@@ -10,3 +10,17 @@ LoggerPtr test::SocketTest::mLogger(Logger::getLogger("de.hu_berlin.informatik.m
 void test::SocketTest::setUp(void){}
 
 void test::SocketTest::tearDown(void){}
+
+void test::SocketTest::testOpen(){
+  ///
+  s = new Socket(string("nethack.alt.org"), string("23"));
+  ///
+  int result = s->open();
+  ///
+  CPPUNIT_ASSERT(result == 0);
+  ///
+  if(result == 0){
+    s->closeSocket();
+  }
+
+}
