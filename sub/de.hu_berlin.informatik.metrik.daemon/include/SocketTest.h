@@ -38,6 +38,9 @@ namespace de {
                 void tearDown(void);
 
                 void testOpen();
+                void testCloseSocket();
+                void testWrite();
+                void testRun();
             };
           }
         }

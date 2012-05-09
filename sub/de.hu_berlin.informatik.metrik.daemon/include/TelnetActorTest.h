@@ -23,9 +23,9 @@ namespace de {
             class TelnetActorTest : public CppUnit::TestFixture {
               private:
                 CPPUNIT_TEST_SUITE(TelnetActorTest);
-                CPPUNIT_TEST(testRun);
-                CPPUNIT_TEST(testSend);
-                CPPUNIT_TEST(testRecv);
+//                CPPUNIT_TEST(testRun);
+  //              CPPUNIT_TEST(testSend);
+    //            CPPUNIT_TEST(testRecv);
                 CPPUNIT_TEST_SUITE_END();
                 /// A logger instance 
                 static log4cxx::LoggerPtr mLogger;

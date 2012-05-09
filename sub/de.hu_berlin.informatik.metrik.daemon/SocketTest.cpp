@@ -16,6 +16,7 @@ void test::SocketTest::testOpen(){
   s = new Socket(string("nethack.alt.org"), string("23"));
   ///
   int result = s->open();
+  LOG4CXX_TRACE(mLogger, "result of operation open() is " << result);
   ///
   CPPUNIT_ASSERT(result == 0);
   ///
