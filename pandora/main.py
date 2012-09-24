@@ -53,34 +53,38 @@ class EnergyAwareAntAlgorithm:
 
   def send(self, packet, packet_trace, sender, destination):
       logging.debug('send called for sender ' + str(sender) + " and destination " + str(destination))
+
       if sender != destination:
+        if not self.network.is_active(sender):
+          raise EnergyException('no remaining energy in sender')
+        # pick the next node
         node = self.get_next_node(packet, sender, destination)
         # add node to packet_trace 
         packet_trace.visited_nodes.append(sender)
-        # increment hop count
-        packet_trace.hop_count += 1
         # save current xii value of the node
         packet_trace.xii_list.append(self.network.get_energy_level(sender))
+
+        # check if the next node is a valid node
         if node != -1:
           self.add_node_to_route_statistics(packet, sender)
+          # calculate the transmission costs
           self.updateTransmissionCosts(packet, sender, destination)
+          # update the pheromone values
           self.updatePheromoneValues(packet, sender, node, destination)
+          # forward packet
           self.send(packet, packet_trace, node, destination)
         else:
-          raise EnergyException('no remaining energy')
+          raise EnergyException('no remaining energy in next node')
       else:
-        #for key in self.network.routes.keys():
-        #  phi = self.network.compute_path_phi(packet, self.network.routes[key], destination)
-        #  packet_trace.phi_dict[tuple(self.network.routes[key])] = phi
-
         # add node to packet_trace 
         packet_trace.visited_nodes.append(sender)
+        # set hop count
+        packet_trace.hop_count = len(packet_trace.visited_nodes) - 2
+
         self.add_node_to_route_statistics(packet, destination)
+
         for node in self.network.network.nodes():
           self.network.log_energy_consumption(packet, node, self.network.network.node[node]['energy'])
-        
-        # Log successful reception of packet at destination
-        #print "ARRIVAL", (''.join(map(str,packet_trace.visited_nodes)) + "," + str(packet_trace.packet_id))
 
   def get_next_node(self, packet, sender, destination):
     logging.debug('get next node for node ' + str(sender) + ' towards destination node ' +  str(destination))
@@ -381,7 +385,6 @@ def main():
     for n in algorithm.network.network.nodes():
       algorithm.network.network.node[n]['routing table'].duplicate_entries(packet)
     try:
-      if w.is_active(1):
         packet_trace = pck.Packet()
         packet_trace_container[packet] = packet_trace
         packet_trace.src = 1
@@ -417,7 +420,6 @@ def main():
   generator.generate_active_path_phi('route_pheromone_log.csv')
   generator.write_route_trace_mg('route_trace_mg.csv')
   #generator.write_route_pheromone_log_file('route_pheromone_log.csv')
-
 
 #algorithm.writeEnergyConsumptionTrace('energy.csv')
   algorithm.writeRoutingTableTrace('routingtable_trace.csv')

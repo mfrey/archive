@@ -63,10 +63,10 @@ class WirelessNetwork:
          new_pkt.fant = False
          new_pkt.xii  = self.network.node[node]['energy']
          #
-         entry  = self.createRoutingTableEntry(node, previous_hop, new_pkt.source, self.settings.phi, new_pkt.xii)
+         entry  = self.createRoutingTableEntry(node, previous_hop, new_pkt.destination, self.settings.phi, new_pkt.xii)
 	     # add the entry to the routing table
          self.updateRoutingTable(0, entry)
-         # set the packet id 
+         # set the packet id, TODO check (bug)
          new_pkt.sequence_number = packet.sequence_number + 1
          # append the packet id to the 'last packets' vector at the destination
          self.network.node[node]['last packets'].append(new_pkt.sequence_number)
