@@ -96,23 +96,11 @@ class EnergyAwareAntAlgorithm:
 
     for n in nodes:
       # check if neighbor is still active
-#      print "---->get_next_node:alive ", self.network.get_energy_status(n)
       if self.network.get_energy_status(n):
         break
       else:
         inactive = inactive + 1
 	
-    #for n in nodes:
-      # check if neighbor is still active
-      #print "---->get_next_node:n ", n
-      #print "---->get_next_node:xii ", self.network.get_energy_level(n)
-      #print "---->get_next_node:alive ", self.network.get_energy_status(n)
-      #print "---->get_next_node:phi ", self.network.get_phi(packet, sender, n, destination)
-      #print ""
-
-        
-    #print "---->get_next_node:inactive ", inactive
-		
     if inactive == len(nodes):
       logging.debug('no active neighbor nodes at node ' + str(sender))
       # no active nodes anymore 
@@ -180,12 +168,8 @@ class EnergyAwareAntAlgorithm:
       # find in which section of the cumulated density it's located
       path = 0
       
-#      print "cumul", cumulatedDensity
-      
       while q > cumulatedDensity[path]:
-#      	print "===>", path, q, cumulatedDensity
       	path += 1
-#      print "===========>", path
       
 #       while path < (len(distribution) - 1):
 #         if(q < cumulatedDensity[path]):
@@ -224,19 +208,6 @@ class EnergyAwareAntAlgorithm:
         self.network.reset_phi(packet, node)
       # set the new energy level
       self.network.set_energy_level(packet, node, new_energy_level)
-      # todo
-
-  def updateNeighborPheromoneValues(self, packet, sender, destination):
-    neighbors = self.network.get_neighbors(sender)
-    for node in neighbors:
-      if self.network.has_path(node, destination):
-	    # get the current pheromone value 
-        phi = self.network.get_phi(packet, sender, node, destination)
-	    # decrease pheromone value
-        phi = self.decreasePheromoneValue(phi)
-		# update the routing table 
-        self.network.set_phi(packet, sender, node, destination, phi)
-        self.updateNeighborPheromoneValues(packet, node, destination)
 
   def updatePheromoneValues(self, packet, sender, nextHop, destination):
     #print "updatePheromoreValues ---- BEGIN"
