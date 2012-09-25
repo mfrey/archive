@@ -66,7 +66,7 @@ class WirelessNetwork:
          entry  = self.createRoutingTableEntry(node, previous_hop, new_pkt.destination, self.settings.phi, new_pkt.xii)
 	     # add the entry to the routing table
          self.updateRoutingTable(0, entry)
-         # set the packet id, TODO check (bug)
+         # set the packet id
          new_pkt.sequence_number = packet.sequence_number + 1
          # append the packet id to the 'last packets' vector at the destination
          self.network.node[node]['last packets'].append(new_pkt.sequence_number)
@@ -109,16 +109,6 @@ class WirelessNetwork:
 
   def updateRoutingTable(self, packet, entry):
     self.network.node[entry.node_i]['routing table'].add(packet, entry)
-
-  def compute_path_phi(self, packet, nodes, destination):
-    #print nodes
-    phi = 0.0
-# TODO: this needs to be fixed because of our strange setup (undirected graphs)
-#    for index, value in enumerate(nodes):
-#      if (index + 1) != len(nodes):
-#        temp = self.network.node[nodes[index]]['routing table']._table[packet][(nodes[index], nodes[index+1], destination)].phi
-#        phi += float(temp)
-    return phi
 
   def getRoutingTableTrace(self):
     result = []
@@ -177,11 +167,26 @@ class WirelessNetwork:
 	return self.network.node[sender]['routing table'].get_phi(packet, sender, node, destination)
 
   def set_phi(self, packet, sender, node, destination, phi):
-    logging.debug('set phi of edge(' + str(sender) + ", " + str(node) + ") to " + str(phi))
+    logging.debug('set phi of edge(' + str(sender) + ", " + str(node) + ") to " + str(phi) + ' and destination is ' + str(destination))
     # TODO create a settings constant for threshold
     if phi < 0.09:
-    	self.network.node[node]['active'] = False
-	self.network.node[sender]['routing table'].set_phi(packet, sender, node, destination, phi)
+      inactive_flag = True
+      # we have to check if phi(x,y) is also below the given threshold and not onlye phi(y,x) 
+      for entry in self.network.node[node]['routing table']._table[packet].keys():
+        if entry[0] == node:
+          # if there is an entry with an higher pheromone value 
+          if self.network.node[node]['routing table'].get_phi(packet, entry[0], entry[1], entry[2]) > 0.09:
+            logging.debug('found entry(' + str(entry[0]) + "," + str(entry[1]) + "," + str(entry[2]) + ") with a pheromone value above threshold")
+            inactive_flag = False
+            break
+
+      if inactive_flag:
+        logging.debug('set node ' + str(node) + " to inactive")
+        # set the node to inactive
+        self.network.node[node]['active'] = False
+      # invalidate the link
+      phi = 0.0 
+    self.network.node[sender]['routing table'].set_phi(packet, sender, node, destination, phi)
 
   def reset_phi(self, packet, sender):
     self.network.node[sender]['routing table'].reset_phi(packet)

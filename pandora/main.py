@@ -14,6 +14,7 @@ import itertools
 import networkx as nx
 
 from general import settings as cfg
+from general import dotfilereader as dfr
 from trace import logfilegenerator as log
 from network import packet as pck
 from network import wirelessnetwork as wifi
@@ -56,6 +57,7 @@ class EnergyAwareAntAlgorithm:
 
       if sender != destination:
         if not self.network.is_active(sender):
+          print sender, self.network.network.node[sender]['energy']
           raise EnergyException('no remaining energy in sender')
         # pick the next node
         node = self.get_next_node(packet, sender, destination)
@@ -210,7 +212,7 @@ class EnergyAwareAntAlgorithm:
       self.network.set_energy_level(packet, node, new_energy_level)
 
   def updatePheromoneValues(self, packet, sender, nextHop, destination):
-    #print "updatePheromoreValues ---- BEGIN"
+    # iterate over each nodes routing table
     for node in self.network.network.nodes():
       if node != destination:
         # iterate over the routing table entries of the node
@@ -234,15 +236,14 @@ class EnergyAwareAntAlgorithm:
               # decrease pheromone value
               phi = self.decreasePheromoneValue(phi)
               #print result
-          # update the routing table 
-          self.network.network.node[node]['routing table']._table[packet][entry].phi = phi          
+          # update the routing table
+          self.network.set_phi(packet, entry[0], entry[1], entry[2], phi)
+#          self.network.network.node[node]['routing table']._table[packet][entry].phi = phi          
           # if phi is below a threshould
           #if phi < 0.009 and entry[1] != destination:          
           #  self.network.network.node[entry[1]]['active'] = False
           #result = "##### updatePheromoneValues: edge("+ str(entry[0]) + "," + str(entry[1]) + ") = " + str(phi)
           #print result
-
-    #print "updatePheromoreValues ---- END"
 
   def increasePheromoneValue(self, phi):
     return (phi + self.settings.delta_phi)
@@ -279,6 +280,7 @@ def main():
   parser.add_argument('-a', dest='alpha', type=float, default=1.0, action='store', help='weight alpha for transmission probablity')
   parser.add_argument('-b', dest='beta', type=float, default=1.0, action='store', help='weight beta for transmission probablity')
   parser.add_argument('-P', dest='phi', type=float, default=1.0, action='store', help='initial phi value')
+  parser.add_argument('-i', dest='dot_file', type=str, default="", action='store', help='dot file')
 
   args = parser.parse_args()
 
@@ -312,14 +314,23 @@ def main():
   # set the initial energy parameter (node)
   settings.xii = args.energy
   logging.debug('set initial energy to ' + str(settings.xii))
+  # set the dot file 
+  settings.dot_file = args.dot_file
+  if settings.dot_file != "":
+    logging.debug('will load dot file' + str(settings.dot_file))
 
   network = nx.Graph()
-  network.add_nodes_from([1,4]);
+
+  if settings.dot_file == "":
+    network.add_nodes_from([1,4]);
 #  network.add_nodes_from([1,8]);
   #network.add_nodes_from([1,11]);
   #network.add_edges_from([(1,2),(1,3),(1,4),(2,5),(5,7),(7,8),(3,6),(6,8),(4,8)])
-  network.add_edges_from([(1,2),(1,3),(2,4),(3,4)])
+    network.add_edges_from([(1,2),(1,3),(2,4),(3,4)])
   #network.add_edges_from([(1,2),(1,3),(1,4),(2,5),(5,8),(8,10),(10,11),(3,6),(6,9),(9,11),(4,7),(7,11)])
+  else:
+    dot_file_reader = dfr.DotFileReader()
+    network = dot_file_reader.read_dot_file(settings.dot_file)
 
   w = wifi.WirelessNetwork()
   w.network = network
@@ -356,6 +367,7 @@ def main():
     for n in algorithm.network.network.nodes():
       algorithm.network.network.node[n]['routing table'].duplicate_entries(packet)
     try:
+        print w.network.node[1]['energy']
         packet_trace = pck.Packet()
         packet_trace_container[packet] = packet_trace
         packet_trace.src = 1

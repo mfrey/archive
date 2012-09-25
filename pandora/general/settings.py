@@ -10,4 +10,5 @@ class Settings:
     self.q = 0.2
     self.alpha = 1.0
     self.beta = 1.0
+    self.dot_file = ""
 
