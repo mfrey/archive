@@ -9,7 +9,7 @@ class DotFileReader:
 
   def read_dot_file(self, filename):
     self.graph = pgv.AGraph(filename)
-    return nx.Graph(nx.from_pydot(self.graph))
+    return nx.Graph(nx.from_agraph(self.graph))
 
 
 
