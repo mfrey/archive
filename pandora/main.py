@@ -57,6 +57,7 @@ class EnergyAwareAntAlgorithm:
 
       if sender != destination:
         if not self.network.is_active(sender):
+          self.network.dumpRoutingTable()
           print sender, self.network.network.node[sender]['energy']
           raise EnergyException('no remaining energy in sender')
         # pick the next node
@@ -367,7 +368,6 @@ def main():
     for n in algorithm.network.network.nodes():
       algorithm.network.network.node[n]['routing table'].duplicate_entries(packet)
     try:
-        print w.network.node[1]['energy']
         packet_trace = pck.Packet()
         packet_trace_container[packet] = packet_trace
         packet_trace.src = 1
