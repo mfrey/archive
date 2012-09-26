@@ -9,7 +9,10 @@ class DotFileReader:
 
   def read_dot_file(self, filename):
     self.graph = pgv.AGraph(filename)
-    return nx.Graph(nx.from_agraph(self.graph))
+    network = nx.Graph(nx.from_agraph(self.graph))
+    mapping = dict([(n,int(n)) for n in network.nodes()])
+    result = nx.relabel_nodes(network, mapping)
+    return result
 
 
 

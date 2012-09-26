@@ -252,21 +252,23 @@ class EnergyAwareAntAlgorithm:
   def decreasePheromoneValue(self, phi):
     return (phi * (1 - self.settings.q))
 
-  def writeLogFile(self, file_name, content):
-    log_file = csv.writer(open(file_name, "w"), delimiter=',')
+  def writeLogFile(self, directory, file_name, content):
+    current_path = os.getcwd()
+    log_file = csv.writer(open(current_path + "/" + directory + "/" + file_name, "w"), delimiter=',')
     for entry in content:
       log_file.writerow(entry)
 
-  def writeEnergyConsumptionTrace(self, file_name):
+  def writeEnergyConsumptionTrace(self, directory, file_name):
     content = self.network.energy_consumption
-    self.writeLogFile(file_name, content)
+    self.writeLogFile(directory, file_name, content)
 
-  def writeRoutingTableTrace(self, file_name):
+  def writeRoutingTableTrace(self, directory, file_name):
     content = self.network.getRoutingTableTrace()
-    self.writeLogFile(file_name, content)
+    self.writeLogFile(directory, file_name, content)
 
-  def writeRoutingDecisionTrace(self, file_name):
-    log_file = csv.writer(open(file_name, "w"), delimiter=',')
+  def writeRoutingDecisionTrace(self, directory, file_name):
+    current_path = os.getcwd()
+    log_file = csv.writer(open(current_path + "/" + directory + "/" + file_name, "w"), delimiter=',')
     for key, value in self.routes.items():
       log_file.writerow(value)
 

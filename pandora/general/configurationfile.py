@@ -8,9 +8,9 @@ class ExperimentSettings:
 	# the name of the experiments
     self.name = ""
 	# the initial pheromone value per edge
-    self.initial_pheromone = 0.0
+    self.phi = 0.0
 	# the initial energy value of a node
-    self.initial_energy = 0.0
+    self.xii = 0.0
 	# a list of alpha weights (transmission probability)
     self.alpha_list = []
 	# a list of beta weights (transmission probability)
@@ -21,6 +21,18 @@ class ExperimentSettings:
     self.q = 0.0
 	# the maximum number of packets which should be sent
     self.packets = 1000
+    # 
+    self.topology = ""
+    # 
+    self.src = -1
+    # 
+    self.dst = -1
+    # 
+    self.repetitions = 30
+    # 
+    self.send = 0.01
+    #
+    self.recv = 0.01
 
   def __str__(self):
     self.name 
@@ -46,11 +58,23 @@ class ConfigurationFile:
 	# read the q parameter and cast it to a float value
     q = float(configuration.get('Experiment','q'))
 	# read the packet parameter and cast it to a int value
-    packets = float(configuration.get('Experiment','packets'))
-	# read the packet parameter and cast it to a int value
+    packets = int(configuration.get('Experiment','packets'))
+	# read the initial energy parameter and cast it to a float value
     xii = float(configuration.get('Experiment','initial_energy'))
-	# read the packet parameter and cast it to a int value
+	# read the initial pheromone parameter and cast it to a float value
     phi = float(configuration.get('Experiment','initial_pheromone'))
+	# read the energy costs per receive parameter and cast it to a float value
+    recv = float(configuration.get('Experiment','energy_recv'))
+	# read the energy costs per send parameter and cast it to a float value
+    send = float(configuration.get('Experiment','energy_send'))
+    # read the location of the topology file
+    topology = configuration.get('Experiment','topology')
+    # read the location of the topology file
+    src = int(configuration.get('Experiment','source'))
+    # read the location of the topology file
+    dst = int(configuration.get('Experiment','destination'))
+    # read the location of the topology file
+    repetitions = int(configuration.get('Experiment','repetitions'))
 	# build up the experiment settings
     settings = ExperimentSettings()
     settings.alpha_list = alpha
@@ -58,7 +82,13 @@ class ConfigurationFile:
     settings.delta_phi = delta_phi
     settings.q = q
     settings.packets = packets
-    settings.initial_energy = xii
-    settings.initial_pheromone = phi
+    settings.phi = phi
+    settings.xii = xii
+    settings.topology = topology
+    settings.src = src
+    settings.dst = dst
+    settings.repetitions = repetitions
+    settings.send = send
+    settings.recv = recv
 	# return the results
     return settings
