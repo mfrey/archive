@@ -18,7 +18,7 @@ Installation from git
 		  * lattice
 		  * ggplot2
 
-3. Create a configuration file which specifies the settings of your experiment. A detail explanation of the different configuration options can be found (here)[https://github.com/mfrey/pandora/wiki/Experiments] 
+3. Create a configuration file which specifies the settings of your experiment. A detail explanation of the different configuration options can be found [here](https://github.com/mfrey/pandora/wiki/Experiments "experiment description"). 
 
 Bug tracker
 -----------
