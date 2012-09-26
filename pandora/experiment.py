@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-import pp
 import os
 import argparse
+import multiprocessing
 
 import main as m
 import networkx as nx
@@ -99,16 +99,19 @@ class Experiment:
     self.algorithm.writeRoutingDecisionTrace(self.log_dir, 'routingdecision_trace.csv')
 
 
-def main():
-  parser = argparse.ArgumentParser(description='evaluation script for the energy aware ant routing algorithm')
-  parser.add_argument('-c', dest='configuration_file', type=str, default="", action='store', help='configuration settings')
+def worker(num):
+  print 'Worker:', num
+  #parser = argparse.ArgumentParser(description='evaluation script for the energy aware ant routing algorithm')
+  #parser.add_argument('-c', dest='configuration_file', type=str, default="", action='store', help='configuration settings')
 
-  arguments = parser.parse_args()
-  
-  if arguments.configuration_file != "":
+  #arguments = parser.parse_args()
+  arguments_configuration_file = "settings-" + str(num) + ".ini"
+
+  if arguments_configuration_file != "":
+    # automatically detect number of possible workers
     configuration = cfg.ConfigurationFile()
     # read the configuration file
-    configuration_settings = configuration.read(arguments.configuration_file)
+    configuration_settings = configuration.read(arguments_configuration_file)
     # set the repetitions
     repetitions = configuration_settings.repetitions + 1
     for alpha in configuration_settings.alpha_list:
@@ -139,7 +142,7 @@ def main():
 
           experiment = Experiment()
           experiment.settings = settings
-          directory = 'experiment-' + str(configuration_settings.packets) + '-' + str(alpha) + '-' + str(beta) 
+          directory = 'experiment-' + str(num) + "-" + str(configuration_settings.packets) + '-' + str(alpha) + '-' + str(beta) 
           # create log directory
           experiment.create_log_directory(directory)
           # create the network and set it up
@@ -149,14 +152,16 @@ def main():
           # run the experiment
           experiment.run_experiment(configuration_settings.packets, configuration_settings.src, configuration_settings.dst)
           # 
-          directory = 'experiment-' + str(configuration_settings.packets) + '-' + str(alpha) + '-' + str(beta) + '/' + str(repetition) 
+          directory = 'experiment-' + str(num) + "-" + str(configuration_settings.packets) + '-' + str(alpha) + '-' + str(beta) + '/' + str(repetition) 
           # create log directory
           experiment.create_log_directory(directory)
           experiment.log_dir = directory
           experiment.generate_log_files()
 
-#  job_server = pp.Server() 
 
 if __name__ == "__main__":
-  main()
-
+  jobs = []
+  for i in range(5):
+    p = multiprocessing.Process(target=worker, args=(i,))
+    jobs.append(p)
+    p.start()

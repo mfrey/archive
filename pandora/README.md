@@ -10,7 +10,6 @@ Installation from git
 2. Install the dependencies for your distribution (packages names can differ):
 
         * Python
-		  * pp 
 		  * pygraphviz 
 		  * networkx
 		  * matplotlib
@@ -19,6 +18,7 @@ Installation from git
 		  * lattice
 		  * ggplot2
 
+3. Create a configuration file which specifies the settings of your experiment. A detail explanation of the different configuration options can be found (here)[https://github.com/mfrey/pandora/wiki/Experiments] 
 
 Bug tracker
 -----------

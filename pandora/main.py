@@ -19,7 +19,7 @@ from trace import logfilegenerator as log
 from network import packet as pck
 from network import wirelessnetwork as wifi
 
-logging.basicConfig(filename='example.log',level=logging.DEBUG)
+#logging.basicConfig(filename='example.log',level=logging.DEBUG)
 
 class Helper:
   def cumulated_sum(self,iterable):
@@ -57,8 +57,8 @@ class EnergyAwareAntAlgorithm:
 
       if sender != destination:
         if not self.network.is_active(sender):
-          self.network.dumpRoutingTable()
-          print sender, self.network.network.node[sender]['energy']
+    #      self.network.dumpRoutingTable()
+    #    print sender, self.network.network.node[sender]['energy']
           raise EnergyException('no remaining energy in sender')
         # pick the next node
         node = self.get_next_node(packet, sender, destination)
