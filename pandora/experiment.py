@@ -25,7 +25,6 @@ class Experiment:
   def create_log_directory(self, directory):
     if not os.path.exists(directory):
       os.makedirs(directory)
-      self.log_dir = directory
 
   def setup_experiment(self):
     # store the settings
@@ -78,20 +77,21 @@ class Experiment:
 
   def generate_log_files(self):
     self.generator.packet_trace = self.packet_trace_container
-    #self.generator.generate_routing_decision_trace(self.log_dir, 'test_routingdecision_trace.csv')
-    #self.generator.generate_paths()
-    #self.generator.network = self.network
-    #self.generator.settings = self.settings
+    self.generator.generate_routing_decision_trace(self.log_dir, 'test_routingdecision_trace.csv')
+    self.generator.generate_paths()
+    self.generator.network = self.network
+    self.generator.settings = self.settings
+    # throws an exception, why?
     #self.generator.position = nx.spring_layout(self.network)
-    #self.generator.write_routes_log_file(self.log_dir, 'routes.csv')
-    #self.generator.write_energy_log_file(self.log_dir, 'energy.csv')
-    #self.generator.write_energy_per_route_log_file(self.log_dir, 'energy_total.csv')
-    #self.generator.write_routing_decision(self.log_dir, 'routing_decision_trace.csv')
-    #self.generator.write_last_sucessful_packet(self.log_dir, 'last_packet.csv')
+    self.generator.write_routes_log_file(self.log_dir, 'routes.csv')
+    self.generator.write_energy_log_file(self.log_dir, 'energy.csv')
+    self.generator.write_energy_per_route_log_file(self.log_dir, 'energy_total.csv')
+    self.generator.write_routing_decision(self.log_dir, 'routing_decision_trace.csv')
+    self.generator.write_last_sucessful_packet(self.log_dir, 'last_packet.csv')
     #generator.animate()
 #  generator.write_route_pheromone_log_file('route_pheromone_log.csv')
-    #self.generator.generate_active_path_phi(self.log_dir, 'route_pheromone_log.csv')
-    #self.generator.write_route_trace_mg(self.log_dir, 'route_trace_mg.csv')
+    self.generator.generate_active_path_phi(self.log_dir, 'route_pheromone_log.csv')
+    self.generator.write_route_trace_mg(self.log_dir, 'route_trace_mg.csv')
     #generator.write_route_pheromone_log_file('route_pheromone_log.csv')
 
     #algorithm.writeEnergyConsumptionTrace('energy.csv')
@@ -149,6 +149,10 @@ def main():
           # run the experiment
           experiment.run_experiment(configuration_settings.packets, configuration_settings.src, configuration_settings.dst)
           # 
+          directory = 'experiment-' + str(configuration_settings.packets) + '-' + str(alpha) + '-' + str(beta) + '/' + str(repetition) 
+          # create log directory
+          experiment.create_log_directory(directory)
+          experiment.log_dir = directory
           experiment.generate_log_files()
 
 #  job_server = pp.Server() 

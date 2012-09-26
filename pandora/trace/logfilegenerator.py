@@ -12,6 +12,7 @@ import traceback
 
 from operator import itemgetter
 
+import os
 import itertools
 import networkx as nx
 
@@ -32,8 +33,9 @@ class LogFileGenerator:
     self.fu_orange = "#FF9900"
     self.settings = cfg.Settings()
 
-  def generate_routing_decision_trace(self, file_name):
-    log_file = open(file_name, "w")
+  def generate_routing_decision_trace(self, directory, file_name):
+    cur_dir = os.getcwd()
+    log_file = open(cur_dir + "/" + directory + "/" + file_name, "w")
     for key in self.packet_trace:
       log_file.write(self.packet_trace[key].route_to_string() + "\n")
   
@@ -58,9 +60,10 @@ class LogFileGenerator:
 
   # aweful, please fix me
   # something like <packet id>, <path id>, <remaining energy>  
-  def write_energy_log_file(self, file_name):
+  def write_energy_log_file(self, directory, file_name):
     attempts = 0
-    log_file = open(file_name, "w")
+    cur_dir = os.getcwd()
+    log_file = open(cur_dir + "/" + directory + "/" + file_name, "w")
     for packet in self.packet_trace:
       # generate a tuple which represents the key for the path list
       route = tuple(self.packet_trace[packet].visited_nodes)
@@ -94,8 +97,9 @@ class LogFileGenerator:
       self.routes[key] = counter
       counter += 1
 
-  def write_routes_log_file(self, file_name):
-    log_file = open(file_name, "w")
+  def write_routes_log_file(self, directory, file_name):
+    cur_dir = os.getcwd()
+    log_file = open(cur_dir + "/" + directory + "/" + file_name, "w")
     for route, identifier in self.routes.items():
       line = str(identifier) + ',' + ','.join(map(str, route)) + '\n'
       log_file.write(line)
@@ -107,9 +111,10 @@ class LogFileGenerator:
       phi += self.network.network[node]['routing table'].table[packet].get_phi(node, nodes[(node+1)], destination)
     return phi
 
-  def write_energy_per_route_log_file(self, file_name):
+  def write_energy_per_route_log_file(self, directory, file_name):
     attempts = 0
-    log_file = open(file_name, "w")
+    cur_dir = os.getcwd()
+    log_file = open(cur_dir + "/" + directory + "/" + file_name, "w")
     for packet in self.packet_trace:
       if attempts < 2:
         try:
@@ -155,27 +160,30 @@ class LogFileGenerator:
     filenames="_tmp%03d.png"
     os.system("ffmpeg -r 3 -minrate 1024k -b 2024k -y -i %s path.mp4"%(filenames))
 
-  def write_last_sucessful_packet(self, file_name):
+  def write_last_sucessful_packet(self, directory, file_name):
     last_packet = (len(self.packet_trace))
     try:
       route = self.routes[tuple(self.packet_trace[last_packet].visited_nodes)]
       row = str(self.settings.alpha) + "," + str(self.settings.beta) + "," + str(route) + "," + str(last_packet)
-      log_file = open(file_name, "w")
+      cur_dir = os.getcwd()
+      log_file = open(cur_dir + "/" + directory + "/" + file_name, "w")
       log_file.write(row)
     except KeyError:
       print "no such route"
     log_file.close()
 
-  def write_route_trace_mg(self, file_name):
-    log_file = open(file_name, "w")
+  def write_route_trace_mg(self, directory, file_name):
+    cur_dir = os.getcwd()
+    log_file = open(cur_dir + "/" + directory + "/" + file_name, "w")
     for packet in self.packet_trace:
       trace = self.packet_trace[packet].route_taken_mg()
       log_file.write(trace)
     log_file.close()
 
-  def write_routing_decision(self, file_name):
+  def write_routing_decision(self, directory, file_name):
     attempts = 0
-    log_file = open(file_name, "w")
+    cur_dir = os.getcwd()
+    log_file = open(cur_dir + "/" + directory + "/" + file_name, "w")
     for packet in self.packet_trace:
       if attempts < 2:
         try:
@@ -192,9 +200,10 @@ class LogFileGenerator:
     log_file.close()
 
   # the problem is we have multiple phi values per edge
-  def generate_active_path_phi(self, file_name):
+  def generate_active_path_phi(self, directory, file_name):
     attempts = 0
-    log_file = open(file_name, "w")
+    cur_dir = os.getcwd()
+    log_file = open(cur_dir + "/" + directory + "/" + file_name, "w")
     for packet in self.packet_trace:
       if attempts < 2:
         try:
