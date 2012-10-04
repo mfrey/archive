@@ -37,12 +37,12 @@ for(e in 1:length(unique(experiment))){
       # iterate over the repetitions
       for(r in 1:length(unique(experiment_data$repetition))){
         # iterate over the current repetition
-        repetitionData <- subset(experiment_data, experiment_data$repetition == r);
+        repetitionData <- subset(experiment_data, experiment_data$repetition == unique(experiment_data$repetition)[r]);
 
         for(p in 1:length(unique(repetitionData$packet))){
           counter <- 0;
 
-          temp <- subset(repetitionData, repetitionData$packet == p)
+          temp <- subset(repetitionData, repetitionData$packet == unique(repetitionData$packet)[p])
  
           if(temp[1,7] > 0.09){
             counter <- counter + 1;
@@ -54,13 +54,13 @@ for(e in 1:length(unique(experiment))){
 
           # determine which was the last packet with the number of routes greater than one
           if(p > 1 & counter < 2){
-            previous <- subset(result, experiment == unique(experiment)[e] & alpha == current_alpha & beta == current_beta & repetition == unique(experiment_data$repetition)[r] & packet == p-1);
+            previous <- subset(result, experiment == unique(experiment)[e] & alpha == current_alpha & beta == current_beta & repetition == unique(experiment_data$repetition)[r] & packet == unique(repetitionData$packet)[p]-1);
             # check if the previous data set has an higher active count than one
             if(previous[1,6] > 1){
-              temp_result_mean <- rbind(temp_result_mean, data.frame(experiment = repetitionData$experiment, alpha = repetitionData$alpha, beta = repetitionData$beta, repetition = repetitionData$repetition, packet = p-1));
+              temp_result_mean <- rbind(temp_result_mean, data.frame(experiment = repetitionData$experiment, alpha = repetitionData$alpha, beta = repetitionData$beta, repetition = repetitionData$repetition, packet = unique(repetitionData$packet)[p]-1));
             }
           }
-          result <- rbind(result, data.frame(experiment = unique(experiment)[e], alpha = current_alpha, beta = current_beta, repetition = unique(experiment_data$repetition)[r], packet = p, active = counter));
+          result <- rbind(result, data.frame(experiment = unique(experiment)[e], alpha = current_alpha, beta = current_beta, repetition = unique(experiment_data$repetition)[r], packet = unique(repetitionData$packet)[p], active = counter));
         }
       }
       subset_temp_result_mean <- subset(temp_result_mean, temp_result_mean$experiment == unique(experiment)[e] & temp_result_mean$alpha == current_alpha & temp_result_mean$beta == current_beta);
