@@ -252,6 +252,25 @@ class EnergyAwareAntAlgorithm:
   def decreasePheromoneValue(self, phi):
     return (phi * (1 - self.settings.q))
 
+  def cubic_phi_decrease(self, phi):
+    a = 1 - (2 * phi) 
+
+    if a > 0:
+      t = 0.5 * ((abs(a)**(1/self.settings.plateau)) + 1)
+    else:
+      t = 0.5 * (1 - (abs(a)**(1/self.settings.plateau)))
+
+    m = t + (self.settings.reduction * self.settings.slow)
+
+    r = 0.5 * ((((2 * m) - 1)**self.settings.plateau) + )
+
+    if(r < 0):
+      return 0
+    elif(r > 1):
+      return 1
+    else:
+      return r
+
   def writeLogFile(self, directory, file_name, content):
     current_path = os.getcwd()
     log_file = csv.writer(open(current_path + "/" + directory + "/" + file_name, "w"), delimiter=',')

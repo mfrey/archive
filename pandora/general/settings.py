@@ -11,4 +11,10 @@ class Settings:
     self.alpha = 1.0
     self.beta = 1.0
     self.dot_file = ""
+    # plateau parameter for cubic evaporation function
+    self.plateau = 3
+    # slow down paramter for cubic evaporation function (slow \in (0,1))
+    self.slow = 0.4
+    # self reduction parameter for cubic evaporation function (reduction \in (0,1))
+    self.reduction = 0.5
 
