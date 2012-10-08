@@ -45,6 +45,8 @@ class EnergyAwareAntAlgorithm:
     self.routes = {}
     self.routing_mode = ['weighted','random','best'] 
     self.routing_mode_set = 0
+    self.evaporation_mode = ['exponential','cubic'] 
+    self.evaporation_mode_set = 0
 
   def add_node_to_route_statistics(self, packet, node):
     if packet in self.routes:
@@ -221,7 +223,7 @@ class EnergyAwareAntAlgorithm:
           phi = self.network.network.node[node]['routing table']._table[packet][entry].phi
           if entry[0] != sender:
             # decrease pheromone value
-            phi = self.decreasePheromoneValue(phi)
+            phi = decrease_phi(phi)
           else:
             # get the next hop
             node_j = self.network.network.node[node]['routing table']._table[packet][entry].node_j
@@ -235,7 +237,7 @@ class EnergyAwareAntAlgorithm:
             else:
               #result = "##### updatePheromoneValues: decrease value of edge("+ str(entry[0]) + "," + str(entry[1]) + ") = " + str(phi)
               # decrease pheromone value
-              phi = self.decreasePheromoneValue(phi)
+              phi = decrease_phi(phi)
               #print result
           # update the routing table
           self.network.set_phi(packet, entry[0], entry[1], entry[2], phi)
@@ -249,7 +251,14 @@ class EnergyAwareAntAlgorithm:
   def increasePheromoneValue(self, phi):
     return (phi + self.settings.delta_phi)
 
-  def decreasePheromoneValue(self, phi):
+  def decrease_phi(self, phi):
+    if self.evaporation_mode[self.evaporation_mode_set] == 'exponential':
+      phi = self.exponential_phi_decrease(phi)
+    else:
+      phi = self.cubic_phi_decrease(phi)
+    return phi
+
+  def exponential_phi_decrease(self, phi):
     return (phi * (1 - self.settings.q))
 
   def cubic_phi_decrease(self, phi):
