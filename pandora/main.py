@@ -223,7 +223,7 @@ class EnergyAwareAntAlgorithm:
           phi = self.network.network.node[node]['routing table']._table[packet][entry].phi
           if entry[0] != sender:
             # decrease pheromone value
-            phi = decrease_phi(phi)
+            phi = self.decrease_phi(phi)
           else:
             # get the next hop
             node_j = self.network.network.node[node]['routing table']._table[packet][entry].node_j
@@ -237,7 +237,7 @@ class EnergyAwareAntAlgorithm:
             else:
               #result = "##### updatePheromoneValues: decrease value of edge("+ str(entry[0]) + "," + str(entry[1]) + ") = " + str(phi)
               # decrease pheromone value
-              phi = decrease_phi(phi)
+              phi = self.decrease_phi(phi)
               #print result
           # update the routing table
           self.network.set_phi(packet, entry[0], entry[1], entry[2], phi)
@@ -271,7 +271,7 @@ class EnergyAwareAntAlgorithm:
 
     m = t + (self.settings.reduction * self.settings.slow)
 
-    r = 0.5 * ((((2 * m) - 1)**self.settings.plateau) + )
+    r = 0.5 * ((((2 * m) - 1)**self.settings.plateau) + 1)
 
     if(r < 0):
       return 0
