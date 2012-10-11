@@ -36,7 +36,7 @@ class Experiment:
 
   def run_experiment(self, packets, source, destination):
     # set the evaporation mode (TODO: find a better place to set the evaporation mode)
-    self.algorithm.evaporation_mode = self.algorithm.settings.evaporation_mode
+    self.algorithm.evaporation_mode_set = self.algorithm.settings.evaporation_mode
     # route discovery
     self.network.initialize_route_discovery(source, destination)
     # try to send all packets
@@ -166,7 +166,7 @@ def worker(num):
 
 if __name__ == "__main__":
   jobs = []
-  for i in range(4):
+  for i in range(1):
     p = multiprocessing.Process(target=worker, args=(i,))
     jobs.append(p)
     p.start()

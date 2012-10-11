@@ -252,7 +252,7 @@ class EnergyAwareAntAlgorithm:
     return (phi + self.settings.delta_phi)
 
   def decrease_phi(self, phi):
-    if self.evaporation_mode[self.evaporation_mode_set] == 'exponential':
+    if self.evaporation_mode[self.evaporation_mode_set] is "exponential":
       phi = self.exponential_phi_decrease(phi)
     else:
       phi = self.cubic_phi_decrease(phi)
