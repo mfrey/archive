@@ -33,6 +33,8 @@ class ExperimentSettings:
     self.send = 0.01
     #
     self.recv = 0.01
+    #
+    self.evaporation_mode = 0
 
   def __str__(self):
     self.name 
@@ -40,6 +42,11 @@ class ExperimentSettings:
 class ConfigurationFile:
   def initialize(self):
     self.filename = ""
+
+  def get_evaporation_mode(self, mode):
+    if mode is "cubic":
+      return 1
+    return 0
 
   def read(self, filename):
     configuration = ConfigParser.ConfigParser()
@@ -75,6 +82,8 @@ class ConfigurationFile:
     dst = int(configuration.get('Experiment','destination'))
     # read the location of the topology file
     repetitions = int(configuration.get('Experiment','repetitions'))
+    # read the evporation mode
+    evaporation_mode = self.get_evaporation_mode(configuration.get('Experiment','evaporation_mode'))
 	# build up the experiment settings
     settings = ExperimentSettings()
     settings.alpha_list = alpha
@@ -90,5 +99,6 @@ class ConfigurationFile:
     settings.repetitions = repetitions
     settings.send = send
     settings.recv = recv
+    settings.evaporation_mode = evaporation_mode
 	# return the results
     return settings

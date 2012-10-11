@@ -17,4 +17,6 @@ class Settings:
     self.slow = 0.4
     # self reduction parameter for cubic evaporation function (reduction \in (0,1))
     self.reduction = 0.5
+    # evaporation mode
+    self.evaporation_mode = 0
 

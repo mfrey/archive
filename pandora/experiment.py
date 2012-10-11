@@ -35,6 +35,9 @@ class Experiment:
     self.generator = log.LogFileGenerator()
 
   def run_experiment(self, packets, source, destination):
+    # set the evaporation mode (TODO: find a better place to set the evaporation mode)
+    self.algorithm.evaporation_mode = self.algorithm.settings.evaporation_mode
+    # route discovery
     self.network.initialize_route_discovery(source, destination)
     # try to send all packets
     for packet in range(1, packets):
@@ -139,6 +142,8 @@ def worker(num):
           settings.xii = configuration_settings.xii
           # set the dot file 
           settings.dot_file = configuration_settings.topology
+          # set the evaporation mode
+          settings.evaporation_mode = configuration_settings.evaporation_mode
 
           experiment = Experiment()
           experiment.settings = settings
