@@ -74,10 +74,8 @@ class Experiment:
     self.network.network = dot_network
     # set the settings
     self.network.settings = self.settings
-    # TODO: verify what the function is actually doing, set up the initial routing table
-    self.network.setInitialRoutingTable()
-    # set the initial energy level
-    self.network.setInitialEnergyLevel(self.settings.xii)
+    # set up the network
+    self.network.setup()
     # set the layout for drawing the network
     self.network.position = nx.spring_layout(self.network.network)
 

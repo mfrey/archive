@@ -367,12 +367,9 @@ def main():
   w.network = network
   # set the settings
   w.settings = settings
-  # set up the initial routing table
-  w.setInitialRoutingTable()
-
+  w.setup()
 #  w.setupRoutingTable(1,8)
 #  w.setupRoutingTableShortestPaths(1,8)
-  w.setInitialEnergyLevel(settings.xii)
   #w.initialize_route_discovery(1,8)
   w.initialize_route_discovery(1,4)
 

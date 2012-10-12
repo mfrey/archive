@@ -20,12 +20,17 @@ class WirelessNetwork:
     self.position = nx.spring_layout(self.network)
     self.routes = {}
 
-  def setInitialEnergyLevel(self,xii):
+  def setup(self):
     for n in self.network.nodes():
-      self.network.node[n]['energy'] = xii
-      self.log_energy_consumption(0, n, xii)
+      # set up routing table
+      self.network.node[n]['routing table'] = rt.RoutingTable()
+      # set up energy level
+      self.network.node[n]['energy'] = self.settings.xii
+      # log it
+      self.log_energy_consumption(0, n, self.network.node[n]['energy'])
+      # set node to active
       self.network.node[n]['active'] = True
-      # todo: move somewhere else
+      # initialize the last packets array
       self.network.node[n]['last packets'] = []
 
   def is_active(self, node):
@@ -102,10 +107,6 @@ class WirelessNetwork:
       else:
         logging.debug('received duplicate packet ' + str(packet.sequence_number) + " at node " + str(node))
         logging.debug('received duplicate packets are ' + str(self.network.node[node]['last packets']))
-
-  def setInitialRoutingTable(self):
-    for n in self.network.nodes():
-      self.network.node[n]['routing table'] = rt.RoutingTable()
 
   def updateRoutingTable(self, packet, entry):
     self.network.node[entry.node_i]['routing table'].add(packet, entry)

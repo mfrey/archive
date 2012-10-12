@@ -4,10 +4,15 @@ import unittest
 import networkx as nx
 
 from network.wirelessnetwork import WirelessNetwork
+from general.settings import Settings
 
 class TestWirelessNetworkFunctions(unittest.TestCase):
   def setUp(self):
     self.network = WirelessNetwork()
+    # create a settings object
+    self.settings = Settings()
+    # set the initial energy level of a node
+    self.settings.xii = 10.0
     # set up a simple network
     network = nx.Graph()
     # add nodes
@@ -23,10 +28,8 @@ class TestWirelessNetworkFunctions(unittest.TestCase):
     source = 1
     # destination node 
     destination = 4
-    #
-    self.network.setInitialRoutingTable()
-    #
-    self.network.setInitialEnergyLevel(10.0)
+    # set up the network
+    self.network.setup();
     # initialize route discovery (test the method)
     self.network.initialize_route_discovery(source, destination)
 
