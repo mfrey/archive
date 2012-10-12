@@ -1,0 +1,1 @@
+export PTYHONPATH:$PYTHONPATH:/`pwd`
