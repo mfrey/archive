@@ -4,6 +4,7 @@ import unittest
 import networkx as nx
 
 from network.wirelessnetwork import WirelessNetwork
+from network.routingtable import RoutingTable
 from general.settings import Settings
 
 class TestWirelessNetworkFunctions(unittest.TestCase):
@@ -13,6 +14,9 @@ class TestWirelessNetworkFunctions(unittest.TestCase):
     self.settings = Settings()
     # set the initial energy level of a node
     self.settings.xii = 10.0
+    # store the settings
+    self.network.settings = self.settings
+
     # set up a simple network
     network = nx.Graph()
     # add nodes
@@ -21,6 +25,21 @@ class TestWirelessNetworkFunctions(unittest.TestCase):
     network.add_edges_from([(1,2),(1,3),(2,4),(3,4)])
     # set the network
     self.network.network = network
+
+
+  def test_setup(self):
+    # test the setup method
+    self.network.setup()
+    # every node should have a routing table
+    for node in self.network.network.nodes():
+      # check if a routing table instance was created
+      self.assertIsInstance(self.network.network.node[node]['routing table'], RoutingTable)
+      # the energy level should match the energy level defined in the settings
+      self.assertIs(self.network.network.node[node]['energy'], self.settings.xii)
+      # check if the active flag was set correctly
+      self.assertTrue(self.network.network.node[node]['active'])
+      # check if the array was initialized
+      self.assertIsNotNone(self.network.network.node[node]['last packets'])
 
   
   def test_initialize_route_discovery(self):
