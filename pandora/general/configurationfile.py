@@ -44,7 +44,7 @@ class ConfigurationFile:
     self.filename = ""
 
   def get_evaporation_mode(self, mode):
-    if mode is "cubic":
+    if mode == "cubic":
       return 1
     return 0
 
@@ -83,7 +83,8 @@ class ConfigurationFile:
     # read the location of the topology file
     repetitions = int(configuration.get('Experiment','repetitions'))
     # read the evporation mode
-    evaporation_mode = self.get_evaporation_mode(configuration.get('Experiment','evaporation_mode'))
+    evaporation_mode = self.get_evaporation_mode(re.sub(r'\s', '',configuration.get('Experiment','evaporation_mode')))
+    print evaporation_mode
 	# build up the experiment settings
     settings = ExperimentSettings()
     settings.alpha_list = alpha
