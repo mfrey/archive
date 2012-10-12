@@ -20,7 +20,7 @@ from general import settings as cfg
 from network import packet as pck
 from network import wirelessnetwork as wifi
 
-logging.basicConfig(filename='example.log',level=logging.DEBUG)
+#logging.basicConfig(filename='example.log',level=logging.DEBUG)
 
 class LogFileGenerator:
   def __init__(self):

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import logging
 import argparse
 import multiprocessing
 
@@ -13,6 +14,8 @@ from network import packet as pck
 from trace import logfilegenerator as log
 from network import wirelessnetwork as wifi
 from general import configurationfile as cfg
+
+logging.basicConfig(filename='experiment.log',level=logging.DEBUG)
 
 class Experiment:
   def __init__(self):
@@ -121,28 +124,38 @@ def worker(num):
           settings = expcfg.Settings()
           # set the number of packets
           packets = configuration_settings.packets 
+          logging.debug('set maximum packets to ' + str(packets))
           # set the alpha weight
           settings.alpha = alpha
+          logging.debug('set alpha to ' + str(settings.alpha))
           # set the alpha weight 
           settings.beta = beta
+          logging.debug('set beta to ' + str(settings.beta))
           # set the value for the energy which is consumed per receive operation
           settings.recv = configuration_settings.recv
+          logging.debug('set energy costs for receiving operations to ' + str(settings.recv))
           # set the value for the energy which is consumed per send operation
           settings.send = configuration_settings.send
+          logging.debug('set energy costs for send operations to ' + str(settings.send))
           # set the q parameter (evaporation process)
           settings.q = configuration_settings.q
+          logging.debug('set q parameter for the evaporation process to ' + str(settings.q))
           # set the delta phi parameter 
           settings.delta_phi = configuration_settings.delta_phi
+          logging.debug('set delta phi parameter for pheromone increase to ' + str(settings.delta_phi))
           # set the initial phi parameter (node)
           settings.phi = configuration_settings.phi
+          logging.debug('set initial phi parameter to ' + str(settings.phi))
           # set the initial energy parameter (node)
           settings.xii = configuration_settings.xii
+          logging.debug('set initial energy value of the nodes to ' + str(settings.xii))
           # set the dot file 
           settings.dot_file = configuration_settings.topology
 
           experiment = Experiment()
           experiment.settings = settings
           directory = 'experiment-' + str(num) + "-" + str(configuration_settings.packets) + '-' + str(alpha) + '-' + str(beta) 
+          logging.debug('create directory ' + str(directory))
           # create log directory
           experiment.create_log_directory(directory)
           # create the network and set it up
@@ -161,7 +174,7 @@ def worker(num):
 
 if __name__ == "__main__":
   jobs = []
-  for i in range(5):
+  for i in range(1):
     p = multiprocessing.Process(target=worker, args=(i,))
     jobs.append(p)
     p.start()

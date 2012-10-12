@@ -5,7 +5,7 @@ import logging
 
 from network import routingtableentry as rte
 
-logging.basicConfig(filename='example.log',level=logging.DEBUG)
+#logging.basicConfig(filename='example.log',level=logging.DEBUG)
 
 class RoutingTable:
   def __init__(self):

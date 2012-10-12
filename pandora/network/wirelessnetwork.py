@@ -4,7 +4,7 @@ import logging
 import networkx as nx
 import matplotlib.pyplot as plt
 
-logging.basicConfig(filename='example.log',level=logging.DEBUG)
+#logging.basicConfig(filename='example.log',level=logging.DEBUG)
 
 from general import settings as cfg
 from network import ant as agent
