@@ -45,6 +45,8 @@ class EnergyAwareAntAlgorithm:
     self.routes = {}
     self.routing_mode = ['weighted','random','best'] 
     self.routing_mode_set = 0
+    self.evaporation_mode = ['exponential','cubic'] 
+    self.evaporation_mode_set = 0
 
   def add_node_to_route_statistics(self, packet, node):
     if packet in self.routes:
@@ -221,7 +223,7 @@ class EnergyAwareAntAlgorithm:
           phi = self.network.network.node[node]['routing table']._table[packet][entry].phi
           if entry[0] != sender:
             # decrease pheromone value
-            phi = self.decreasePheromoneValue(phi)
+            phi = self.decrease_phi(phi)
           else:
             # get the next hop
             node_j = self.network.network.node[node]['routing table']._table[packet][entry].node_j
@@ -235,7 +237,7 @@ class EnergyAwareAntAlgorithm:
             else:
               #result = "##### updatePheromoneValues: decrease value of edge("+ str(entry[0]) + "," + str(entry[1]) + ") = " + str(phi)
               # decrease pheromone value
-              phi = self.decreasePheromoneValue(phi)
+              phi = self.decrease_phi(phi)
               #print result
           # update the routing table
           self.network.set_phi(packet, entry[0], entry[1], entry[2], phi)
@@ -249,8 +251,34 @@ class EnergyAwareAntAlgorithm:
   def increasePheromoneValue(self, phi):
     return (phi + self.settings.delta_phi)
 
-  def decreasePheromoneValue(self, phi):
+  def decrease_phi(self, phi):
+    if self.evaporation_mode[self.evaporation_mode_set] is "exponential":
+      phi = self.exponential_phi_decrease(phi)
+    else:
+      phi = self.cubic_phi_decrease(phi)
+    return phi
+
+  def exponential_phi_decrease(self, phi):
     return (phi * (1 - self.settings.q))
+
+  def cubic_phi_decrease(self, phi):
+    a = 1 - (2 * phi) 
+
+    if a > 0:
+      t = 0.5 * ((abs(a)**(1/self.settings.plateau)) + 1)
+    else:
+      t = 0.5 * (1 - (abs(a)**(1/self.settings.plateau)))
+
+    m = t + (self.settings.reduction * self.settings.slow)
+
+    r = 0.5 * ((((2 * m) - 1)**self.settings.plateau) + 1)
+
+    if(r < 0):
+      return 0
+    elif(r > 1):
+      return 1
+    else:
+      return r
 
   def writeLogFile(self, directory, file_name, content):
     current_path = os.getcwd()
