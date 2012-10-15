@@ -19,7 +19,7 @@ from trace import logfilegenerator as log
 from network import packet as pck
 from network import wirelessnetwork as wifi
 
-#logging.basicConfig(filename='example.log',level=logging.DEBUG)
+logging.basicConfig(filename='example.log',level=logging.DEBUG)
 
 class Helper:
   def cumulated_sum(self,iterable):
@@ -75,7 +75,7 @@ class EnergyAwareAntAlgorithm:
           # calculate the transmission costs
           self.updateTransmissionCosts(packet, sender, destination)
           # update the pheromone values
-          self.updatePheromoneValues(packet, sender, node, destination)
+          self.update_phi(packet, sender, node, destination)
           # forward packet
           self.send(packet, packet_trace, node, destination)
         else:
@@ -214,39 +214,35 @@ class EnergyAwareAntAlgorithm:
       # set the new energy level
       self.network.set_energy_level(packet, node, new_energy_level)
 
-  def updatePheromoneValues(self, packet, sender, nextHop, destination):
-    # iterate over each nodes routing table
-    for node in self.network.network.nodes():
-      if node != destination:
-        # iterate over the routing table entries of the node
-        for entry in self.network.network.node[node]['routing table']._table[packet].keys():
-          phi = self.network.network.node[node]['routing table']._table[packet][entry].phi
-          if entry[0] != sender:
+  
+  def update_phi(self, packet, sender, next_hop, destination):
+    for n in self.network.network.nodes():
+      if n != destination:
+        for e in self.network.network.node[n]['routing table']._table[packet].keys():
+          current_phi = self.network.network.node[n]['routing table']._table[packet][e].phi
+          new_phi = current_phi
+          # current node entry of routing table entry
+          node_i = e[0]
+          # next hop entry of routing table entry
+          node_j = e[1]
+          # destination entry of routing table entry
+          dst = e[2] 
+
+          # node is not sender, so decrease this entry
+          if node_i != sender:
+            logging.debug('decrease phi value for edge(' + str(node_i) + ', ' + str(node_j) + ')i')
             # decrease pheromone value
-            phi = self.decrease_phi(phi)
+            new_phi = self.decrease_phi(current_phi)
           else:
-            # get the next hop
-            node_j = self.network.network.node[node]['routing table']._table[packet][entry].node_j
-            # get the destination of the routing table entry
-            dst = self.network.network.node[node]['routing table']._table[packet][entry].destination
-            # if both matches, increase the edge, else decrease
-            if dst == destination and node_j == nextHop: 
-              phi = self.increasePheromoneValue(phi)
-              #result = "##### updatePheromoneValues: increase value of edge("+ str(entry[0]) + "," + str(entry[1]) + ") = " + str(phi)
-              #print result
+            if dst == destination and node_j == next_hop: 
+              logging.debug('increase phi value for edge(' + str(node_i) + ', ' + str(node_j) + ')i')
+              new_phi = self.increasePheromoneValue(current_phi)
             else:
-              #result = "##### updatePheromoneValues: decrease value of edge("+ str(entry[0]) + "," + str(entry[1]) + ") = " + str(phi)
-              # decrease pheromone value
-              phi = self.decrease_phi(phi)
-              #print result
-          # update the routing table
-          self.network.set_phi(packet, entry[0], entry[1], entry[2], phi)
-#          self.network.network.node[node]['routing table']._table[packet][entry].phi = phi          
-          # if phi is below a threshould
-          #if phi < 0.009 and entry[1] != destination:          
-          #  self.network.network.node[entry[1]]['active'] = False
-          #result = "##### updatePheromoneValues: edge("+ str(entry[0]) + "," + str(entry[1]) + ") = " + str(phi)
-          #print result
+              logging.debug('decrease phi value for edge(' + str(node_i) + ', ' + str(node_j) + ')i')
+              new_phi = self.decrease_phi(current_phi)
+          logging.debug('update phi value for edge(' + str(node_i) + ', ' + str(node_j) + ') to ' + str(new_phi) + '. Former value was ' + str(current_phi))
+          # update the pheromone value to 
+          self.network.set_phi(packet, node_i, node_j, dst, new_phi)
 
   def increasePheromoneValue(self, phi):
     return (phi + self.settings.delta_phi)
@@ -415,25 +411,25 @@ def main():
 
   generator = log.LogFileGenerator()
   generator.packet_trace = packet_trace_container
-  generator.generate_routing_decision_trace('test_routingdecision_trace.csv')
+  generator.generate_routing_decision_trace('.', 'test_routingdecision_trace.csv')
   generator.generate_paths()
   generator.network = w
   generator.settings = settings
   generator.position = nx.spring_layout(network)
-  generator.write_routes_log_file('routes.csv')
-  generator.write_energy_log_file('energy.csv')
-  generator.write_energy_per_route_log_file('energy_total.csv')
-  generator.write_routing_decision('routing_decision_trace.csv')
-  generator.write_last_sucessful_packet('last_packet.csv')
+  generator.write_routes_log_file('.', 'routes.csv')
+  generator.write_energy_log_file('.', 'energy.csv')
+  generator.write_energy_per_route_log_file('.', 'energy_total.csv')
+  generator.write_routing_decision('.', 'routing_decision_trace.csv')
+  generator.write_last_sucessful_packet('.', 'last_packet.csv')
   #generator.animate()
 #  generator.write_route_pheromone_log_file('route_pheromone_log.csv')
-  generator.generate_active_path_phi('route_pheromone_log.csv')
-  generator.write_route_trace_mg('route_trace_mg.csv')
+  generator.generate_active_path_phi('.', 'route_pheromone_log.csv')
+  generator.write_route_trace_mg('.', 'route_trace_mg.csv')
   #generator.write_route_pheromone_log_file('route_pheromone_log.csv')
 
 #algorithm.writeEnergyConsumptionTrace('energy.csv')
-  algorithm.writeRoutingTableTrace('routingtable_trace.csv')
-  algorithm.writeRoutingDecisionTrace('routingdecision_trace.csv')
+  algorithm.writeRoutingTableTrace('.', 'routingtable_trace.csv')
+  algorithm.writeRoutingDecisionTrace('.', 'routingdecision_trace.csv')
 
 if __name__ == "__main__":
   main()

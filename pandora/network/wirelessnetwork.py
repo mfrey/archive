@@ -4,7 +4,7 @@ import logging
 import networkx as nx
 import matplotlib.pyplot as plt
 
-#logging.basicConfig(filename='example.log',level=logging.DEBUG)
+logging.basicConfig(filename='example.log',level=logging.DEBUG)
 
 from general import settings as cfg
 from network import ant as agent
@@ -14,7 +14,6 @@ from network import routingtableentry as rte
 class WirelessNetwork:
   def __init__(self):
     self.network = nx.Graph()
-    #self.network = nx.DiGraph()
     self.settings = cfg.Settings()
     self.energy_consumption = []
     self.position = nx.spring_layout(self.network)
@@ -57,7 +56,7 @@ class WirelessNetwork:
   def find_route(self, previous_hop, packet, node):
     # we have finally received the destination node
     if node == packet.destination:
-       logging.debug('finally at the destination node ' + str(node) + ' at destination node ' + str(node))
+       logging.debug('finally at the destination node ' + str(node))
        if packet.fant == True:
          logging.debug('packet ' + str(packet.sequence_number) + ' at destination node ' + str(node))
          new_pkt = agent.Ant()
@@ -67,12 +66,13 @@ class WirelessNetwork:
          # change the type of the packet
          new_pkt.fant = False
          new_pkt.xii  = self.network.node[node]['energy']
+         # set the packet id
+         new_pkt.sequence_number = packet.sequence_number + 1
+         logging.debug('create new ant agent ' + str(new_pkt))
          #
          entry  = self.createRoutingTableEntry(node, previous_hop, new_pkt.destination, self.settings.phi, new_pkt.xii)
 	     # add the entry to the routing table
          self.updateRoutingTable(0, entry)
-         # set the packet id
-         new_pkt.sequence_number = packet.sequence_number + 1
          # append the packet id to the 'last packets' vector at the destination
          self.network.node[node]['last packets'].append(new_pkt.sequence_number)
          # send the packet back
