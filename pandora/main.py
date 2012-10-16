@@ -171,6 +171,7 @@ class EnergyAwareAntAlgorithm:
       # get a random number
       q = random.uniform(0,1)
       # find in which section of the cumulated density it's located
+      logging.debug('q is: ' + str(q))
       path = 0
       
       while q > cumulatedDensity[path]:
