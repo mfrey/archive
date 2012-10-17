@@ -20,7 +20,7 @@ from general import settings as cfg
 from network import packet as pck
 from network import wirelessnetwork as wifi
 
-module_logger = logging.getLogger(__name__)
+module_logger = logging.getLogger('trace')
 
 class LogFileGenerator:
   def __init__(self):
@@ -33,7 +33,7 @@ class LogFileGenerator:
     self.fu_orange = "#FF9900"
     self.settings = cfg.Settings()
     self.logger = logging.getLogger(__name__)
-    self.logger.setLevel(self.logger.DEBUG)
+    self.logger.setLevel(logging.DEBUG)
 
   def generate_routing_decision_trace(self, directory, file_name):
     cur_dir = os.getcwd()

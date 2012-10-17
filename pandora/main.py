@@ -377,6 +377,8 @@ def main():
   #w.initialize_route_discovery(1,8)
   w.initialize_route_discovery(1,39)
   w.set_initial_phi_value(1,39)
+  w.file_handler = fh
+  w.logger.addHandler(fh)
 
 #w.network.node[2]['energy'] = 5.0
 #w.network.node[3]['energy'] = 5.0
@@ -421,6 +423,7 @@ def main():
       break
 
   generator = log.LogFileGenerator()
+  generator.logger.addHandler(fh)
   generator.packet_trace = packet_trace_container
   generator.generate_routing_decision_trace('.', 'test_routingdecision_trace.csv')
   generator.generate_paths()

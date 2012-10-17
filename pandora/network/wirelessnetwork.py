@@ -19,12 +19,15 @@ class WirelessNetwork:
     self.position = nx.spring_layout(self.network)
     self.routes = {}
     self.logger = logging.getLogger(__name__)
-    self.logger.setLevel(self.logger.DEBUG)
+    self.logger.setLevel(logging.DEBUG)
+    # the handler should be overwritten by another lcass
+    self.file_handler = logging.FileHandler('log_file_does_not_exist.log')
 
   def setup(self):
     for n in self.network.nodes():
       # set up routing table
       self.network.node[n]['routing table'] = rt.RoutingTable()
+      self.network.node[n]['routing table'].logger.addHandler(self.file_handler)
       # set up energy level
       self.network.node[n]['energy'] = self.settings.xii
       # log it

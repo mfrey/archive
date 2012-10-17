@@ -15,13 +15,25 @@ from trace import logfilegenerator as log
 from network import wirelessnetwork as wifi
 from general import configurationfile as cfg
 
-logging.basicConfig(filename='experiment.log',level=logging.DEBUG)
+module_logger = logging.getLogger(__name__)
 
 class Experiment:
   def __init__(self):
+    self.logger = logging.getLogger(__name__)
+    self.logger.setLevel(logging.DEBUG)
+    self.file_handler = logging.FileHandler('experiment.log')
+    self.file_handler.setLevel(logging.DEBUG)
+    self.logger.addHandler(self.file_handler)
+
     self.settings = expcfg.Settings()
     self.network = wifi.WirelessNetwork()
+    # add file handler of experiment to wirelessnetwork class logger
+    self.network.logger.addHandler(self.file_handler)
+    # and also store the file hanlder
+    self.network.file_handler = self.file_handler
     self.algorithm = m.EnergyAwareAntAlgorithm()
+    # set file handler for algorithm class
+    self.algorithm.logger.addHandler(self.file_handler)
     self.packet_trace_container = {}
     self.log_dir = ""
 
@@ -80,6 +92,9 @@ class Experiment:
     self.network.position = nx.spring_layout(self.network.network)
 
   def generate_log_files(self):
+    # add file handler of experiment to logfilegenerator class logger
+    self.generator.logger.addHandler(self.file_handler)
+
     self.generator.packet_trace = self.packet_trace_container
     self.generator.generate_routing_decision_trace(self.log_dir, 'test_routingdecision_trace.csv')
     self.generator.generate_paths()

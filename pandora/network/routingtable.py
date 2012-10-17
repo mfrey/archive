@@ -11,7 +11,7 @@ class RoutingTable:
   def __init__(self):
     self._table = {}
     self.logger = logging.getLogger(__name__)
-    self.logger.setLevel(self.logger.DEBUG)
+    self.logger.setLevel(logging.DEBUG)
 
   def add(self, packet, entry):
     key= (entry.node_i, entry.node_j, entry.destination)
