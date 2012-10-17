@@ -40,7 +40,6 @@ class TestWirelessNetworkFunctions(unittest.TestCase):
       self.assertTrue(self.network.network.node[node]['active'])
       # check if the array was initialized
       self.assertIsNotNone(self.network.network.node[node]['last packets'])
-
   
   def test_initialize_route_discovery(self):
     # source node

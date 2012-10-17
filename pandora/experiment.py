@@ -89,18 +89,25 @@ class Experiment:
     #self.generator.position = nx.spring_layout(self.network)
     self.generator.write_routes_log_file(self.log_dir, 'routes.csv')
     self.generator.write_energy_log_file(self.log_dir, 'energy.csv')
-    self.generator.write_energy_per_route_log_file(self.log_dir, 'energy_total.csv')
+    # DEACTIVATED:
+    #self.generator.write_energy_per_route_log_file(self.log_dir, 'energy_total.csv')
     self.generator.write_routing_decision(self.log_dir, 'routing_decision_trace.csv')
-    self.generator.write_last_sucessful_packet(self.log_dir, 'last_packet.csv')
+    # DEACTIVATED:
+    #self.generator.write_last_sucessful_packet(self.log_dir, 'last_packet.csv')
     #generator.animate()
 #  generator.write_route_pheromone_log_file('route_pheromone_log.csv')
     self.generator.generate_active_path_phi(self.log_dir, 'route_pheromone_log.csv')
-    self.generator.write_route_trace_mg(self.log_dir, 'route_trace_mg.csv')
+    # DEACTIVATED:
+    #self.generator.write_route_trace_mg(self.log_dir, 'route_trace_mg.csv')
+
     #generator.write_route_pheromone_log_file('route_pheromone_log.csv')
 
     #algorithm.writeEnergyConsumptionTrace('energy.csv')
+
     self.algorithm.writeRoutingTableTrace(self.log_dir, 'routingtable_trace.csv')
-    self.algorithm.writeRoutingDecisionTrace(self.log_dir, 'routingdecision_trace.csv')
+
+    # DEACTIVATED:
+#    self.algorithm.writeRoutingDecisionTrace(self.log_dir, 'routingdecision_trace.csv')
 
 
 def worker(num):

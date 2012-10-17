@@ -5,7 +5,7 @@ import pygraphviz as pgv
 
 class DotFileReader:
   def initialize(self):
-    self.graph = pgv.Agraph()
+    self.graph = pgv.AGraph()
 
   def read_dot_file(self, filename):
     self.graph = pgv.AGraph(filename)

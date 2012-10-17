@@ -4,12 +4,12 @@ import logging
 import networkx as nx
 import matplotlib.pyplot as plt
 
-logging.basicConfig(filename='example.log',level=logging.DEBUG)
-
 from general import settings as cfg
 from network import ant as agent
 from network import routingtable as rt
 from network import routingtableentry as rte
+
+module_logger = logging.getLogger(__name__)
 
 class WirelessNetwork:
   def __init__(self):
@@ -18,6 +18,8 @@ class WirelessNetwork:
     self.energy_consumption = []
     self.position = nx.spring_layout(self.network)
     self.routes = {}
+    self.logger = logging.getLogger(__name__)
+    self.logger.setLevel(self.logger.DEBUG)
 
   def setup(self):
     for n in self.network.nodes():
@@ -50,15 +52,15 @@ class WirelessNetwork:
     self.network.node[source]['last packets'].append(0)
     # send forward ant agents
     for n in self.network.neighbors_iter(source):
-      logging.debug('send forward agent to node ' + str(n))
+      self.logger.debug('send forward agent to node ' + str(n))
       self.find_route(source, pkt, n) 
 
   def find_route(self, previous_hop, packet, node):
     # we have finally received the destination node
     if node == packet.destination:
-       logging.debug('finally at the destination node ' + str(node))
+       self.logger.debug('finally at the destination node ' + str(node))
        if packet.fant == True:
-         logging.debug('packet ' + str(packet.sequence_number) + ' at destination node ' + str(node))
+         self.logger.debug('packet ' + str(packet.sequence_number) + ' at destination node ' + str(node))
          new_pkt = agent.Ant()
          # switch source and destination in the agent
          new_pkt.destination = packet.source
@@ -68,7 +70,7 @@ class WirelessNetwork:
          new_pkt.xii  = self.network.node[node]['energy']
          # set the packet id
          new_pkt.sequence_number = packet.sequence_number + 1
-         logging.debug('create new ant agent ' + str(new_pkt))
+         self.logger.debug('create new ant agent ' + str(new_pkt))
          #
          entry  = self.createRoutingTableEntry(node, previous_hop, new_pkt.destination, self.settings.phi, new_pkt.xii)
 	     # add the entry to the routing table
@@ -80,7 +82,7 @@ class WirelessNetwork:
            self.find_route(node, new_pkt, n)
          # todo: update costs
        else:
-         logging.debug('add entry (node_i, node_j, dst) ' + str(node) + ', ' + str(previous_hop) + ', ' + str(packet.source))
+         self.logger.debug('add entry (node_i, node_j, dst) ' + str(node) + ', ' + str(previous_hop) + ', ' + str(packet.source))
          xii  = self.network.node[node]['energy']
          entry  = self.createRoutingTableEntry(node, previous_hop, packet.source, self.settings.phi, xii)
 	     # add the entry to the routing table
@@ -89,9 +91,9 @@ class WirelessNetwork:
     else:
       # check if we have seen the packet already
       if packet.sequence_number not in self.network.node[node]['last packets']:
-        logging.debug('node ' + str(node) + " received packet " + str(packet.sequence_number))
+        self.logger.debug('node ' + str(node) + " received packet " + str(packet.sequence_number))
         entry  = self.createRoutingTableEntry(node, previous_hop, packet.source, self.settings.phi, packet.xii)
-        logging.debug('add entry (node_i, node_j, dst) ' + str(node) + ", " + str(previous_hop) + ", " + str(packet.source))
+        self.logger.debug('add entry (node_i, node_j, dst) ' + str(node) + ", " + str(previous_hop) + ", " + str(packet.source))
 	    # add the entry to the routing table
         self.updateRoutingTable(0, entry)
         # append the packet id to the 'last packets' vector at the destination
@@ -105,8 +107,21 @@ class WirelessNetwork:
 
       # log the duplicate 
       else:
-        logging.debug('received duplicate packet ' + str(packet.sequence_number) + " at node " + str(node))
-        logging.debug('received duplicate packets are ' + str(self.network.node[node]['last packets']))
+        self.logger.debug('received duplicate packet ' + str(packet.sequence_number) + " at node " + str(node))
+        self.logger.debug('received duplicate packets are ' + str(self.network.node[node]['last packets']))
+
+  def set_initial_phi_value(self, src, dst):
+    # get all shortest paths between a source and a destination
+    paths = nx.all_shortest_paths(self.network, source=src, target=dst)
+    # iterate over the paths
+    for path in paths:
+      for index, node in enumerate(path):
+        # check if it is the last element in the list
+        if index != (len(path)-1):
+          node_i = node
+          node_j = path[index+1]
+          phi = 2 * self.network.node[node]['routing table'].get_phi(0, node_i, node_j, dst)
+          self.network.node[node]['routing table'].set_phi(0, node_i, node_j, dst, phi)
 
   def updateRoutingTable(self, packet, entry):
     self.network.node[entry.node_i]['routing table'].add(packet, entry)
@@ -132,7 +147,7 @@ class WirelessNetwork:
           print str(packet) + ', ' + str(routing_table_entry.node_i) + ', ' + str(routing_table_entry.node_j) + ', ' + str(routing_table_entry.destination) + ', ' + str(routing_table_entry.phi) + ', ' + str(routing_table_entry.xii)
 
   def createRoutingTableEntry(self, node_i, node_j, destination, phi, xii):
-    logging.debug('create routing table entry for node ' + str(node_i) + ' to node ' + str(destination) + ' via ' + str(node_j) + ' with phi ' + str(phi) + ' and energy value ' + str(xii))
+    self.logger.debug('create routing table entry for node ' + str(node_i) + ' to node ' + str(destination) + ' via ' + str(node_j) + ' with phi ' + str(phi) + ' and energy value ' + str(xii))
     entry = rte.RoutingTableEntry()
     entry.node_i      = node_i
     entry.node_j      = node_j
@@ -160,7 +175,7 @@ class WirelessNetwork:
   def set_energy_level(self, packet, node, energy):
     # iterate over the neighbors (predecessors and successors)
     for n in self.network.neighbors(node):
-      logging.debug('set energy level of node ' + str(node) + " at node " + str(n) + " and packet " + str(packet))
+      self.logger.debug('set energy level of node ' + str(node) + " at node " + str(n) + " and packet " + str(packet))
       self.network.node[n]['routing table'].set_energy_level(packet, node, energy)
     self.network.node[node]['energy'] = energy;
 
@@ -168,7 +183,7 @@ class WirelessNetwork:
 	return self.network.node[sender]['routing table'].get_phi(packet, sender, node, destination)
 
   def set_phi(self, packet, sender, node, destination, phi):
-    logging.debug('set phi of edge(' + str(sender) + ", " + str(node) + ") to " + str(phi) + ' and destination is ' + str(destination))
+    self.logger.debug('set phi of edge(' + str(sender) + ", " + str(node) + ") to " + str(phi) + ' and destination is ' + str(destination))
     # TODO create a settings constant for threshold
     if phi < 0.09:
       inactive_flag = True
@@ -177,12 +192,12 @@ class WirelessNetwork:
         if entry[0] == node:
           # if there is an entry with an higher pheromone value 
           if self.network.node[node]['routing table'].get_phi(packet, entry[0], entry[1], entry[2]) > 0.09:
-            logging.debug('found entry(' + str(entry[0]) + "," + str(entry[1]) + "," + str(entry[2]) + ") with a pheromone value above threshold")
+            self.logger.debug('found entry(' + str(entry[0]) + "," + str(entry[1]) + "," + str(entry[2]) + ") with a pheromone value above threshold")
             inactive_flag = False
             break
 
       if inactive_flag:
-        logging.debug('set node ' + str(node) + " to inactive")
+        self.logger.debug('set node ' + str(node) + " to inactive")
         # set the node to inactive
         self.network.node[node]['active'] = False
       # invalidate the link

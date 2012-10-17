@@ -7,7 +7,7 @@ import sys
 import copy
 import pylab
 import random
-import logging
+import logging 
 import argparse
 import traceback
 import itertools
@@ -19,7 +19,7 @@ from trace import logfilegenerator as log
 from network import packet as pck
 from network import wirelessnetwork as wifi
 
-logging.basicConfig(filename='example.log',level=logging.DEBUG)
+module_logger = logging.getLogger(__name__)
 
 class Helper:
   def cumulated_sum(self,iterable):
@@ -47,6 +47,9 @@ class EnergyAwareAntAlgorithm:
     self.routing_mode_set = 0
     self.evaporation_mode = ['exponential','cubic'] 
     self.evaporation_mode_set = 0
+    self.logger = logging.getLogger(__name__)
+    self.logger.setLevel(logging.DEBUG)
+    #logging.disable(logging.DEBUG)
 
   def add_node_to_route_statistics(self, packet, node):
     if packet in self.routes:
@@ -55,7 +58,7 @@ class EnergyAwareAntAlgorithm:
       self.routes[packet] = [packet, node]
 
   def send(self, packet, packet_trace, sender, destination):
-      logging.debug('send called for sender ' + str(sender) + " and destination " + str(destination))
+      self.logger.debug('send called for sender ' + str(sender) + " and destination " + str(destination))
 
       if sender != destination:
         if not self.network.is_active(sender):
@@ -92,10 +95,10 @@ class EnergyAwareAntAlgorithm:
           self.network.log_energy_consumption(packet, node, self.network.network.node[node]['energy'])
 
   def get_next_node(self, packet, sender, destination):
-    logging.debug('get next node for node ' + str(sender) + ' towards destination node ' +  str(destination))
+    self.logger.debug('get next node for node ' + str(sender) + ' towards destination node ' +  str(destination))
     # get the neighbor nodes towards a destination
     nodes = self.network.getNeighborsTowardsDestination(packet, sender, destination)
-    logging.debug('neighbors of node ' + str(sender) + " towards destination are " + str(nodes))
+    self.logger.debug('neighbors of node ' + str(sender) + " towards destination are " + str(nodes))
     # count how many of the neighbor nodes are in active 
     inactive  = 0
 
@@ -107,7 +110,7 @@ class EnergyAwareAntAlgorithm:
         inactive = inactive + 1
 	
     if inactive == len(nodes):
-      logging.debug('no active neighbor nodes at node ' + str(sender))
+      self.logger.debug('no active neighbor nodes at node ' + str(sender))
       # no active nodes anymore 
       return -1
 	
@@ -140,9 +143,9 @@ class EnergyAwareAntAlgorithm:
     for node in nodes:
       phi   = self.network.get_phi(packet, sender, node, destination)
       #print "======> phi:", phi
-      logging.debug('phi for edge(' + str(sender) + ', ' + str(node) + ') is ' + str(phi))
+      self.logger.debug('phi for edge(' + str(sender) + ', ' + str(node) + ') is ' + str(phi))
       xii   = self.network.get_energy_level(node)
-      logging.debug('energy level of node ' + str(node) + ' is ' + str(xii))
+      self.logger.debug('energy level of node ' + str(node) + ' is ' + str(xii))
       #print "======> xii:", xii
       # todo: check if this is really correct
       p_sum = p_sum + pow(phi, self.settings.alpha) + pow(xii, self.settings.beta)
@@ -150,7 +153,7 @@ class EnergyAwareAntAlgorithm:
       
     #print "=======> p_sum:", p_sum
 
-    logging.debug('p_sum is ' + str(p_sum))
+    self.logger.debug('p_sum is ' + str(p_sum))
     # calculate the probablity
     for index, value in enumerate(p):
       phi   = self.network.get_phi(packet, sender, nodes[index], destination)
@@ -167,11 +170,11 @@ class EnergyAwareAntAlgorithm:
     else:
       # compute the cumulated density
       cumulatedDensity = list(self.helper.cumulated_sum(distribution))
-      logging.debug('cumulated density is  ' + str(cumulatedDensity))
+      self.logger.debug('cumulated density is  ' + str(cumulatedDensity))
       # get a random number
       q = random.uniform(0,1)
       # find in which section of the cumulated density it's located
-      logging.debug('q is: ' + str(q))
+      self.logger.debug('q is: ' + str(q))
       path = 0
       
       while q > cumulatedDensity[path]:
@@ -183,7 +186,7 @@ class EnergyAwareAntAlgorithm:
 #         else:
 # 	      path = path + 1
       # return the path
-      logging.debug('path is  ' + str(path))
+      self.logger.debug('path is  ' + str(path))
       return path;
 
   def updateTransmissionCosts(self, packet, sender, destination):
@@ -231,17 +234,17 @@ class EnergyAwareAntAlgorithm:
 
           # node is not sender, so decrease this entry
           if node_i != sender:
-            logging.debug('decrease phi value for edge(' + str(node_i) + ', ' + str(node_j) + ')i')
+            self.logger.debug('decrease phi value for edge(' + str(node_i) + ', ' + str(node_j) + ')i')
             # decrease pheromone value
             new_phi = self.decrease_phi(current_phi)
           else:
             if dst == destination and node_j == next_hop: 
-              logging.debug('increase phi value for edge(' + str(node_i) + ', ' + str(node_j) + ')i')
+              self.logger.debug('increase phi value for edge(' + str(node_i) + ', ' + str(node_j) + ')i')
               new_phi = self.increasePheromoneValue(current_phi)
             else:
-              logging.debug('decrease phi value for edge(' + str(node_i) + ', ' + str(node_j) + ')i')
+              self.logger.debug('decrease phi value for edge(' + str(node_i) + ', ' + str(node_j) + ')i')
               new_phi = self.decrease_phi(current_phi)
-          logging.debug('update phi value for edge(' + str(node_i) + ', ' + str(node_j) + ') to ' + str(new_phi) + '. Former value was ' + str(current_phi))
+          self.logger.debug('update phi value for edge(' + str(node_i) + ', ' + str(node_j) + ') to ' + str(new_phi) + '. Former value was ' + str(current_phi))
           # update the pheromone value to 
           self.network.set_phi(packet, node_i, node_j, dst, new_phi)
 
@@ -298,13 +301,17 @@ class EnergyAwareAntAlgorithm:
       log_file.writerow(value)
 
 def main():
+  # create file handler which logs even debug messages
+  fh = logging.FileHandler('example_2.log')
+  fh.setLevel(logging.DEBUG)
+
   parser = argparse.ArgumentParser(description='evaluation script for the energy aware ant routing algorithm')
   parser.add_argument('-p', dest='packets', type=int, default=10, action='store', help='number of packets to send')
   parser.add_argument('-s', dest='send', type=float, default=0.02, action='store', help='energy consumed per send operation')
   parser.add_argument('-r', dest='receive', type=float, default=0.01, action='store', help='energy consumed per receive operation')
-  parser.add_argument('-e', dest='energy', type=float, default=1.0, action='store', help='initial energy value')
-  parser.add_argument('-q', dest='q', type=float, default=0.2, action='store', help='q parameter for evaporation process')
-  parser.add_argument('-d', dest='delta', type=float, default=0.1, action='store', help='delta phi parameter for pheromone increase')
+  parser.add_argument('-e', dest='energy', type=float, default=10.0, action='store', help='initial energy value')
+  parser.add_argument('-q', dest='q', type=float, default=0.1, action='store', help='q parameter for evaporation process')
+  parser.add_argument('-d', dest='delta', type=float, default=1.0, action='store', help='delta phi parameter for pheromone increase')
   parser.add_argument('-a', dest='alpha', type=float, default=1.0, action='store', help='weight alpha for transmission probablity')
   parser.add_argument('-b', dest='beta', type=float, default=1.0, action='store', help='weight beta for transmission probablity')
   parser.add_argument('-P', dest='phi', type=float, default=1.0, action='store', help='initial phi value')
@@ -317,35 +324,35 @@ def main():
 
   # set the number of packets
   packets = args.packets 
-  logging.debug('set number of packets to ' + str(packets))
+  module_logger.debug('set number of packets to ' + str(packets))
   # set the alpha weight
   settings.alpha = args.alpha
-  logging.debug('set alpha to ' + str(settings.alpha))
+  module_logger.debug('set alpha to ' + str(settings.alpha))
   # set the alpha weight 
   settings.beta = args.beta
-  logging.debug('set beta to ' + str(settings.beta))
+  module_logger.debug('set beta to ' + str(settings.beta))
   # set the value for the energy which is consumed per receive operation
   settings.recv = args.receive
-  logging.debug('set energy consumption for receive operation to ' + str(settings.recv))
+  module_logger.debug('set energy consumption for receive operation to ' + str(settings.recv))
   # set the value for the energy which is consumed per send operation
   settings.send = args.send
-  logging.debug('set energy consumption for send operation to ' + str(settings.send))
+  module_logger.debug('set energy consumption for send operation to ' + str(settings.send))
   # set the q parameter (evaporation process)
   settings.q = args.q
-  logging.debug('set q paramater of pheromone evaporation to ' + str(settings.q))
+  module_logger.debug('set q paramater of pheromone evaporation to ' + str(settings.q))
   # set the delta phi parameter 
   settings.delta_phi = args.delta
-  logging.debug('set delta phi paramater of pheromone increase to ' + str(settings.delta_phi))
+  module_logger.debug('set delta phi paramater of pheromone increase to ' + str(settings.delta_phi))
   # set the initial phi parameter (node)
   settings.phi = args.phi
-  logging.debug('set initial phi to ' + str(settings.phi))
+  module_logger.debug('set initial phi to ' + str(settings.phi))
   # set the initial energy parameter (node)
   settings.xii = args.energy
-  logging.debug('set initial energy to ' + str(settings.xii))
+  module_logger.debug('set initial energy to ' + str(settings.xii))
   # set the dot file 
   settings.dot_file = args.dot_file
   if settings.dot_file != "":
-    logging.debug('will load dot file' + str(settings.dot_file))
+    module_logger.debug('will load dot file' + str(settings.dot_file))
 
   network = nx.Graph()
 
@@ -368,7 +375,8 @@ def main():
 #  w.setupRoutingTable(1,8)
 #  w.setupRoutingTableShortestPaths(1,8)
   #w.initialize_route_discovery(1,8)
-  w.initialize_route_discovery(1,4)
+  w.initialize_route_discovery(1,39)
+  w.set_initial_phi_value(1,39)
 
 #w.network.node[2]['energy'] = 5.0
 #w.network.node[3]['energy'] = 5.0
@@ -385,6 +393,8 @@ def main():
   algorithm.settings = settings
   algorithm.network = w
 
+  algorithm.logger.addHandler(fh)
+
   packet_trace_container = {}
 
   for packet in range(1,packets):
@@ -395,10 +405,10 @@ def main():
         packet_trace = pck.Packet()
         packet_trace_container[packet] = packet_trace
         packet_trace.src = 1
-        packet_trace.dst = 4 
+        packet_trace.dst = 39 
         # we geht the current energy level of the network (initial energy level)
         packet_trace.network_initial_xii = algorithm.network.get_network_energy()
-        algorithm.send(packet, packet_trace, 1, 4)
+        algorithm.send(packet, packet_trace, 1, 39)
         # we geht the current energy level of the network (energy level after transmissions)
         packet_trace.network_final_xii = algorithm.network.get_network_energy()
         # compute the tranmission costs
@@ -418,19 +428,23 @@ def main():
   generator.settings = settings
   generator.position = nx.spring_layout(network)
   generator.write_routes_log_file('.', 'routes.csv')
-  generator.write_energy_log_file('.', 'energy.csv')
+# DEACTIVATED
+#  generator.write_energy_log_file('.', 'energy.csv')
   generator.write_energy_per_route_log_file('.', 'energy_total.csv')
   generator.write_routing_decision('.', 'routing_decision_trace.csv')
-  generator.write_last_sucessful_packet('.', 'last_packet.csv')
+#  generator.write_last_sucessful_packet('.', 'last_packet.csv')
   #generator.animate()
 #  generator.write_route_pheromone_log_file('route_pheromone_log.csv')
   generator.generate_active_path_phi('.', 'route_pheromone_log.csv')
-  generator.write_route_trace_mg('.', 'route_trace_mg.csv')
+
+  # DEACTIVATED
+  #generator.write_route_trace_mg('.', 'route_trace_mg.csv')
+
   #generator.write_route_pheromone_log_file('route_pheromone_log.csv')
 
 #algorithm.writeEnergyConsumptionTrace('energy.csv')
   algorithm.writeRoutingTableTrace('.', 'routingtable_trace.csv')
-  algorithm.writeRoutingDecisionTrace('.', 'routingdecision_trace.csv')
+#  algorithm.writeRoutingDecisionTrace('.', 'routingdecision_trace.csv')
 
 if __name__ == "__main__":
   main()
