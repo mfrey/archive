@@ -36,8 +36,6 @@ class Experiment:
     self.algorithm.logger.addHandler(self.file_handler)
     self.packet_trace_container = {}
     self.log_dir = ""
-    self.src = -1
-    self.dst = -1
 
   def create_log_directory(self, directory):
     if not os.path.exists(directory):
@@ -52,7 +50,7 @@ class Experiment:
     self.generator = log.LogFileGenerator()
 
   def run_experiment(self, packets, source, destination):
-    # set the evaporation mode (TODO: find a better place to set the evaporation mode)
+    # set the evaporation mode
     self.algorithm.evaporation_mode_set = self.algorithm.settings.evaporation_mode
     # route discovery
     self.network.initialize_route_discovery(source, destination)
@@ -91,9 +89,6 @@ class Experiment:
       self.network.network = file_reader.read_json_graph(topology_file)
     else: 
       print "this should never happen" 
-
-    if self.src == -1:
-      self.src, self.dst = self.network.find_pair()
 
     # set the settings
     self.network.settings = self.settings
@@ -137,70 +132,80 @@ class Experiment:
 
 
 def worker(num):
-  print 'Worker:', num
-  #parser = argparse.ArgumentParser(description='evaluation script for the energy aware ant routing algorithm')
-  #parser.add_argument('-c', dest='configuration_file', type=str, default="", action='store', help='configuration settings')
+  file_handler = logging.FileHandler('experiment.log')
+  file_handler.setLevel(logging.DEBUG)
+  module_logger.addHandler(file_handler)
 
-  #arguments = parser.parse_args()
+  print 'Worker:', num
   arguments_configuration_file = "settings-" + str(num) + ".ini"
 
   if arguments_configuration_file != "":
-    # automatically detect number of possible workers
     configuration = cfg.ConfigurationFile()
     # read the configuration file
     configuration_settings = configuration.read(arguments_configuration_file)
     # set the repetitions
     repetitions = configuration_settings.repetitions + 1
-    for alpha in configuration_settings.alpha_list:
-      for beta in configuration_settings.beta_list:
-        for repetition in range(1, repetitions):
-          # prepare the experiment
-          settings = expcfg.Settings()
-          # set the number of packets
-          packets = configuration_settings.packets 
-          logging.debug('set maximum packets to ' + str(packets))
-          # set the alpha weight
-          settings.alpha = alpha
-          logging.debug('set alpha to ' + str(settings.alpha))
-          # set the alpha weight 
-          settings.beta = beta
-          logging.debug('set beta to ' + str(settings.beta))
-          # set the value for the energy which is consumed per receive operation
-          settings.recv = configuration_settings.recv
-          logging.debug('set energy costs for receiving operations to ' + str(settings.recv))
-          # set the value for the energy which is consumed per send operation
-          settings.send = configuration_settings.send
-          logging.debug('set energy costs for send operations to ' + str(settings.send))
-          # set the q parameter (evaporation process)
-          settings.q = configuration_settings.q
-          logging.debug('set q parameter for the evaporation process to ' + str(settings.q))
-          # set the delta phi parameter 
-          settings.delta_phi = configuration_settings.delta_phi
-          logging.debug('set delta phi parameter for pheromone increase to ' + str(settings.delta_phi))
-          # set the initial phi parameter (node)
-          settings.phi = configuration_settings.phi
-          logging.debug('set initial phi parameter to ' + str(settings.phi))
-          # set the initial energy parameter (node)
-          settings.xii = configuration_settings.xii
-          logging.debug('set initial energy value of the nodes to ' + str(settings.xii))
-          # set the topology file 
-          settings.topology_file = configuration_settings.topology
-          # set the evaporation mode
-          settings.evaporation_mode = configuration_settings.evaporation_mode
+    # prepare the experiment
+    settings = expcfg.Settings()
+    # set the number of packets
+    packets = configuration_settings.packets 
+    module_logger.debug('set maximum packets to ' + str(packets))
+    # set the value for the energy which is consumed per receive operation
+    settings.recv = configuration_settings.recv
+    module_logger.debug('set energy costs for receiving operations to ' + str(settings.recv))
+    # set the value for the energy which is consumed per send operation
+    settings.send = configuration_settings.send
+    module_logger.debug('set energy costs for send operations to ' + str(settings.send))
+    # set the q parameter (evaporation process)
+    settings.q = configuration_settings.q
+    module_logger.debug('set q parameter for the evaporation process to ' + str(settings.q))
+    # set the delta phi parameter 
+    settings.delta_phi = configuration_settings.delta_phi
+    module_logger.debug('set delta phi parameter for pheromone increase to ' + str(settings.delta_phi))
+    # set the initial phi parameter (node)
+    settings.phi = configuration_settings.phi
+    module_logger.debug('set initial phi parameter to ' + str(settings.phi))
+    # set the initial energy parameter (node)
+    settings.xii = configuration_settings.xii
+    module_logger.debug('set initial energy value of the nodes to ' + str(settings.xii))
+    # set the topology file 
+    settings.topology_file = configuration_settings.topology
+    # set the evaporation mode
+    settings.evaporation_mode = configuration_settings.evaporation_mode
 
+    for alpha in configuration_settings.alpha_list:
+      # set the alpha weight
+      settings.alpha = alpha
+      module_logger.debug('set alpha to ' + str(settings.alpha))
+      for beta in configuration_settings.beta_list:
+        # set the alpha weight 
+        settings.beta = beta
+        module_logger.debug('set beta to ' + str(settings.beta))
+
+        directory = 'experiment-' + str(num) + "-" + str(configuration_settings.packets) + '-' + str(alpha) + '-' + str(beta) 
+
+        if not os.path.exists(directory):
+          module_logger.debug('create directory ' + str(directory))
+          os.makedirs(directory)
+
+        # TODO: for every setting we generate a new source/destination pair
+        experiment = Experiment()
+        experiment.settings = settings
+        # create the network and set it up
+        experiment.setup_network(configuration_settings.topology)
+        src, dst = experiment.network.find_pair()
+        module_logger.debug('set source to ' + str(src) + " and destination " + str(dst))
+
+        for repetition in range(1, repetitions):
           experiment = Experiment()
           experiment.settings = settings
-          directory = 'experiment-' + str(num) + "-" + str(configuration_settings.packets) + '-' + str(alpha) + '-' + str(beta) 
-          logging.debug('create directory ' + str(directory))
-          # create log directory
-          experiment.create_log_directory(directory)
           # create the network and set it up
           experiment.setup_network(configuration_settings.topology)
 
           # setup the experiment
           experiment.setup_experiment()
           # run the experiment
-          experiment.run_experiment(configuration_settings.packets, experiment.src, experiment.dst)
+          experiment.run_experiment(configuration_settings.packets, src, dst)
           # 
           directory = 'experiment-' + str(num) + "-" + str(configuration_settings.packets) + '-' + str(alpha) + '-' + str(beta) + '/' + str(repetition) 
           # create log directory

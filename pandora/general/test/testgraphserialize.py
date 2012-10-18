@@ -8,7 +8,7 @@ from general.graphserialize import GraphSerialize
 
 class TestGraphSerialize(unittest.TestCase):
   def setUp(self):
-    self.network = nx.gnm_random_graph(100, 5, 42, False)
+    self.network = nx.random_regular_graph(5, 100, 42)
 
   def test_json_graph(self):
     export = GraphSerialize()

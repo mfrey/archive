@@ -48,7 +48,7 @@ class EnergyAwareAntAlgorithm:
     self.evaporation_mode = ['exponential','cubic'] 
     self.evaporation_mode_set = 0
     self.logger = logging.getLogger(__name__)
-    self.logger.setLevel(logging.FATAL)
+    self.logger.setLevel(logging.DEBUG)
     #logging.disable(logging.DEBUG)
 
   def add_node_to_route_statistics(self, packet, node):
