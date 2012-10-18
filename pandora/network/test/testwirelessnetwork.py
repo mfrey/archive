@@ -3,9 +3,10 @@
 import unittest
 import networkx as nx
 
+from general.settings import Settings
+from general.graphserialize import GraphSerialize
 from network.wirelessnetwork import WirelessNetwork
 from network.routingtable import RoutingTable
-from general.settings import Settings
 
 class TestWirelessNetworkFunctions(unittest.TestCase):
   def setUp(self):
@@ -16,15 +17,9 @@ class TestWirelessNetworkFunctions(unittest.TestCase):
     self.settings.xii = 10.0
     # store the settings
     self.network.settings = self.settings
-
+    serialize = GraphSerialize()
     # set up a simple network
-    network = nx.Graph()
-    # add nodes
-    network.add_nodes_from([1,4])
-    # add edges
-    network.add_edges_from([(1,2),(1,3),(2,4),(3,4)])
-    # set the network
-    self.network.network = network
+    self.network.network =  serialize.read_dot_file('grid.dot')
 
 
   def test_setup(self):
@@ -50,9 +45,7 @@ class TestWirelessNetworkFunctions(unittest.TestCase):
     self.network.setup();
     # initialize route discovery (test the method)
     self.network.initialize_route_discovery(source, destination)
-
-
-#  def test_add(self):
+    self.network.dumpRoutingTable()
 
 
 if __name__ == '__main__':

@@ -33,19 +33,15 @@ class WirelessNetwork:
     end = len(self.network.nodes())
 
     source = random.randint(start, end)
-    print "source is " + str(source)
 
     while True:
       destination = random.randint(start, end)
-      print "source is " + str(destination)
 
       if destination != source:
         # check if the destination is an immediate neighbor of the source node
         if destination not in self.network.neighbors(source):
-          print destination, source
           # check if there is an path between source and destination
           if nx.has_path(self.network, source, destination):
-            print "destination is " + str(source)
             return (source, destination)
 
 
