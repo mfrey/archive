@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import random
 import logging
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -27,18 +28,18 @@ class WirelessNetwork:
 
   def find_pair(self):
     # the first node
-    start = self.network.network.nodes()[0]
+    start = self.network.nodes()[0]
     # the last node
-    end = len(self.network.network.nodes())
+    end = len(self.network.nodes())
 
     source = int(random.uniform(start, end))
 
     while True:
       destination = int(random.uniform(start, end))
       # check if the destination is an immediate neighbor of the source node
-      if destination not in self.network.network.neighbors(source):
+      if destination not in self.network.neighbors(source):
         # check if there is an path between source and destination
-        if nx.has_path(self.network.network, source, destination):
+        if nx.has_path(self.network, source, destination):
           return (source, destination)
 
 

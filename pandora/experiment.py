@@ -36,6 +36,8 @@ class Experiment:
     self.algorithm.logger.addHandler(self.file_handler)
     self.packet_trace_container = {}
     self.log_dir = ""
+    self.src = -1
+    self.dst = -1
 
   def create_log_directory(self, directory):
     if not os.path.exists(directory):
@@ -90,8 +92,8 @@ class Experiment:
     else: 
       print "this should never happen" 
 
-    if self.network.settings.src == -1:
-      self.network.settings.src, self.network.settings.dst = self.network.find_pair()
+    if self.src == -1:
+      self.src, self.dst = self.network.find_pair()
 
     # set the settings
     self.network.settings = self.settings
@@ -198,7 +200,7 @@ def worker(num):
           # setup the experiment
           experiment.setup_experiment()
           # run the experiment
-          experiment.run_experiment(configuration_settings.packets, experiment.network.settings.src, experiment.network.settings.dst)
+          experiment.run_experiment(configuration_settings.packets, experiment.src, experiment.dst)
           # 
           directory = 'experiment-' + str(num) + "-" + str(configuration_settings.packets) + '-' + str(alpha) + '-' + str(beta) + '/' + str(repetition) 
           # create log directory
