@@ -23,6 +23,7 @@ class WirelessNetwork:
     self.logger.setLevel(logging.DEBUG)
     # the handler should be overwritten by another lcass
     self.file_handler = logging.FileHandler('log_file_does_not_exist.log')
+    self.paths = {}
 
   def setup(self):
     for n in self.network.nodes():
@@ -246,6 +247,35 @@ class WirelessNetwork:
 		  result = node
     return result
 
+
+  def find_all_paths(self, source, destination, cutoff):
+    """ The function finds all simple paths between two nodes.
+
+    Parameters
+    ----------
+    source : The source node.
+
+    destination : The destination node.
+
+    cutoff : The maximum path length to search.
+
+    Notes
+    -----
+    The function basically wraps the nx.all_simple_paths() method
+    of the networkx package and adds support for reading/writing
+    already found paths between a source/destination of previous
+    runs of the script. If at all, this only makes sense if the 
+    graphs are below a certain size/order. As stated in the 
+    documentation of networkx the all single paths can be found
+    at best in O(V+E) and at worst in O(n!)
+    """
+    key = (source, destination)
+
+    # check if all paths have been previously found
+    if key not in self.paths:
+      # iterate over the results
+      for path in nx.all_simple_paths(self.network, source, destination, cutoff):
+        self.paths[key].append(path)
 
 def main():
   network = nx.Graph()

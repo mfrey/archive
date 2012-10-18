@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import logging
 import networkx as nx
 import pygraphviz as pgv
 
@@ -53,6 +54,3 @@ class GraphSerialize:
       return network
     except IOError:
       self.logger.fatal('an IO error exception occurred while reading a JSON representation of a graph')
-
-if __name__ == "__main__":
-  main()
