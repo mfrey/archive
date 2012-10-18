@@ -8,7 +8,7 @@ import multiprocessing
 import main as m
 import networkx as nx
 
-from general import dotfilereader as dfr
+from general import graphserialize as grs
 from general import settings as expcfg
 from network import packet as pck
 from trace import logfilegenerator as log
@@ -79,7 +79,8 @@ class Experiment:
         break
 
   def setup_network(self, topology_file):
-    dot_file_reader = dfr.DotFileReader()
+    dot_file_reader = grs.GraphSerialize()
+    dot_file_reader.logger.addHandler(self.file_handler)
     # read the configuration file 
     dot_network = dot_file_reader.read_dot_file(topology_file)
     # pass the network configuration to the wireless network

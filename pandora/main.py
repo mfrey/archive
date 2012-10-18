@@ -14,7 +14,7 @@ import itertools
 import networkx as nx
 
 from general import settings as cfg
-from general import dotfilereader as dfr
+from general import graphserialize as grs 
 from trace import logfilegenerator as log
 from network import packet as pck
 from network import wirelessnetwork as wifi
@@ -364,7 +364,8 @@ def main():
     network.add_edges_from([(1,2),(1,3),(2,4),(3,4)])
   #network.add_edges_from([(1,2),(1,3),(1,4),(2,5),(5,8),(8,10),(10,11),(3,6),(6,9),(9,11),(4,7),(7,11)])
   else:
-    dot_file_reader = dfr.DotFileReader()
+    dot_file_reader = grs.GraphSerialize()
+    dot_file_reader.logger.addHandler(fh)
     network = dot_file_reader.read_dot_file(settings.dot_file)
 
   w = wifi.WirelessNetwork()

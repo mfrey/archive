@@ -9,7 +9,6 @@ from network import ant as agent
 from network import routingtable as rt
 from network import routingtableentry as rte
 
-from networkx.readwrite import json_graph
 
 module_logger = logging.getLogger(__name__)
 
@@ -246,17 +245,6 @@ class WirelessNetwork:
 		  phi = new_phi
 		  result = node
     return result
-
-  def write(self, file_name):
-    export_file = open(file_name, "w")
-    export_file.write(json_graph.dumps(self.network))
-    export_file.close()
-
-  def read(self, file_name):
-    import_file = open(file_name, "r")
-    content = import_file.read()
-    self.network = json_graph.loads(content)
-    import_file.close()
 
 
 def main():
