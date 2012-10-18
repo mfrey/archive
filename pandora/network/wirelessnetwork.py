@@ -21,9 +21,9 @@ class WirelessNetwork:
     self.position = nx.spring_layout(self.network)
     self.routes = {}
     self.logger = logging.getLogger(__name__)
-    self.logger.setLevel(logging.DEBUG)
     # the handler should be overwritten by another lcass
     self.file_handler = logging.FileHandler('log_file_does_not_exist.log')
+    self.logger.setLevel(logging.FATAL)
     self.paths = {}
 
   def find_pair(self):
@@ -36,11 +36,13 @@ class WirelessNetwork:
 
     while True:
       destination = int(random.uniform(start, end))
-      # check if the destination is an immediate neighbor of the source node
-      if destination not in self.network.neighbors(source):
-        # check if there is an path between source and destination
-        if nx.has_path(self.network, source, destination):
-          return (source, destination)
+
+      if destination != source:
+        # check if the destination is an immediate neighbor of the source node
+        if destination not in self.network.neighbors(source):
+          # check if there is an path between source and destination
+          if nx.has_path(self.network, source, destination):
+            return (source, destination)
 
 
   def setup(self):
