@@ -79,12 +79,20 @@ class Experiment:
         break
 
   def setup_network(self, topology_file):
-    dot_file_reader = grs.GraphSerialize()
-    dot_file_reader.logger.addHandler(self.file_handler)
-    # read the configuration file 
-    dot_network = dot_file_reader.read_dot_file(topology_file)
-    # pass the network configuration to the wireless network
-    self.network.network = dot_network
+    file_reader = grs.GraphSerialize()
+
+    if topology_file.endswith("dot"):
+      file_reader.logger.addHandler(self.file_handler)
+      # read the configuration file 
+      self.network.network = file_reader.read_dot_file(topology_file)
+    elif topology_file.endswith("json"):
+      self.network.network = file_reader.read_json_graph(topology_file)
+    else: 
+      print "this should never happen" 
+
+    if self.network.settings.src == -1:
+      self.network.settings.src, self.network.settings.dst = self.network.find_pair()
+
     # set the settings
     self.network.settings = self.settings
     # set up the network
@@ -173,8 +181,8 @@ def worker(num):
           # set the initial energy parameter (node)
           settings.xii = configuration_settings.xii
           logging.debug('set initial energy value of the nodes to ' + str(settings.xii))
-          # set the dot file 
-          settings.dot_file = configuration_settings.topology
+          # set the topology file 
+          settings.topology_file = configuration_settings.topology
           # set the evaporation mode
           settings.evaporation_mode = configuration_settings.evaporation_mode
 
@@ -186,10 +194,11 @@ def worker(num):
           experiment.create_log_directory(directory)
           # create the network and set it up
           experiment.setup_network(configuration_settings.topology)
+
           # setup the experiment
           experiment.setup_experiment()
           # run the experiment
-          experiment.run_experiment(configuration_settings.packets, configuration_settings.src, configuration_settings.dst)
+          experiment.run_experiment(configuration_settings.packets, experiment.network.settings.src, experiment.network.settings.dst)
           # 
           directory = 'experiment-' + str(num) + "-" + str(configuration_settings.packets) + '-' + str(alpha) + '-' + str(beta) + '/' + str(repetition) 
           # create log directory
@@ -200,7 +209,7 @@ def worker(num):
 
 if __name__ == "__main__":
   jobs = []
-  for i in range(11):
+  for i in range(1):
     p = multiprocessing.Process(target=worker, args=(i,))
     jobs.append(p)
     p.start()

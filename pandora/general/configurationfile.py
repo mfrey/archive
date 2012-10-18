@@ -77,9 +77,12 @@ class ConfigurationFile:
     # read the location of the topology file
     topology = configuration.get('Experiment','topology')
     # read the location of the topology file
-    src = int(configuration.get('Experiment','source'))
-    # read the location of the topology file
-    dst = int(configuration.get('Experiment','destination'))
+    if configuration.get('Experiment', 'node_selection') == "random":
+      src = dst = -1
+    else:
+      src = int(configuration.get('Experiment','source'))
+      # read the location of the topology file
+      dst = int(configuration.get('Experiment','destination'))
     # read the location of the topology file
     repetitions = int(configuration.get('Experiment','repetitions'))
     # read the evporation mode

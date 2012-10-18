@@ -25,6 +25,23 @@ class WirelessNetwork:
     self.file_handler = logging.FileHandler('log_file_does_not_exist.log')
     self.paths = {}
 
+  def find_pair(self):
+    # the first node
+    start = self.network.network.nodes()[0]
+    # the last node
+    end = len(self.network.network.nodes())
+
+    source = int(random.uniform(start, end))
+
+    while True:
+      destination = int(random.uniform(start, end))
+      # check if the destination is an immediate neighbor of the source node
+      if destination not in self.network.network.neighbors(source):
+        # check if there is an path between source and destination
+        if nx.has_path(self.network.network, source, destination):
+          return (source, destination)
+
+
   def setup(self):
     for n in self.network.nodes():
       # set up routing table

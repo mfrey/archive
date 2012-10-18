@@ -10,7 +10,7 @@ class Settings:
     self.q = 0.2
     self.alpha = 1.0
     self.beta = 1.0
-    self.dot_file = ""
+    self.topology = ""
     # plateau parameter for cubic evaporation function
     self.plateau = 3
     # slow down paramter for cubic evaporation function (slow \in (0,1))
