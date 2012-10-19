@@ -25,7 +25,7 @@ class WirelessNetwork:
     self.file_handler = logging.FileHandler('log_file_does_not_exist.log')
     self.logger.setLevel(logging.DEBUG)
     self.paths = {}
-    self.routes = { ():[[]] }
+    self.routes = {}
 
   def find_pair(self):
     # the first node
@@ -272,20 +272,32 @@ class WirelessNetwork:
 
 
   def dummy_func(self, source, destination, key):
-      for entry in self.network.node[source]['routing table'].table[0].entries():
-          # check if the 'destination' in the entry matches the desired destination
-          if entry[2] == destination:
-              # check if the route structure has been initialized with the corresponding key
+    counter = 0
+    for entry in self.network.node[source]['routing table'].get(0):
+      # check if the 'destination' in the entry matches 
+      # the desired destination
+      if entry[2] == destination:
+          counter = counter + 1
+          
+          if source != key[0]:
+            # append the node to previous entries (if necessary)
+            for index, route in enumerate(self.routes[key]):
+              if entry[0] in route:
+                self.routes[key][index].append(entry[1])
+                
+          # the else statement will only executed once
+          # per source/destination pair              
+          else:
               if not self.routes.has_key(key):
-                  self.routes[key] = [[]]
-                  self.routes[key].append([entry[0], entry[1]])
-              # well, we have to check the existing entries
+                  self.routes[key] = [[entry[0], entry[1]]]
               else:
-                  for index, route in enumerate(self.routes[key]):
-                      if entry[0] in route:
-                          self.routes[key][index].append(entry[1])
-              # recursive call
-              self.dummy(entry[1], destination, key)
+                  self.routes[key].append([entry[0], entry[1]])
+                
+          # check if the route structure has been initialized with the corresponding key
+
+                
+          # recursive call
+          self.dummy_func(entry[1], destination, key)
               
               
   def find_all_paths(self, source, destination, cutoff):
