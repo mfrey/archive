@@ -2,7 +2,6 @@
 
 import os
 import logging
-import argparse
 import multiprocessing
 
 import main as m
@@ -215,8 +214,9 @@ def worker(num):
 
 
 if __name__ == "__main__":
-  jobs = []
-  for i in range(1):
-    p = multiprocessing.Process(target=worker, args=(i,))
-    jobs.append(p)
-    p.start()
+    jobs = []
+    
+    for i in range(1):
+        p = multiprocessing.Process(target=worker, args=(i,))
+        jobs.append(p)
+        p.start()
