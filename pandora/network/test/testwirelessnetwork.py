@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import unittest
-import networkx as nx
 
 from general.settings import Settings
 from general.graphserialize import GraphSerialize
@@ -20,7 +19,6 @@ class TestWirelessNetworkFunctions(unittest.TestCase):
     serialize = GraphSerialize()
     # set up a simple network
     self.network.network =  serialize.read_dot_file('grid.dot')
-
 
   def test_setup(self):
     # test the setup method
@@ -42,11 +40,20 @@ class TestWirelessNetworkFunctions(unittest.TestCase):
     # destination node 
     destination = 4
     # set up the network
-    self.network.setup();
+    self.network.setup()
     # initialize route discovery (test the method)
     self.network.initialize_route_discovery(source, destination)
     self.network.dumpRoutingTable()
 
 
+  def test_dummy(self):
+    src, dst = 4, 5
+    # set up the network
+    self.network.setup()
+    self.network.initialize_route_discovery(src, dst)
+    #self.network.dummy_func(src, dst, (src,dst))
+    print self.network.routes
+    
+
 if __name__ == '__main__':
-  unittest.main()
+    unittest.main()

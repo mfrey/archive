@@ -337,14 +337,16 @@ def main():
         network.add_edges_from([(1,2),(1,3),(2,4),(3,4)])
         
     w = wifi.WirelessNetwork()
+    w.file_handler = fh
+    w.logger.addHandler(fh) 
+    
     w.network = network
     w.settings = settings
     w.setup()
 
-    w.initialize_route_discovery(1,39)
-    w.set_initial_phi_value(1,39)
-    w.file_handler = fh
-    w.logger.addHandler(fh) 
+    w.initialize_route_discovery(4,5)
+    w.set_initial_phi_value(4,5)
+
     w.position = nx.spring_layout(w.network)
    
     algorithm = EnergyAwareAntAlgorithm()

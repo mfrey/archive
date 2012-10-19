@@ -23,8 +23,9 @@ class WirelessNetwork:
     self.logger = logging.getLogger(__name__)
     # the handler should be overwritten by another lcass
     self.file_handler = logging.FileHandler('log_file_does_not_exist.log')
-    self.logger.setLevel(logging.FATAL)
+    self.logger.setLevel(logging.DEBUG)
     self.paths = {}
+    self.routes = { ():[[]] }
 
   def find_pair(self):
     # the first node
@@ -145,6 +146,8 @@ class WirelessNetwork:
         if index != (len(path)-1):
           node_i = node
           node_j = path[index+1]
+          self.logger.debug(' update phi for (' + str(node_i) + ', ' + str(node_j) + ', ' + str(dst) + ')')
+
           phi = 2 * self.network.node[node]['routing table'].get_phi(0, node_i, node_j, dst)
           self.network.node[node]['routing table'].set_phi(0, node_i, node_j, dst, phi)
 
@@ -268,6 +271,23 @@ class WirelessNetwork:
     return result
 
 
+  def dummy_func(self, source, destination, key):
+      for entry in self.network.node[source]['routing table'].table[0].entries():
+          # check if the 'destination' in the entry matches the desired destination
+          if entry[2] == destination:
+              # check if the route structure has been initialized with the corresponding key
+              if not self.routes.has_key(key):
+                  self.routes[key] = [[]]
+                  self.routes[key].append([entry[0], entry[1]])
+              # well, we have to check the existing entries
+              else:
+                  for index, route in enumerate(self.routes[key]):
+                      if entry[0] in route:
+                          self.routes[key][index].append(entry[1])
+              # recursive call
+              self.dummy(entry[1], destination, key)
+              
+              
   def find_all_paths(self, source, destination, cutoff):
     """ The function finds all simple paths between two nodes.
 
@@ -284,10 +304,10 @@ class WirelessNetwork:
     The function basically wraps the nx.all_simple_paths() method
     of the networkx package and adds support for reading/writing
     already found paths between a source/destination of previous
-    runs of the script. If at all, this only makes sense if the 
+    runs of this script. If at all, this only makes sense if the 
     graphs are below a certain size/order. As stated in the 
-    documentation of networkx the all single paths can be found
-    at best in O(V+E) and at worst in O(n!)
+    documentation of networkx, all single paths can be found
+    at best in O(V+E) and at worst in O(n!) (where n denotes |V|).
     """
     key = (source, destination)
 
@@ -297,14 +317,20 @@ class WirelessNetwork:
       for path in nx.all_simple_paths(self.network, source, destination, cutoff):
         self.paths[key].append(path)
 
-def main():
-  network = nx.Graph()
-  network.add_nodes_from([1,8]);
-  network.add_edges_from([(1,2),(1,3),(1,4),(2,5),(5,7),(7,8),(3,6),(6,8),(4,8)])
 
-  w = wifi.WirelessNetwork()
-  w.network = network
-  w.draw()
+            
+                           
+                  
+      
+
+def main():
+    network = nx.Graph()
+    network.add_nodes_from([1,8]);
+    network.add_edges_from([(1,2),(1,3),(1,4),(2,5),(5,7),(7,8),(3,6),(6,8),(4,8)])
+    
+    w = WirelessNetwork()
+    w.network = network
+    w.draw()
 
 if __name__ == "__main__":
-  main()
+    main()
