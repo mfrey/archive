@@ -225,6 +225,16 @@ class LogFileGenerator:
           self.generate_paths()
     log_file.close()
 
+  def write_routing_table_trace(self, file_name):
+    content = self.network.getRoutingTableTrace()
+    self.write_csv_log_file(directory, file_name, content)
+
+  def write_csv_log_file(self, directory, file_name, content):
+    current_path = os.getcwd()
+    log_file = csv.writer(open(current_path + "/" + directory + "/" + file_name, "w"), delimiter=',')
+    for entry in content:
+      log_file.writerow(entry)
+
   def generate_statistics(self):
     #
     self.generate_routing_decision_trace('test_routingdecision_trace.csv')
