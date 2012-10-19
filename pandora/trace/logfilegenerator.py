@@ -10,7 +10,6 @@ import os
 import networkx as nx
 
 from general import settings as cfg
-from network import packet as pck
 from network import wirelessnetwork as wifi
 
 module_logger = logging.getLogger('trace')
@@ -100,11 +99,6 @@ class LogFileGenerator:
       log_file.write(line)
     log_file.close()
 
-  def compute_path_phi(self, packets, nodes, destination):
-    phi = 0
-    for node in len(nodes - 1):
-      phi += self.network.network[node]['routing table'].table[packet].get_phi(node, nodes[(node + 1)], destination)
-    return phi
 
   def write_energy_per_route_log_file(self, directory, file_name):
     attempts = 0

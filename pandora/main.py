@@ -274,21 +274,6 @@ class EnergyAwareAntAlgorithm:
     else:
       return r
 
-#  def writeLogFile(self, directory, file_name, content):
-#    current_path = os.getcwd()
-#    log_file = csv.writer(open(current_path + "/" + directory + "/" + file_name, "w"), delimiter=',')
-#    for entry in content:
-#      log_file.writerow(entry)
-
-#  def writeEnergyConsumptionTrace(self, directory, file_name):
-#    content = self.network.energy_consumption
-#    self.writeLogFile(directory, file_name, content)
-
-#  def writeRoutingDecisionTrace(self, directory, file_name):
-#    current_path = os.getcwd()
-#    log_file = csv.writer(open(current_path + "/" + directory + "/" + file_name, "w"), delimiter=',')
-#    for key, value in self.routes.items():
-#      log_file.writerow(value)
 
 def main():
     fh = logging.FileHandler('example_2.log')
@@ -306,75 +291,62 @@ def main():
     parser.add_argument('-P', dest='phi', type=float, default=1.0, action='store', help='initial phi value')
     parser.add_argument('-i', dest='dot_file', type=str, default="", action='store', help='dot file')
     
-    args = parser.parse_args()
+    arguments = parser.parse_args()
     
     # create a settings object
     settings = cfg.Settings()
     # set the number of packets
-    packets = args.packets 
+    packets = arguments.packets 
     module_logger.debug('set number of packets to ' + str(packets))
     # set the alpha weight
-    settings.alpha = args.alpha
+    settings.alpha = arguments.alpha
     module_logger.debug('set alpha to ' + str(settings.alpha))
     # set the alpha weight 
-    settings.beta = args.beta
+    settings.beta = arguments.beta
     module_logger.debug('set beta to ' + str(settings.beta))
     # set the value for the energy which is consumed per receive operation
-    settings.recv = args.receive
+    settings.recv = arguments.receive
     module_logger.debug('set energy consumption for receive operation to ' + str(settings.recv))
     # set the value for the energy which is consumed per send operation
-    settings.send = args.send
+    settings.send = arguments.send
     module_logger.debug('set energy consumption for send operation to ' + str(settings.send))
     # set the q parameter (evaporation process)
-    settings.q = args.q
+    settings.q = arguments.q
     module_logger.debug('set q paramater of pheromone evaporation to ' + str(settings.q))
     # set the delta phi parameter 
-    settings.delta_phi = args.delta
+    settings.delta_phi = arguments.delta
     module_logger.debug('set delta phi paramater of pheromone increase to ' + str(settings.delta_phi))
     # set the initial phi parameter (node)
-    settings.phi = args.phi
+    settings.phi = arguments.phi
     module_logger.debug('set initial phi to ' + str(settings.phi))
     # set the initial energy parameter (node)
-    settings.xii = args.energy
+    settings.xii = arguments.energy
     module_logger.debug('set initial energy to ' + str(settings.xii))
     # set the dot file 
-    settings.dot_file = args.dot_file
+    settings.dot_file = arguments.dot_file
+    
+    network = nx.Graph()
+    
     if settings.dot_file != "":
         module_logger.debug('will load dot file' + str(settings.dot_file))
-        network = nx.Graph()
-    
-        if settings.dot_file == "":
-            network.add_nodes_from([1,4]);
-            network.add_edges_from([(1,2),(1,3),(2,4),(3,4)])
-        else:
-            dot_file_reader = grs.GraphSerialize()
-            dot_file_reader.logger.addHandler(fh)
-            network = dot_file_reader.read_dot_file(settings.dot_file)
-            
+        dot_file_reader = grs.GraphSerialize()
+        dot_file_reader.logger.addHandler(fh)
+        network = dot_file_reader.read_dot_file(settings.dot_file)
+    else:
+        network.add_nodes_from([1,4]);
+        network.add_edges_from([(1,2),(1,3),(2,4),(3,4)])
+        
     w = wifi.WirelessNetwork()
     w.network = network
-    # set the settings
     w.settings = settings
     w.setup()
-    #  w.setupRoutingTable(1,8)
-    #  w.setupRoutingTableShortestPaths(1,8)
-    #w.initialize_route_discovery(1,8)
+
     w.initialize_route_discovery(1,39)
     w.set_initial_phi_value(1,39)
     w.file_handler = fh
-    w.logger.addHandler(fh)
-    
-    #w.network.node[2]['energy'] = 5.0
-    #w.network.node[3]['energy'] = 5.0
-    #w.network.node[4]['energy'] = 5.0
-    
-    #  w.set_phi(0, 1, 3, 8, settings.phi * 2)
-    #  w.set_phi(0, 3, 6, 8, settings.phi * 2)
-    #  w.set_phi(0, 6, 8, 8, settings.phi * 2)
-    
+    w.logger.addHandler(fh) 
     w.position = nx.spring_layout(w.network)
-    #w.draw()
-    
+   
     algorithm = EnergyAwareAntAlgorithm()
     algorithm.settings = settings
     algorithm.network = w
