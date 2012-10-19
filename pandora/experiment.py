@@ -125,7 +125,7 @@ class Experiment:
 
     #algorithm.writeEnergyConsumptionTrace('energy.csv')
 
-    self.algorithm.writeRoutingTableTrace(self.log_dir, 'routingtable_trace.csv')
+    self.generator.write_routingtable_trace(self.log_dir, 'routingtable_trace.csv')
 
     # DEACTIVATED:
 #    self.algorithm.writeRoutingDecisionTrace(self.log_dir, 'routingdecision_trace.csv')

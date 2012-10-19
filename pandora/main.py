@@ -127,7 +127,7 @@ class EnergyAwareAntAlgorithm:
       #
       # pick the best route (highest pheromone)
       else:
-        node = self.network.get_highest_phi(packet, source, nodes, destination)
+        node = self.network.get_highest_phi(packet, sender, nodes, destination)
       return node
 
   def forwarding(self, packet, sender, nodes, destination):
@@ -288,10 +288,6 @@ class EnergyAwareAntAlgorithm:
 
   def writeEnergyConsumptionTrace(self, directory, file_name):
     content = self.network.energy_consumption
-    self.writeLogFile(directory, file_name, content)
-
-  def writeRoutingTableTrace(self, directory, file_name):
-    content = self.network.getRoutingTableTrace()
     self.writeLogFile(directory, file_name, content)
 
   def writeRoutingDecisionTrace(self, directory, file_name):

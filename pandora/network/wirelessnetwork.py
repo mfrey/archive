@@ -151,7 +151,7 @@ class WirelessNetwork:
   def updateRoutingTable(self, packet, entry):
     self.network.node[entry.node_i]['routing table'].add(packet, entry)
 
-  def getRoutingTableTrace(self):
+  def get_routingtable_trace(self):
     result = []
     for n in self.network.nodes():
       # iterate over the packet entries in the routing table
