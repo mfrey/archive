@@ -1,19 +1,12 @@
 #!/usr/bin/env python
 
-import os
 import csv
-import sys
-import copy
 import pylab
-import random
 import logging
-import argparse
-import traceback
 
 from operator import itemgetter
 
 import os
-import itertools
 import networkx as nx
 
 from general import settings as cfg
@@ -47,7 +40,7 @@ class LogFileGenerator:
     for packet in self.packet_trace:
       if attempts < 2:
         try:
-          for key,value in self.packet_trace[packet].phi_dict.items():
+          for key, value in self.packet_trace[packet].phi_dict.items():
             route_identifier = self.routes[key]
             route_as_list = list(key)
             hop_count = len(route_as_list) - 2
@@ -109,8 +102,8 @@ class LogFileGenerator:
 
   def compute_path_phi(self, packets, nodes, destination):
     phi = 0
-    for node in len(nodes-1):
-      phi += self.network.network[node]['routing table'].table[packet].get_phi(node, nodes[(node+1)], destination)
+    for node in len(nodes - 1):
+      phi += self.network.network[node]['routing table'].table[packet].get_phi(node, nodes[(node + 1)], destination)
     return phi
 
   def write_energy_per_route_log_file(self, directory, file_name):
@@ -146,21 +139,21 @@ class LogFileGenerator:
     for packet in self.packet_trace:
       for node in self.packet_trace[packet].visited_nodes:
         pylab.clf()
-        pylab.subplot(111,aspect='equal')
+        pylab.subplot(111, aspect='equal')
         for n in self.network.network:
           # draw node with the respective size
           size = 1000 * self.packet_trace[packet].xii_dict[n]
           alpha = 1.0 * self.packet_trace[packet].xii_dict[n]
-          nx.draw(self.network.network, position, with_labels=True, node_color=self.fu_green,node_size=size,alpha=alpha)
+          nx.draw(self.network.network, position, with_labels=True, node_color=self.fu_green, node_size=size, alpha=alpha)
 
         size = 1000 * self.packet_trace[packet].xii_dict[node]
-        nx.draw_networkx_nodes(self.network.network, position,nodelist=[node], node_color=self.fu_orange,size=size)
+        nx.draw_networkx_nodes(self.network.network, position, nodelist=[node], node_color=self.fu_orange, size=size)
         pylab.draw()
-        fname = '_tmp%03d.png'%i
-        pylab.savefig(fname,dpi=100)
-        i=i+1
-    filenames="_tmp%03d.png"
-    os.system("ffmpeg -r 3 -minrate 1024k -b 2024k -y -i %s path.mp4"%(filenames))
+        fname = '_tmp%03d.png' % i
+        pylab.savefig(fname, dpi=100)
+        i = i + 1
+    filenames = "_tmp%03d.png"
+    os.system("ffmpeg -r 3 -minrate 1024k -b 2024k -y -i %s path.mp4" % (filenames))
 
   def write_last_sucessful_packet(self, directory, file_name):
     last_packet = (len(self.packet_trace))
@@ -212,18 +205,34 @@ class LogFileGenerator:
           for route in self.routes.keys():
             phi = 0.0
             for index, value in enumerate(route):
-              if index < len(route)-1:
-                current_hop, next_hop, destination = route[index], route[index+1], self.packet_trace[packet].dst
+              if index < len(route) - 1:
+                current_hop, next_hop, destination = route[index], route[index + 1], self.packet_trace[packet].dst
                 phi += self.network.get_phi(packet, current_hop, next_hop, destination)
             # fix me
             hop_count = len(route) - 2
-            row = str(packet) + ',' + str(self.routes[route]) +  ',' + str(phi) + ',' + str(hop_count) + '\n'
+            row = str(packet) + ',' + str(self.routes[route]) + ',' + str(phi) + ',' + str(hop_count) + '\n'
             log_file.write(row)
         except KeyError:
           attempts += 1
           # the path dictionary is probably not set up, generate paths
           self.generate_paths()
     log_file.close()
+
+  def write_routingtable_trace(self, directory, file_name):
+    """ The function writes a routing table trace to a specified file.
+    
+    Parameters
+    ----------
+    """
+    content = self.network.get_routingtable_trace()
+    self.write_csv_log_file(directory, file_name, content)
+
+  def write_csv_log_file(self, directory, file_name, content):
+    current_path = os.getcwd()
+    log_file = csv.writer(open(current_path + "/" + directory + "/" + file_name, "w"), delimiter=',')
+    for entry in content:
+      log_file.writerow(entry)
+    
 
   def generate_statistics(self):
     #
