@@ -47,7 +47,7 @@ class TestWirelessNetworkFunctions(unittest.TestCase):
 
 
   def test_fck(self):
-    src, dst = 4, 5
+    src, dst = 4, 10
     # set up the network
     self.network.setup()
     self.network.initialize_route_discovery(src, dst)

@@ -272,32 +272,43 @@ class WirelessNetwork:
 
 
   def dummy_func(self, source, destination, key):
-    counter = 0
     for entry in self.network.node[source]['routing table'].get(0):
-      # check if the 'destination' in the entry matches 
-      # the desired destination
+      # check if the 'destination' in the entry matches the desired destination
       if entry[2] == destination:
-          counter = counter + 1
-          
-          if source != key[0]:
-            # append the node to previous entries (if necessary)
-            for index, route in enumerate(self.routes[key]):
-              if entry[0] in route:
-                self.routes[key][index].append(entry[1])
-                
-          # the else statement will only executed once
-          # per source/destination pair              
-          else:
-              if not self.routes.has_key(key):
-                  self.routes[key] = [[entry[0], entry[1]]]
-              else:
-                  self.routes[key].append([entry[0], entry[1]])
-                
-          # check if the route structure has been initialized with the corresponding key
+		if source != key[0]:
+		  routes_to_append = []
+		  # append the node to previous entries (if necessary)
+		  for index, route in enumerate(self.routes[key]):
+			# check if the current node is in the current route 
+			if entry[0] in route:
+			  # determine the position of the last entry
+			  last_entry = len(route) - 1
 
-                
-          # recursive call
-          self.dummy_func(entry[1], destination, key)
+			  # check if the current node is the last entry in the current route 
+			  if entry[0] == route[last_entry]: 
+				# add entry 
+				self.routes[key][index].append(entry[1])
+			  # TODO: CHECK!
+			  else:
+				# get the index of the last occurence of the node 
+				last_entry = [i for i, v in enumerate(route) if v == entry[0]]
+				# build up a new path (we certainly 'hope' that there is only one occurence of the node in the list)
+				new_route = [v for i, v in enumerate(route) if i <= ((last_entry[0]))]
+				# append the node
+				new_route.append(entry[1])
+				# append it 
+				routes_to_append.append(new_route)
+
+#		  for route in routes_to_append: 
+#			self.routes[key].append(route)
+        # the else statement will only executed once per source/destination pair            
+		else:
+		  if not self.routes.has_key(key):
+			self.routes[key] = [[entry[0], entry[1]]]
+		  else:
+			self.routes[key].append([entry[0], entry[1]])
+        # recursive call
+		self.dummy_func(entry[1], destination, key)
               
               
   def find_all_paths(self, source, destination, cutoff):
@@ -328,12 +339,6 @@ class WirelessNetwork:
       # iterate over the results
       for path in nx.all_simple_paths(self.network, source, destination, cutoff):
         self.paths[key].append(path)
-
-
-            
-                           
-                  
-      
 
 def main():
     network = nx.Graph()
