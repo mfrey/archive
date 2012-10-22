@@ -10,7 +10,6 @@ from network import ant as agent
 from network import routingtable as rt
 from network import routingtableentry as rte
 
-
 module_logger = logging.getLogger(__name__)
 
 class WirelessNetwork:
@@ -44,7 +43,6 @@ class WirelessNetwork:
           # check if there is an path between source and destination
           if nx.has_path(self.network, source, destination):
             return (source, destination)
-
 
   def setup(self):
     for n in self.network.nodes():
@@ -80,11 +78,12 @@ class WirelessNetwork:
     for n in self.network.neighbors_iter(source):
       self.logger.debug('send forward agent to node ' + str(n))
       self.find_route(source, pkt, n) 
+      pkt.sequence_number = pkt.sequence_number + 1
 
   def find_route(self, previous_hop, packet, node):
     # we have finally received the destination node
     if node == packet.destination:
-       self.logger.debug('finally at the destination node ' + str(node))
+       self.logger.debug('finally at destination node ' + str(node))
        if packet.fant == True:
          self.logger.debug('packet ' + str(packet.sequence_number) + ' at destination node ' + str(node))
          new_pkt = agent.Ant()

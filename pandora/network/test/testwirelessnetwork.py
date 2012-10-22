@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import logging
 import unittest
 
 from general.settings import Settings
@@ -19,6 +20,10 @@ class TestWirelessNetworkFunctions(unittest.TestCase):
     serialize = GraphSerialize()
     # set up a simple network
     self.network.network =  serialize.read_dot_file('grid.dot')
+    # set file handler
+    self.network.file_handler = logging.FileHandler('unittest.log')
+    # enable file handler
+    self.network.logger.addHandler(self.network.file_handler)
 
   def test_setup(self):
     # test the setup method
@@ -35,13 +40,13 @@ class TestWirelessNetworkFunctions(unittest.TestCase):
       self.assertIsNotNone(self.network.network.node[node]['last packets'])
   
   def test_initialize_route_discovery(self):
+        
     src, dst = 4, 10
     # set up the network
     self.network.setup()
     # initialize route discovery (test the method)
     self.network.initialize_route_discovery(src, dst)
-  #  self.network.dumpRoutingTable()
-
+    self.network.dumpRoutingTable()
 
   def test_fck(self):
     src, dst = 4, 10
