@@ -58,38 +58,6 @@ class WirelessNetwork:
       # initialize the last packets array
       self.network.node[n]['last packets'] = []
 
-  def rd(self, source, destination):
-    # build up the initial list of neighbors
-    neighbors = [nx.neighbors(self.network, source)]
-    # set the previous node initially to the source node
-    previous = [source]
-    # set the index 
-    index = 0
-
-    while neighbors:
-      node_j = previos.pop()
-      neighbor = neighbors.pop()
-
-      for index, node_i in enumerate(neighbor):
-        entry = (node_i, node_j, source)
-        print entry
-
-        if node_i != destination:
-          if index == len(neighbor)-1:
-            next_neighbors = []
-            for i,j in enumerate(neighbors):
-              for k,l in enumerate(j):
-                temp_neighbors = nx.neighbors(self.network, l)
-                temp_neighbors = filter(lambda a: a != previous[i], temp_neighbors)
-                print temp_neighbors
-                next_neighbors.append(temp_neighbors)
-            previous = neighbors
-            neighbors.append(next_neighbors)
-
-      print "bar "  + str(neighbors)
-          
- 
-
   def is_active(self, node):
     return self.network.node[node]['active']
 
@@ -97,77 +65,16 @@ class WirelessNetwork:
     return self.network.neighbors(node)
 
   def initialize_route_discovery(self, source, destination):
-    # create an ant agent
-    pkt = agent.Ant()
-    pkt.sequence_number = 0
-    pkt.source = source
-    pkt.destination = destination
-    pkt.xii = self.settings.xii
-    pkt.fant = True
-    # add the initial packet to the source node
-    self.network.node[source]['last packets'].append(0)
-    # send forward ant agents
-    for n in self.network.neighbors_iter(source):
-      self.logger.debug('send forward agent to node ' + str(n))
-      self.find_route(source, pkt, n) 
-      pkt.sequence_number = pkt.sequence_number + 1
-
-  def find_route(self, previous_hop, packet, node):
-    # we have finally received the destination node
-    if node == packet.destination:
-       self.logger.debug('finally at destination node ' + str(node))
-       if packet.fant == True:
-         self.logger.debug('packet ' + str(packet.sequence_number) + ' at destination node ' + str(node))
-         new_pkt = agent.Ant()
-         # switch source and destination in the agent
-         new_pkt.destination = packet.source
-         new_pkt.source = node 
-         # change the type of the packet
-         new_pkt.fant = False
-         new_pkt.xii  = self.network.node[node]['energy']
-         # set the packet id
-         new_pkt.sequence_number = packet.sequence_number + 1
-         self.logger.debug('create new ant agent ' + str(new_pkt))
-         #
-         entry  = self.createRoutingTableEntry(node, previous_hop, new_pkt.destination, self.settings.phi, new_pkt.xii)
-	     # add the entry to the routing table
-         self.updateRoutingTable(0, entry)
-         # append the packet id to the 'last packets' vector at the destination
-         self.network.node[node]['last packets'].append(new_pkt.sequence_number)
-         # send the packet back
-         for n in self.network.neighbors(node): 
-           self.find_route(node, new_pkt, n)
-         # todo: update costs
-       else:
-         self.logger.debug('add entry (node_i, node_j, dst) ' + str(node) + ', ' + str(previous_hop) + ', ' + str(packet.source))
-         xii  = self.network.node[node]['energy']
-         entry  = self.createRoutingTableEntry(node, previous_hop, packet.source, self.settings.phi, xii)
-	     # add the entry to the routing table
-         self.updateRoutingTable(0, entry)
-
-    else:
-      # check if we have seen the packet already
-      if packet.sequence_number not in self.network.node[node]['last packets']:
-        self.logger.debug('node ' + str(node) + " received packet " + str(packet.sequence_number))
-        entry  = self.createRoutingTableEntry(node, previous_hop, packet.source, self.settings.phi, packet.xii)
-        self.logger.debug('add entry (node_i, node_j, dst) ' + str(node) + ", " + str(previous_hop) + ", " + str(packet.source))
-	    # add the entry to the routing table
-        self.updateRoutingTable(0, entry)
-        # append the packet id to the 'last packets' vector at the destination
-        self.network.node[node]['last packets'].append(packet.sequence_number)
-        # update the energy costs in the packet
-        packet.xii = self.network.node[node]['energy'] 
-        # send the packet to the neighbors of the node
-        for n in self.network.neighbors(node): 
-          # don't forward the packet to the previous hop
-          if n != previous_hop:
-            self.find_route(node, packet, n)
-        # todo: update costs
-
-      # log the duplicate 
-      else:
-        self.logger.debug('received duplicate packet ' + str(packet.sequence_number) + " at node " + str(node))
-        self.logger.debug('received duplicate packets are ' + str(self.network.node[node]['last packets']))
+    paths = nx.all_simple_paths(self.network, source, destination, 7)
+    for path in paths:
+      for index, node in enumerate(path):
+        if index != len(path)-1:
+          # forward ant entry
+          entry  = self.createRoutingTableEntry(path[index+1], node, source, self.settings.phi, self.settings.xii)
+          self.updateRoutingTable(0, entry)
+          # backward ant entry
+          entry  = self.createRoutingTableEntry(node, path[index+1], destination, self.settings.phi, self.settings.xii)
+          self.updateRoutingTable(0, entry)
 
   def set_initial_phi_value(self, src, dst):
     # get all shortest paths between a source and a destination
@@ -302,46 +209,6 @@ class WirelessNetwork:
 		  phi = new_phi
 		  result = node
     return result
-
-
-  def dummy_func(self, source, destination, key):
-    for entry in self.network.node[source]['routing table'].get(0):
-      # check if the 'destination' in the entry matches the desired destination
-      if entry[2] == destination:
-		if source != key[0]:
-		  routes_to_append = []
-		  # append the node to previous entries (if necessary)
-		  for index, route in enumerate(self.routes[key]):
-			# check if the current node is in the current route 
-			if entry[0] in route:
-			  # determine the position of the last entry
-			  last_entry = len(route) - 1
-
-			  # check if the current node is the last entry in the current route 
-			  if entry[0] == route[last_entry]: 
-				# add entry 
-				self.routes[key][index].append(entry[1])
-			  # TODO: CHECK!
-			  else:
-				# get the index of the last occurence of the node 
-				last_entry = [i for i, v in enumerate(route) if v == entry[0]]
-				# build up a new path (we certainly 'hope' that there is only one occurence of the node in the list)
-				new_route = [v for i, v in enumerate(route) if i <= ((last_entry[0]))]
-				# append the node
-				new_route.append(entry[1])
-				# append it 
-				routes_to_append.append(new_route)
-
-#		  for route in routes_to_append: 
-#			self.routes[key].append(route)
-        # the else statement will only executed once per source/destination pair            
-		else:
-		  if not self.routes.has_key(key):
-			self.routes[key] = [[entry[0], entry[1]]]
-		  else:
-			self.routes[key].append([entry[0], entry[1]])
-        # recursive call
-		self.dummy_func(entry[1], destination, key)
               
   def find_all_paths(self, source, destination, cutoff):
     """ The function finds all simple paths between two nodes.
