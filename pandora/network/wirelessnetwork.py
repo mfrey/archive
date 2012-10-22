@@ -277,6 +277,7 @@ class WirelessNetwork:
       # check if the 'destination' in the entry matches 
       # the desired destination
       if entry[2] == destination:
+          print entry
           counter = counter + 1
           
           if source != key[0]:
