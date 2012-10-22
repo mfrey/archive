@@ -128,7 +128,9 @@ class WirelessNetwork:
         packet.xii = self.network.node[node]['energy'] 
         # send the packet to the neighbors of the node
         for n in self.network.neighbors(node): 
-          self.find_route(node, packet, n)
+          # don't forward the packet to the previous hop
+          if n != previous_hop:
+            self.find_route(node, packet, n)
         # todo: update costs
 
       # log the duplicate 

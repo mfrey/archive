@@ -35,14 +35,11 @@ class TestWirelessNetworkFunctions(unittest.TestCase):
       self.assertIsNotNone(self.network.network.node[node]['last packets'])
   
   def test_initialize_route_discovery(self):
-    # source node
-    source = 1
-    # destination node 
-    destination = 4
+    src, dst = 4, 10
     # set up the network
     self.network.setup()
     # initialize route discovery (test the method)
-    self.network.initialize_route_discovery(source, destination)
+    self.network.initialize_route_discovery(src, dst)
   #  self.network.dumpRoutingTable()
 
 
