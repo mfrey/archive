@@ -50,7 +50,7 @@ class TestWirelessNetworkFunctions(unittest.TestCase):
   def test_random_select(self):
     # set up the network
     self.network.setup()
-    self.network.find_pair(2)
+    self.network.find_pair(4)
     
 if __name__ == '__main__':
     unittest.main()
