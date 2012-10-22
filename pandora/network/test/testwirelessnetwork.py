@@ -50,7 +50,14 @@ class TestWirelessNetworkFunctions(unittest.TestCase):
   def test_random_select(self):
     # set up the network
     self.network.setup()
-    self.network.find_pair(4)
-    
+#    self.network.find_pair(4)
+ 
+  def test_random_select_hard(self):
+    serialize = GraphSerialize()
+    self.network.network =  serialize.read_dot_file('advanced.dot')
+    # set up the network
+    self.network.setup()
+    self.network.find_pair(8)
+
 if __name__ == '__main__':
     unittest.main()

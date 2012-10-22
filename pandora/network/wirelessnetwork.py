@@ -30,7 +30,7 @@ class WirelessNetwork:
     # the first node
     start = self.network.nodes()[0]
     # the last node
-    end = len(self.network.nodes())
+    end = len(self.network.nodes())-1
 
     source = random.randint(start, end)
 
