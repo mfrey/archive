@@ -58,6 +58,38 @@ class WirelessNetwork:
       # initialize the last packets array
       self.network.node[n]['last packets'] = []
 
+  def rd(self, source, destination):
+    # build up the initial list of neighbors
+    neighbors = [nx.neighbors(self.network, source)]
+    # set the previous node initially to the source node
+    previous = [source]
+    # set the index 
+    index = 0
+
+    while neighbors:
+      node_j = previos.pop()
+      neighbor = neighbors.pop()
+
+      for index, node_i in enumerate(neighbor):
+        entry = (node_i, node_j, source)
+        print entry
+
+        if node_i != destination:
+          if index == len(neighbor)-1:
+            next_neighbors = []
+            for i,j in enumerate(neighbors):
+              for k,l in enumerate(j):
+                temp_neighbors = nx.neighbors(self.network, l)
+                temp_neighbors = filter(lambda a: a != previous[i], temp_neighbors)
+                print temp_neighbors
+                next_neighbors.append(temp_neighbors)
+            previous = neighbors
+            neighbors.append(next_neighbors)
+
+      print "bar "  + str(neighbors)
+          
+ 
+
   def is_active(self, node):
     return self.network.node[node]['active']
 
