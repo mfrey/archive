@@ -67,6 +67,11 @@ class WirelessNetwork:
   def initialize_route_discovery(self, source, destination):
     paths = nx.all_simple_paths(self.network, source, destination, 7)
     for path in paths:
+      if not self.routes.has_key((source,destination)):
+        self.routes[(source,destination)] = [path]
+      else:
+        self.routes[(source,destination)].append(path)
+
       for index, node in enumerate(path):
         if index != len(path)-1:
           # forward ant entry
