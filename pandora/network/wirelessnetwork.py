@@ -25,24 +25,31 @@ class WirelessNetwork:
     self.logger.setLevel(logging.DEBUG)
     self.paths = {}
     self.routes = {}
+    self.random_destinations = []
 
-  def find_pair(self):
+  def find_pair(self, depth):
     # the first node
     start = self.network.nodes()[0]
     # the last node
     end = len(self.network.nodes())
 
     source = random.randint(start, end)
+    print "picked source node " + str(source)
+    print self._find_pair(source, [], 3)
+    print self.random_destinations
 
-    while True:
-      destination = random.randint(start, end)
 
-      if destination != source:
-        # check if the destination is an immediate neighbor of the source node
-        if destination not in self.network.neighbors(source):
-          # check if there is an path between source and destination
-          if nx.has_path(self.network, source, destination):
-            return (source, destination)
+  def _find_pair(self, source, blacklist, depth):
+    depth = depth - 1
+    blacklist.append(source)
+
+    if depth > 0:
+      for node in nx.neighbors(self.network, source):
+        if node not in blacklist:
+          self._find_pair(node, blacklist, depth)
+    else:
+      self.random_destinations.append(source)
+
 
   def setup(self):
     for n in self.network.nodes():

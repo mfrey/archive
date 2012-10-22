@@ -45,7 +45,12 @@ class TestWirelessNetworkFunctions(unittest.TestCase):
     self.network.setup()
     # initialize route discovery (test the method)
     self.network.initialize_route_discovery(src, dst)
-    print self.network.dumpRoutingTable()
+#    print self.network.dumpRoutingTable()
+
+  def test_random_select(self):
+    # set up the network
+    self.network.setup()
+    self.network.find_pair(2)
     
 if __name__ == '__main__':
     unittest.main()
