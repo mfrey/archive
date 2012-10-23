@@ -53,6 +53,7 @@ class Experiment:
     self.algorithm.evaporation_mode_set = self.algorithm.settings.evaporation_mode
     # route discovery
     self.network.initialize_route_discovery(source, destination)
+
     # try to send all packets
     for packet in range(1, packets):
       # duplicate the initial entry
@@ -192,7 +193,7 @@ def worker(num):
         experiment.settings = settings
         # create the network and set it up
         experiment.setup_network(configuration_settings.topology)
-        src, dst = experiment.network.find_pair()
+        src, dst = experiment.network.find_pair(configuration_settings.depth)
         module_logger.debug('set source to ' + str(src) + " and destination " + str(dst))
 
         for repetition in range(1, repetitions):

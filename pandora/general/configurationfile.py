@@ -21,20 +21,22 @@ class ExperimentSettings:
     self.q = 0.0
 	# the maximum number of packets which should be sent
     self.packets = 1000
-    # 
+    # the name of the topology file
     self.topology = ""
-    # 
+    # the source node
     self.src = -1
-    # 
+    # the destination node
     self.dst = -1
-    # 
+    # the total number of repetitions
     self.repetitions = 30
     # 
     self.send = 0.01
     #
     self.recv = 0.01
-    #
+    # the evaporation mode
     self.evaporation_mode = 0
+    # the maximum path depth for finding nodes
+    self.depth
 
   def __str__(self):
     self.name 
@@ -76,9 +78,12 @@ class ConfigurationFile:
     send = float(configuration.get('Experiment','energy_send'))
     # read the location of the topology file
     topology = configuration.get('Experiment','topology')
+    # the maximum path depth 
+    depth = -1
     # read the location of the topology file
     if configuration.get('Experiment', 'node_selection') == "random":
       src = dst = -1
+      depth = int(configuration.get('Experiment','depth'))
     else:
       src = int(configuration.get('Experiment','source'))
       # read the location of the topology file
@@ -103,6 +108,7 @@ class ConfigurationFile:
     settings.repetitions = repetitions
     settings.send = send
     settings.recv = recv
+    settings.depth = depth
     settings.evaporation_mode = evaporation_mode
 	# return the results
     return settings

@@ -82,6 +82,8 @@ class WirelessNetwork:
           # backward ant entry
           entry  = self.createRoutingTableEntry(node, path[index+1], destination, self.settings.phi, self.settings.xii)
           self.updateRoutingTable(0, entry)
+      # setup the initial phi value
+      self.set_initial_phi_value(source, destination)
 
   def set_initial_phi_value(self, src, dst):
     """ The function sets the initial pheromone value for all shortest paths of a source/destination pair.
@@ -94,9 +96,10 @@ class WirelessNetwork:
 
     """
     try:
-      # get all shortest paths between a source and a destination
+      # get all routes between a source and a destination
       routes = self.routes[(src,dst)]
       lengths = [len(route) for route in routes]
+      # get all routes between a source and a destination
       routes = filter(lambda x: len(x) == min(lengths), routes)
       # iterate over all shortest paths
       for path in routes:
