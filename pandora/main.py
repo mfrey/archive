@@ -216,31 +216,35 @@ class EnergyAwareAntAlgorithm:
   def update_phi(self, packet, sender, next_hop, destination):
     for n in self.network.network.nodes():
       if n != destination:
-        for e in self.network.network.node[n]['routing table']._table[packet].keys():
-          current_phi = self.network.network.node[n]['routing table']._table[packet][e].phi
-          new_phi = current_phi
-          # current node entry of routing table entry
-          node_i = e[0]
-          # next hop entry of routing table entry
-          node_j = e[1]
-          # destination entry of routing table entry
-          dst = e[2] 
+        # check if the node has routing table entries at all
+        if len(self.network.network.node[n]['routing table']._table) != 0:
+          for e in self.network.network.node[n]['routing table']._table[packet].keys():
+            current_phi = self.network.network.node[n]['routing table']._table[packet][e].phi
+            # current node entry of routing table entry
+            node_i = e[0]
+            # next hop entry of routing table entry
+            node_j = e[1]
+            # destination entry of routing table entry
+            dst = e[2] 
+          
+            current_phi = self.network.get_phi(packet, node_i, node_j, dst)
+            new_phi = current_phi
 
-          # node is not sender, so decrease this entry
-          if node_i != sender:
-            self.logger.debug('decrease phi value for edge(' + str(node_i) + ', ' + str(node_j) + ')i')
-            # decrease pheromone value
-            new_phi = self.decrease_phi(current_phi)
-          else:
-            if dst == destination and node_j == next_hop: 
-              self.logger.debug('increase phi value for edge(' + str(node_i) + ', ' + str(node_j) + ')i')
-              new_phi = self.increasePheromoneValue(current_phi)
-            else:
+            # node is not sender, so decrease this entry
+            if node_i != sender:
               self.logger.debug('decrease phi value for edge(' + str(node_i) + ', ' + str(node_j) + ')i')
+              # decrease pheromone value
               new_phi = self.decrease_phi(current_phi)
-          self.logger.debug('update phi value for edge(' + str(node_i) + ', ' + str(node_j) + ') to ' + str(new_phi) + '. Former value was ' + str(current_phi))
-          # update the pheromone value to 
-          self.network.set_phi(packet, node_i, node_j, dst, new_phi)
+            else:
+              if dst == destination and node_j == next_hop: 
+                self.logger.debug('increase phi value for edge(' + str(node_i) + ', ' + str(node_j) + ')i')
+                new_phi = self.increasePheromoneValue(current_phi)
+              else:
+                self.logger.debug('decrease phi value for edge(' + str(node_i) + ', ' + str(node_j) + ')i')
+                new_phi = self.decrease_phi(current_phi)
+            self.logger.debug('update phi value for edge(' + str(node_i) + ', ' + str(node_j) + ') to ' + str(new_phi) + '. Former value was ' + str(current_phi))
+            # update the pheromone value to 
+            self.network.set_phi(packet, node_i, node_j, dst, new_phi)
 
   def increasePheromoneValue(self, phi):
     return (phi + self.settings.delta_phi)

@@ -196,12 +196,13 @@ def worker(num):
         src, dst = experiment.network.find_pair(configuration_settings.depth)
         module_logger.debug('set source to ' + str(src) + " and destination " + str(dst))
 
+        print 'set source to ' + str(src) + " and destination " + str(dst)
+
         for repetition in range(1, repetitions):
           experiment = Experiment()
           experiment.settings = settings
           # create the network and set it up
           experiment.setup_network(configuration_settings.topology)
-
           # setup the experiment
           experiment.setup_experiment()
           # run the experiment

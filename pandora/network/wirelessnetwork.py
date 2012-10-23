@@ -109,8 +109,11 @@ class WirelessNetwork:
             node_i = node
             node_j = path[index+1]
             self.logger.debug(' update phi for (' + str(node_i) + ', ' + str(node_j) + ', ' + str(dst) + ')')
-
-            phi = 2 * self.network.node[node]['routing table'].get_phi(0, node_i, node_j, dst)
+            # get the current value
+            phi = self.network.node[node]['routing table'].get_phi(0, node_i, node_j, dst)
+            # only if the edge has not been updated previously
+            if phi <= 1.0:
+              phi = phi * 2
             self.network.node[node]['routing table'].set_phi(0, node_i, node_j, dst, phi)
     except KeyError:
       self.logger.debug('the source/destination pair was not found in the routes list')
