@@ -31,19 +31,19 @@ class WirelessNetwork:
     start = self.network.nodes()[0]
     # the last node
     end = len(self.network.nodes())-1
-
+    # pick a node (randomly)
     source = random.randint(start, end)
-
-    print "picked source node " + str(source)
+    # a list containing potential destination nodes (at a given depth)
     destinations = []
-
+    # find all nodes at a given depth
     for node, path_depth in nx.single_source_shortest_path_length(self.network, source, depth).items():
       if path_depth == depth:
        destinations.append(node)
-
+    # pick a index (randomly) out of the potential nodes
     destination_index = random.randint(0, (len(destinations)-1))
-    print destinations, destination_index
-    print destinations[destination_index]
+    destination = destinations[destination_index]
+
+    return (source, destination)
 
 
   def setup(self):
@@ -84,19 +84,34 @@ class WirelessNetwork:
           self.updateRoutingTable(0, entry)
 
   def set_initial_phi_value(self, src, dst):
-    # get all shortest paths between a source and a destination
-    paths = nx.all_shortest_paths(self.network, source=src, target=dst)
-    # iterate over the paths
-    for path in paths:
-      for index, node in enumerate(path):
-        # check if it is the last element in the list
-        if index != (len(path)-1):
-          node_i = node
-          node_j = path[index+1]
-          self.logger.debug(' update phi for (' + str(node_i) + ', ' + str(node_j) + ', ' + str(dst) + ')')
+    """ The function sets the initial pheromone value for all shortest paths of a source/destination pair.
 
-          phi = 2 * self.network.node[node]['routing table'].get_phi(0, node_i, node_j, dst)
-          self.network.node[node]['routing table'].set_phi(0, node_i, node_j, dst, phi)
+    Parameters
+    ----------
+    source : The source node.
+
+    destination : The destination node.
+
+    """
+    try:
+      # get all shortest paths between a source and a destination
+      routes = self.routes[(src,dst)]
+      lengths = [len(route) for route in routes]
+      routes = filter(lambda x: len(x) == min(lengths), routes)
+      # iterate over all shortest paths
+      for path in routes:
+        for index, node in enumerate(path):
+          # check if it is the last element in the list
+          if index != (len(path)-1):
+            node_i = node
+            node_j = path[index+1]
+            self.logger.debug(' update phi for (' + str(node_i) + ', ' + str(node_j) + ', ' + str(dst) + ')')
+
+            phi = 2 * self.network.node[node]['routing table'].get_phi(0, node_i, node_j, dst)
+            self.network.node[node]['routing table'].set_phi(0, node_i, node_j, dst, phi)
+    except KeyError:
+      self.logger.debug('the source/destination pair was not found in the routes list')
+   
 
   def updateRoutingTable(self, packet, entry):
     self.network.node[entry.node_i]['routing table'].add(packet, entry)
