@@ -16,7 +16,7 @@ class Packet:
     self.src = -1
     # destination of the packet
     self.dst = -1
-
+ 
     # packet id of the node
     self.packet_id = 0
     # list of visited nodes

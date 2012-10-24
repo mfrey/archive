@@ -51,7 +51,7 @@ class EnergyAwareAntAlgorithm:
     else:
       self.routes[packet] = [packet, node]
 
-  def send(self, packet, packet_trace, sender, destination):
+  def send(self, packet, sender, destination):
       self.logger.debug('send called for sender ' + str(sender) + " and destination " + str(destination))
 
       if sender != destination:
@@ -62,31 +62,31 @@ class EnergyAwareAntAlgorithm:
         # pick the next node
         node = self.get_next_node(packet, sender, destination)
         # add node to packet_trace 
-        packet_trace.visited_nodes.append(sender)
+        packet.visited_nodes.append(sender)
         # save current xii value of the node
-        packet_trace.xii_list.append(self.network.get_energy_level(sender))
+        packet.xii_list.append(self.network.get_energy_level(sender))
 
         # check if the next node is a valid node
         if node != -1:
-          self.add_node_to_route_statistics(packet, sender)
+          self.add_node_to_route_statistics(packet.packet_id, sender)
           # calculate the transmission costs
-          self.updateTransmissionCosts(packet, sender, destination)
+          self.updateTransmissionCosts(packet.packet_id, sender, destination)
           # update the pheromone values
-          self.update_phi(packet, sender, node, destination)
+          self.update_phi(packet.packet_id, sender, node, destination)
           # forward packet
-          self.send(packet, packet_trace, node, destination)
+          self.send(packet, node, destination)
         else:
           raise EnergyException('no remaining energy in next node')
       else:
         # add node to packet_trace 
-        packet_trace.visited_nodes.append(sender)
+        packet.visited_nodes.append(sender)
         # set hop count
-        packet_trace.hop_count = len(packet_trace.visited_nodes) - 2
+        packet.hop_count = len(packet.visited_nodes) - 2
 
-        self.add_node_to_route_statistics(packet, destination)
+        self.add_node_to_route_statistics(packet.packet_id, destination)
 
         for node in self.network.network.nodes():
-          self.network.log_energy_consumption(packet, node, self.network.network.node[node]['energy'])
+          self.network.log_energy_consumption(packet.packet_id, node, self.network.network.node[node]['energy'])
 
   def get_next_node(self, packet, sender, destination):
     self.logger.debug('get next node for node ' + str(sender) + ' towards destination node ' +  str(destination))
@@ -114,14 +114,14 @@ class EnergyAwareAntAlgorithm:
     if len(nodes) > 0:
       # weighted mode, default
       if self.routing_mode[self.routing_mode_set] == 'weighted':
-        distribution = self.forwarding(packet, sender, nodes, destination)
+        distribution = self.forwarding(packet.packet_id, sender, nodes, destination)
         node = nodes[self.getPath(distribution)]
       # simply pick a random route
       #elif self.routing_mode[self.routing_mode_set] == 'random':
       #
       # pick the best route (highest pheromone)
       else:
-        node = self.network.get_highest_phi(packet, sender, nodes, destination)
+        node = self.network.get_highest_phi(packet.packet_id, sender, nodes, destination)
       return node
 
   def forwarding(self, packet, sender, nodes, destination):

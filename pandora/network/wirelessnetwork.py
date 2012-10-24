@@ -154,9 +154,13 @@ class WirelessNetwork:
 
   def getNeighborsTowardsDestination(self, packet, source, destination):
     result = []
-    for entry in self.network.node[source]['routing table'].table[packet]:
+    for entry in self.network.node[source]['routing table'].table[packet.packet_id]:
       if entry.destination == destination:
-        result.append(entry.node_j)
+        if entry.node_j not in packet.visited_nodes:
+          result.append(entry.node_j)
+
+    if len(result) == 0:
+      print "result set is null"
     return result
 
   def get_energy_status(self, node):

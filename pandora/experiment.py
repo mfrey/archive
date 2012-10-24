@@ -55,27 +55,28 @@ class Experiment:
     self.network.initialize_route_discovery(source, destination)
 
     # try to send all packets
-    for packet in range(1, packets):
+    for sequence_number in range(1, packets):
       # duplicate the initial entry
       for n in self.algorithm.network.network.nodes():
-        self.algorithm.network.network.node[n]['routing table'].duplicate_entries(packet)
+        self.algorithm.network.network.node[n]['routing table'].duplicate_entries(sequence_number)
       try:
-        packet_trace = pck.Packet()
-        self.packet_trace_container[packet] = packet_trace
-        packet_trace.src = source 
-        packet_trace.dst = destination
+        packet = pck.Packet()
+        packet.packet_id = sequence_number
+        self.packet_trace_container[sequence_number] = packet
+        packet.src = source 
+        packet.dst = destination
         # we geht the current energy level of the network (initial energy level)
-        packet_trace.network_initial_xii = self.algorithm.network.get_network_energy()
-        self.algorithm.send(packet, packet_trace, source, destination)
+        packet.network_initial_xii = self.algorithm.network.get_network_energy()
+        self.algorithm.send(packet, source, destination)
         # we geht the current energy level of the network (energy level after transmissions)
-        packet_trace.network_final_xii = self.algorithm.network.get_network_energy()
+        packet.network_final_xii = self.algorithm.network.get_network_energy()
         # compute the tranmission costs
-        packet_trace.set_transmission_costs() 
+        packet.set_transmission_costs() 
         #
-        packet_trace.xii_dict = self.algorithm.network.get_network_energy_as_dict()
+        packet.xii_dict = self.algorithm.network.get_network_energy_as_dict()
       except m.EnergyException, err:
         print err
-        del self.packet_trace_container[packet]
+        del self.packet_trace_container[sequence_number]
         break
 
   def setup_network(self, topology_file):
