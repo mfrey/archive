@@ -20,17 +20,21 @@ for EXPERIMENT in $EXPERIMENTS; do
     for BETA in $BETA_LIST; do
       # build up the name of the directory 
       EXPERIMENT_DIR='experiment-'$EXPERIMENT'-'$PACKETS'-'$ALPHA'-'$BETA
-      cd $EXPERIMENT_DIR
-      SUM=0
       for REPETITION in $REPETITIONS; do
-        LAST_PACKET=`tail -1 $REPETITION/routing_decision_trace.csv | cut -d ',' -f 1`
-        SUM=$((SUM + LAST_PACKET))
+        cp count_jumps.py $EXPERIMENT_DIR'/'$REPETITION
+        cd $EXPERIMENT_DIR'/'$REPETITION
+        NUM_OF_ROUTES=`wc -l routes.csv | cut -d " " -f 1`
+        python2.7 count_jumps.py -a $ALPHA -b $BETA -e $EXPERIMENT -r $NUM_OF_ROUTES
+        JUMPS=`cut -d ',' -f 6 route_jumps.csv`
+        SUM=$((SUM + JUMPS))
+        rm count_jumps.py
+        cd ../..
 	  done;
       # The value of '10' denotes the number of repetitions
       MEAN=$(echo "scale=2; $SUM / 10" | bc)
       RESULT=$EXPERIMENT","$ALPHA","$BETA","$MEAN
-      echo $RESULT >> mean_packets.csv
-      cd ..
+      echo $RESULT >> mean_jumps.csv
+
     done;
   done;
 done;
