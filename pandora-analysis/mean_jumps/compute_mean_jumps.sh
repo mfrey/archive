@@ -20,6 +20,7 @@ for EXPERIMENT in $EXPERIMENTS; do
     for BETA in $BETA_LIST; do
       # build up the name of the directory 
       EXPERIMENT_DIR='experiment-'$EXPERIMENT'-'$PACKETS'-'$ALPHA'-'$BETA
+	  SUM=0
       for REPETITION in $REPETITIONS; do
         cp count_jumps.py $EXPERIMENT_DIR'/'$REPETITION
         cd $EXPERIMENT_DIR'/'$REPETITION
