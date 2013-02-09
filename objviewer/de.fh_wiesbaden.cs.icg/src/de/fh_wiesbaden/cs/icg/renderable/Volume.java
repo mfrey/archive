@@ -1,5 +1,6 @@
 package de.fh_wiesbaden.cs.icg.renderable;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
@@ -7,7 +8,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.vecmath.Point2f;
 
-import com.sun.opengl.util.BufferUtil;
+import com.jogamp.common.nio.Buffers;
 
 public class Volume {
 	public Point2f leftRightPoint;
@@ -44,14 +45,17 @@ public class Volume {
 				2,6,7,3,
 				6,4,5,7
 		};
+
 		
-		FloatBuffer vertexBuf = BufferUtil.newFloatBuffer(vertices.length);
+		FloatBuffer vertexBuf = Buffers.newDirectFloatBuffer(vertices.length);
 		vertexBuf.put(vertices);
 		vertexBuf.rewind();
 		
-		ByteBuffer indexBuf = BufferUtil.newByteBuffer(indices.length);
+		ByteBuffer indexBuf = Buffers.newDirectByteBuffer(indices.length);
 		indexBuf.put(indices);
 		indexBuf.rewind();
+		
+		
 		
 		gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
 		gl.glEnableClientState(GL.GL_INDEX_ARRAY);

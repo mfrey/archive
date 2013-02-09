@@ -11,6 +11,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 
 import javax.media.opengl.*;
+import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;

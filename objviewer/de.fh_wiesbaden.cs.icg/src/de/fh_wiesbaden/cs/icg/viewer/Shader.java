@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 
 /**
@@ -67,7 +68,7 @@ public class Shader {
     /**
      * 
      */
-    public void printShaderInfoLog(GL gl, int id){
+    public void printShaderInfoLog(GL2 gl, int id){
     	//
     	int[] check = new int[1];
     	//
@@ -78,6 +79,7 @@ public class Shader {
             return;
         }
         byte[] compilecontent = new byte[logLength+1];
+        
         gl.glGetInfoLogARB(id,logLength,check,0,compilecontent,0);
         String infolog = new String(compilecontent);
         System.err.println("\nInfo Log of Shader Object ID: " + id);
@@ -115,8 +117,8 @@ public class Shader {
      */
 	public void loadShader(GLAutoDrawable drawable) {
 		// Get the OpenGL object
-		GL gl = drawable.getGL();
-		// Create the vertex shader
+		GL2 gl = drawable.getGL().getGL2(); 
+		// Create the vertex shader 
 		int vertexShader = gl.glCreateShader(GL.GL_VERTEX_SHADER);
 		// Create the fragment shader
 		int fragmentShader = gl.glCreateShader(GL.GL_FRAGMENT_SHADER);

@@ -2,8 +2,6 @@ package de.fh_wiesbaden.cs.icg.viewer.gui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,6 +17,10 @@ import de.fh_wiesbaden.cs.icg.viewer.Renderer;
  * @author Michael Frey
  */
 public class UmbrellaFrame extends Frame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * A reference to the renderer control
 	 */

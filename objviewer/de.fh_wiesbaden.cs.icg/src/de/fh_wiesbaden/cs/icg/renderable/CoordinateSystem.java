@@ -3,7 +3,8 @@ package de.fh_wiesbaden.cs.icg.renderable;
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 
-import com.sun.opengl.util.GLUT;
+//import com.sun.opengl.util.GLUT;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 public class CoordinateSystem implements Renderable {
 	private float AXIS_LENGTH = 10.0f;

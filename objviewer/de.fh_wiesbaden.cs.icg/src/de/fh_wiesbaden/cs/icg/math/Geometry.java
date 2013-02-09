@@ -7,7 +7,7 @@ import javax.vecmath.Matrix3d;
 import javax.vecmath.Tuple3d;
 import javax.vecmath.Vector3f;
 
-import com.sun.opengl.util.BufferUtil;
+import com.jogamp.common.nio.Buffers;
 
 /**
  * The class implements a number of helper functions for mathematical geometric
@@ -85,7 +85,7 @@ public class Geometry {
 	 * @return The content of the vector transformed into a float buffer
 	 */
 	public static FloatBuffer vector4ToFloat(float x, float y, float z, float w) {
-		FloatBuffer result = BufferUtil.newFloatBuffer(4);
+		FloatBuffer result = Buffers.newDirectFloatBuffer(4);
 		result.put(x);
 		result.put(y);
 		result.put(z);
@@ -108,7 +108,7 @@ public class Geometry {
 	 * @return The content of the vector transformed into a float buffer
 	 */
 	public static FloatBuffer vector3ToFloat(float x, float y, float z) {
-		FloatBuffer result = BufferUtil.newFloatBuffer(3);
+		FloatBuffer result = Buffers.newDirectFloatBuffer(3);
 		result.put(x);
 		result.put(y);
 		result.put(z);

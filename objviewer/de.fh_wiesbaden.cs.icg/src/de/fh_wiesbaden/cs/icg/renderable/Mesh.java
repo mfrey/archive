@@ -11,7 +11,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.vecmath.Vector3f;
 
-import com.sun.opengl.util.BufferUtil;
+import com.jogamp.common.nio.Buffers;
 
 import de.fh_wiesbaden.cs.icg.math.Edge;
 import de.fh_wiesbaden.cs.icg.math.Face;
@@ -172,7 +172,7 @@ public class Mesh implements Renderable {
 		gl.glMatrixMode(GL.GL_MODELVIEW);
 		// Create the vertex buffer
 		//if (this.vertex == null) {
-			this.vertex = BufferUtil.newFloatBuffer(3 * this.vertexList.size());
+			this.vertex = Buffers.newDirectFloatBuffer(3 * this.vertexList.size());
 			for (Vertex v : this.vertexList) {
 				this.vertex.put(v.x); this.vertex.put(v.y); this.vertex.put(v.z);
 			}
@@ -184,7 +184,7 @@ public class Mesh implements Renderable {
 		if (this.normalList != null) {
 			// Create the normal buffer
 			if (this.normal == null) {
-				this.normal = BufferUtil.newFloatBuffer(3 * this.vertexList.size());
+				this.normal = Buffers.newDirectFloatBuffer(3 * this.vertexList.size());
 				for (Vertex vertex : this.vertexList) {
 					Normal n = vertex.getNormal();
 					if(n != null){
@@ -210,7 +210,7 @@ public class Mesh implements Renderable {
 		gl.glTranslatef(this.x, this.y, this.z);
 		// Create the face buffer
 		if (this.face == null) {
-			this.face = BufferUtil.newIntBuffer(3 * this.faceList.size());
+			this.face = Buffers.newDirectIntBuffer(3 * this.faceList.size());
 			for (Face f : this.faceList) {
 				this.face.put(f.getVertex());
 			}
