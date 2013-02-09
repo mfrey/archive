@@ -14,6 +14,8 @@ Installation from git
 2. Install the dependencies for your distribution (packages names can differ):
 
 		* jogl
+		* java3d
+
 
 [1]:http://paulbourke.net/dataformats/obj/
 [2]:http://en.wikipedia.org/wiki/Winged_edge
