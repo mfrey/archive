@@ -72,7 +72,7 @@ public class Shader {
     	//
     	int[] check = new int[1];
     	//
-        gl.glGetObjectParameterivARB(id, GL.GL_OBJECT_INFO_LOG_LENGTH_ARB, check, 0);
+        gl.glGetObjectParameterivARB(id, GL2.GL_OBJECT_INFO_LOG_LENGTH_ARB, check, 0);
         int logLength = check[0];
         if ( logLength <= 1 ) {
             System.out.println("[[Shader]] Shader Object Info Log is Clean");
@@ -119,9 +119,9 @@ public class Shader {
 		// Get the OpenGL object
 		GL2 gl = drawable.getGL().getGL2(); 
 		// Create the vertex shader 
-		int vertexShader = gl.glCreateShader(GL.GL_VERTEX_SHADER);
+		int vertexShader = gl.glCreateShader(GL2.GL_VERTEX_SHADER);
 		// Create the fragment shader
-		int fragmentShader = gl.glCreateShader(GL.GL_FRAGMENT_SHADER);
+		int fragmentShader = gl.glCreateShader(GL2.GL_FRAGMENT_SHADER);
 		// Get the shader source for the vertex shader
 		gl.glShaderSource(vertexShader, 1, new String[]{vertexShaderProgram}, new int[]{vertexShaderProgram.length()},0);
 		// Compile the vertex shader program

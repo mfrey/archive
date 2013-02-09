@@ -1,16 +1,13 @@
 package de.fh_wiesbaden.cs.icg.viewer.gui;
 
 import java.awt.BorderLayout;
-
 import java.awt.Dimension;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 
-import javax.media.opengl.*;
 import javax.media.opengl.awt.GLCanvas;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -20,10 +17,11 @@ import javax.swing.JMenuItem;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import com.sun.opengl.util.Animator;
+import com.jogamp.opengl.util.Animator;
 
 import de.fh_wiesbaden.cs.icg.viewer.Renderer;
 import de.fh_wiesbaden.cs.icg.viewer.parser.Parser;
+//import com.sun.opengl.util.Animator;
 
 /**
  * The class implements the graphical user interface of the OpenGL viewer

@@ -11,12 +11,13 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 import javax.vecmath.Point2f;
 
-import com.sun.opengl.util.BufferUtil;
+import com.jogamp.common.nio.Buffers;
 
 import de.fh_wiesbaden.cs.icg.renderable.CoordinateSystem;
 import de.fh_wiesbaden.cs.icg.renderable.Renderable;
@@ -96,11 +97,11 @@ public class Renderer implements GLEventListener, KeyListener, MouseListener,
 	/**
 	 * A first light source
 	 */
-	private Light one = new Light(GL.GL_LIGHT0);
+	private Light one = new Light(GL2.GL_LIGHT0);
 	/**
 	 * A second light source
 	 */
-	private Light two = new Light(GL.GL_LIGHT1);
+	private Light two = new Light(GL2.GL_LIGHT1);
 	/**
 	 * The dimensions of the window 
 	 */
@@ -242,17 +243,17 @@ public class Renderer implements GLEventListener, KeyListener, MouseListener,
 	 */
 	private void select(GLAutoDrawable drawable){
 		// Get the OpenGL object
-		GL gl = drawable.getGL();
+		GL2 gl = drawable.getGL().getGL2();
 		// Create a new buffer
 		int[] buffer = new int[this.selectionBufferSize];
 		// Store the hits in a variable
 		int hits;
 		// Create a selection buffer
-		IntBuffer selectionBuffer = BufferUtil.newIntBuffer(this.selectionBufferSize);
+		IntBuffer selectionBuffer = Buffers.newDirectIntBuffer(this.selectionBufferSize);
 		// Specify the array to be used for the returned hit records with
 		gl.glSelectBuffer(this.selectionBufferSize, selectionBuffer);
 		// Enter selection mode by specifying GL_SELECT
-		gl.glRenderMode(GL.GL_SELECT);
+		gl.glRenderMode(GL2.GL_SELECT);
 		// Initialize the name stack 
 		gl.glInitNames();
 		// Pushes a name on the stack
@@ -260,7 +261,7 @@ public class Renderer implements GLEventListener, KeyListener, MouseListener,
 		//
 		gl.glPushMatrix();
 		// Define the viewing volume
-		gl.glMatrixMode(GL.GL_PROJECTION);
+		gl.glMatrixMode(GL2.GL_PROJECTION);
 		// Load the identity matrix
 		gl.glLoadIdentity();
 		// Define the selection volume
@@ -268,7 +269,7 @@ public class Renderer implements GLEventListener, KeyListener, MouseListener,
 				this.selectionVolume.bottomTopPoint.x, this.selectionVolume.bottomTopPoint.y,
 				this.selectionVolume.nearFarPoint.x, this.selectionVolume.nearFarPoint.y);
 		// Set the matrix mode to model view
-		gl.glMatrixMode(GL.GL_MODELVIEW);
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		// Load the identity matrix
 		gl.glLoadIdentity();
 		// Draw the objects and store their name on the stack
@@ -281,7 +282,7 @@ public class Renderer implements GLEventListener, KeyListener, MouseListener,
 		gl.glPopMatrix();
 		gl.glFlush();
 		// Hits are written in the selection buffer while glRenderMode(...) is called
-		hits = gl.glRenderMode(GL.GL_RENDER);
+		hits = gl.glRenderMode(GL2.GL_RENDER);
 		// Write the hits into the buffer
 		selectionBuffer.get(buffer);
 		// Process the hits
@@ -349,29 +350,29 @@ public class Renderer implements GLEventListener, KeyListener, MouseListener,
 	 */
 	private void pick(GLAutoDrawable drawable){
 		// Get the GL object
-		GL gl = drawable.getGL();
+		GL2 gl = drawable.getGL().getGL2();
 		// Create a new GLU object
 		GLU glu = new GLU();
 		// Create a new hit record buffer
 		int[] buffer = new int[this.selectionBufferSize];
 		// Create a selection buffer
-		IntBuffer selectBuffer = BufferUtil.newIntBuffer(this.selectionBufferSize);
+		IntBuffer selectBuffer = Buffers.newDirectIntBuffer(this.selectionBufferSize);
 		// Store the hits in a variable
 		int hits;
 		// Define a viewport
 		int viewport[] = new int[4];
 		// Store the current viewport coordinates in the viewport variable
-		gl.glGetIntegerv(GL.GL_VIEWPORT, viewport, 0);
+		gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport, 0);
 		// Set the selection buffer
 		gl.glSelectBuffer(this.selectionBufferSize, selectBuffer);
 		// Switch to select render mode
-		gl.glRenderMode(GL.GL_SELECT);
+		gl.glRenderMode(GL2.GL_SELECT);
 		// Initialize the name stack
 		gl.glInitNames();
 		//
 		gl.glPushName(-1);
 		// Switch to projection matrix mode
-		gl.glMatrixMode(GL.GL_PROJECTION);
+		gl.glMatrixMode(GL2.GL_PROJECTION);
 		gl.glPushMatrix();
 		gl.glLoadIdentity();
 		// Creates a 5x5 pixel picking region near cursor location
@@ -384,7 +385,7 @@ public class Renderer implements GLEventListener, KeyListener, MouseListener,
 		//
         this.camera.lookAt(glu);
 		// Render the objects into selection buffer
-        gl.glMatrixMode(GL.GL_MODELVIEW);
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
 		for (int i=0; i<this.renderableObjects.size(); i++) {
 			// Store the name of the object on the name stack
 			gl.glLoadName(i);
@@ -393,7 +394,7 @@ public class Renderer implements GLEventListener, KeyListener, MouseListener,
 		gl.glPopMatrix();
 		gl.glFlush();
 		// Hits are written into the selection buffer while glRenderMode(...) is called
-		hits = gl.glRenderMode(GL.GL_RENDER);
+		hits = gl.glRenderMode(GL2.GL_RENDER);
 		// Get the selection buffer
 		selectBuffer.get(buffer);
 		// Process the hits
@@ -415,17 +416,17 @@ public class Renderer implements GLEventListener, KeyListener, MouseListener,
 	@Override
 	public void display(GLAutoDrawable drawable) {
 		// Get the OpenGL object
-		GL gl = drawable.getGL();	
+		GL2 gl = drawable.getGL().getGL2();	
 		// Enable or disable the depth test
 		if (buffer) {
 			// Enable the depth test
-			gl.glEnable(GL.GL_DEPTH_TEST);
+			gl.glEnable(GL2.GL_DEPTH_TEST);
 		} else {
 			// Disable the depth test
-			gl.glDisable(GL.GL_DEPTH_TEST);
+			gl.glDisable(GL2.GL_DEPTH_TEST);
 		}
 		//  Indicates the buffers currently enabled for color writing and depth buffer enabled
-		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 		// Load the identity matrix
 		gl.glLoadIdentity();
 		// Set the camera
@@ -433,11 +434,11 @@ public class Renderer implements GLEventListener, KeyListener, MouseListener,
 		// Set the current render mode
 		this.setRenderMode(drawable);
 		
-		gl.glEnable(GL.GL_LIGHT0);
+		gl.glEnable(GL2.GL_LIGHT0);
 		float[] lightPosition1 = {0.0f, 15.0f, 18.0f, 1.0f};
 		float[] lightDiffuse1 = {1.0f, 1.0f, 1.0f, 1.0f};
-		gl.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, lightPosition1, 0);
-		gl.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, lightDiffuse1, 0);
+		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition1, 0);
+		gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, lightDiffuse1, 0);
 		
 		/*
 		gl.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS, 76.8f);
@@ -506,7 +507,6 @@ public class Renderer implements GLEventListener, KeyListener, MouseListener,
 	 * @param deviceChanged
 	 *            If the device has changed
 	 */
-	@Override
 	public void displayChanged(GLAutoDrawable drawable, boolean modeChanged,
 			boolean deviceChanged) {
 		/**
@@ -526,22 +526,22 @@ public class Renderer implements GLEventListener, KeyListener, MouseListener,
 	@Override
 	public void init(GLAutoDrawable drawable) {
 		// Get the 'OpenGL object'
-		GL gl = drawable.getGL();
+		GL2 gl = drawable.getGL().getGL2();
 		// Set the color
 		gl.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		// Set the matrix mode to model view matrix
-		gl.glMatrixMode(GL.GL_MODELVIEW);
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		/** If enabled, use the current lighting parameters to compute the vertex color or index. Otherwise, simply
 		associate the current color or index with each vertex */
-		gl.glEnable(GL.GL_LIGHTING);
+		gl.glEnable(GL2.GL_LIGHTING);
 		// Define the first light
 		//gl.glEnable(GL.GL_LIGHT0);
 		// Define a second light
 		//gl.glEnable(GL.GL_LIGHT1);
 		// Enable material parameters
-		gl.glEnable(GL.GL_COLOR_MATERIAL);
+		gl.glEnable(GL2.GL_COLOR_MATERIAL);
 		// Passes the depth test if the incoming depth value is less than the stored depth value.
-		gl.glDepthFunc(GL.GL_LESS);
+		gl.glDepthFunc(GL2.GL_LESS);
 		// The default z mapping
 		gl.glDepthRange(0.0, 1.0);
 	}
@@ -556,31 +556,31 @@ public class Renderer implements GLEventListener, KeyListener, MouseListener,
 	 */
 	private void setRenderMode(GLAutoDrawable drawable) {
 		// Get the GL object
-		GL gl = drawable.getGL();
+		GL2 gl = drawable.getGL().getGL2();
 		// Determine the current render mode
 		if (this.currentRenderMode == RENDER_MODE_FLAT) {
 			// Sets the polygon rasterization to front and back and fill
-			gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_FILL);
+			gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2.GL_FILL);
 			// Set shading model to gouraud shading
-			gl.glShadeModel(GL.GL_FLAT);
+			gl.glShadeModel(GL2.GL_FLAT);
 			return;
 		} else if (this.currentRenderMode == RENDER_MODE_GOURAUD) {
 			// Sets the polygon rasterization to front and back and fill
-			gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_FILL);
+			gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2.GL_FILL);
 			// Set shading model to gouraud shading
-			gl.glShadeModel(GL.GL_SMOOTH);
+			gl.glShadeModel(GL2.GL_SMOOTH);
 			return;
 		} else if (this.currentRenderMode == RENDER_MODE_WIRE_FRAME) {
 			// Sets the polygon rasterization to front and back and lines 
-			gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_LINE);
+			gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2.GL_LINE);
 			// Set shading model to gouraud shading
-			gl.glShadeModel(GL.GL_SMOOTH);
+			gl.glShadeModel(GL2.GL_SMOOTH);
 			return;
 		} else if (this.currentRenderMode == RENDER_MODE_WIRE_FRAME_ON_GOURAUD) {
 			// Sets the polygon rasterization to front and back and fill 
-			gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_FILL);
+			gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2.GL_FILL);
 			// Set shading model to gouraud shading
-			gl.glShadeModel(GL.GL_SMOOTH);
+			gl.glShadeModel(GL2.GL_SMOOTH);
 			return;
 		}
 	}
@@ -590,11 +590,11 @@ public class Renderer implements GLEventListener, KeyListener, MouseListener,
 	 */
 	private void setCamera(GLAutoDrawable drawable) {
 		// Get the GL object
-		GL gl = drawable.getGL();
+		GL2 gl = drawable.getGL().getGL2();
 		// Create a GLU object
 		GLU glu = new GLU();
 		// Set the matrix mode to gl projection for glPerspective
-		gl.glMatrixMode(GL.GL_PROJECTION);
+		gl.glMatrixMode(GL2.GL_PROJECTION);
 		// Load the identity matrix
 		gl.glLoadIdentity();
 		// Set the frustum in world coordinates
@@ -624,11 +624,11 @@ public class Renderer implements GLEventListener, KeyListener, MouseListener,
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 			int height) {
 		// Get the GL object
-		GL gl = drawable.getGL();
+		GL2 gl = drawable.getGL().getGL2();
 		// Set the viewport to the new width and height
 		gl.glViewport(0, 0, width, height);
 		// Set the matrix mode to gl projection for glOrtho
-		gl.glMatrixMode(GL.GL_PROJECTION);
+		gl.glMatrixMode(GL2.GL_PROJECTION);
 		// Load the identity matrix
 		gl.glLoadIdentity();
 		/** 
@@ -846,5 +846,11 @@ public class Renderer implements GLEventListener, KeyListener, MouseListener,
 
 	public void setLambda(float lambda) {
 		this.lambda = lambda;
+	}
+
+	@Override
+	public void dispose(GLAutoDrawable arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }

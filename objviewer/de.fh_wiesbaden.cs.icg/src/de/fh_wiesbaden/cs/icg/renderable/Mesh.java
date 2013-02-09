@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.vecmath.Vector3f;
 
@@ -165,11 +166,11 @@ public class Mesh implements Renderable {
 	@Override
 	public void draw(GLAutoDrawable drawable) {
 		// Get the OpenGL object
-		GL gl = drawable.getGL();
+		GL2 gl = drawable.getGL().getGL2();
 		// Enable vertex arrays
-		gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
+		gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
 		// Set matrix mode to model view matrix
-		gl.glMatrixMode(GL.GL_MODELVIEW);
+		gl.glMatrixMode(GL2.GL_MODELVIEW);
 		// Create the vertex buffer
 		//if (this.vertex == null) {
 			this.vertex = Buffers.newDirectFloatBuffer(3 * this.vertexList.size());
@@ -196,7 +197,7 @@ public class Mesh implements Renderable {
 				this.normal.rewind();
 			}
 			// Enable the normal array
-			gl.glEnableClientState(GL.GL_NORMAL_ARRAY);
+			gl.glEnableClientState(GL2.GL_NORMAL_ARRAY);
 			// Set the normal pointer
 			gl.glNormalPointer(GL.GL_FLOAT, 0, this.normal);
 		}
@@ -226,7 +227,7 @@ public class Mesh implements Renderable {
 					GL.GL_UNSIGNED_INT, this.face);
 			gl.glDisable(GL.GL_POLYGON_OFFSET_FILL);
 
-			gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_LINE);
+			gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2.GL_LINE);
 			if (this.selected) {
 				gl.glColor3f(1.0f, 0.0f, 0.0f);
 			} else {
@@ -245,11 +246,11 @@ public class Mesh implements Renderable {
 		gl.glPopMatrix();
 		
 		if (this.normalList != null) {
-			gl.glDisableClientState(GL.GL_NORMAL_ARRAY);
+			gl.glDisableClientState(GL2.GL_NORMAL_ARRAY);
 		}
 		
 		// Disable the vertex array
-		gl.glDisableClientState(GL.GL_VERTEX_ARRAY);
+		gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
 		// Render the border edges
 		this.renderBorderEdges(drawable);
 		// Render the discrete mean curvature
@@ -263,7 +264,7 @@ public class Mesh implements Renderable {
 	 */
 	public void renderBorderEdges(GLAutoDrawable drawable) {
 		// Get the OpenGL object
-		GL gl = drawable.getGL();
+		GL2 gl = drawable.getGL().getGL2();
 		// Get the border edges
 		Vector<Edge> borderEdges = this.getHashBorderEdges();
 		// Push the model view matrix
@@ -297,7 +298,7 @@ public class Mesh implements Renderable {
 	 */
 	public void renderDiscreteMeanCurvature(GLAutoDrawable drawable) {
 		// Get the OpenGL object
-		GL gl = drawable.getGL();
+		GL2 gl = drawable.getGL().getGL2();
 		// Get the border edges
 		Vector<Edge> borderEdges = this.getHashBorderEdges();
 		// Push the model view matrix

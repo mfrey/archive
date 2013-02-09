@@ -1,6 +1,7 @@
 package de.fh_wiesbaden.cs.icg.renderable;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 
 //import com.sun.opengl.util.GLUT;
@@ -11,7 +12,7 @@ public class CoordinateSystem implements Renderable {
 	@Override
 	public void draw(GLAutoDrawable drawable) {
 		// Get the OpenGL object
-		GL gl = drawable.getGL();
+		GL2 gl = drawable.getGL().getGL2();
 		GLUT glut = new GLUT();
 
 		gl.glBegin(GL.GL_LINES);

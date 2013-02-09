@@ -1,10 +1,10 @@
 package de.fh_wiesbaden.cs.icg.renderable;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.vecmath.Point2f;
 
@@ -23,7 +23,7 @@ public class Volume {
 	}
 	
 	public void draw(GLAutoDrawable drawable){
-		GL gl = drawable.getGL();
+		GL2 gl = drawable.getGL().getGL2();
 		
 		float[] vertices = new float[] {
 			this.leftRightPoint.x, this.bottomTopPoint.y, -1*this.nearFarPoint.x,
@@ -57,17 +57,17 @@ public class Volume {
 		
 		
 		
-		gl.glEnableClientState(GL.GL_VERTEX_ARRAY);
-		gl.glEnableClientState(GL.GL_INDEX_ARRAY);
+		gl.glEnableClientState(GL2.GL_VERTEX_ARRAY);
+		gl.glEnableClientState(GL2.GL_INDEX_ARRAY);
 		
 		gl.glVertexPointer(3, GL.GL_FLOAT, 0, vertexBuf);
 		
-		gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_LINE);
+		gl.glPolygonMode(GL.GL_FRONT_AND_BACK, GL2.GL_LINE);
 		gl.glColor3f(1.0f, 1.0f, 1.0f);
-		gl.glDrawElements(GL.GL_QUADS, indices.length, GL.GL_UNSIGNED_BYTE, indexBuf);
+		gl.glDrawElements(GL2.GL_QUADS, indices.length, GL.GL_UNSIGNED_BYTE, indexBuf);
 		
-		gl.glDisableClientState(GL.GL_INDEX_ARRAY);
-		gl.glDisableClientState(GL.GL_VERTEX_ARRAY);
+		gl.glDisableClientState(GL2.GL_INDEX_ARRAY);
+		gl.glDisableClientState(GL2.GL_VERTEX_ARRAY);
 	}
 
 	public Point2f getLeftRightPoint() {

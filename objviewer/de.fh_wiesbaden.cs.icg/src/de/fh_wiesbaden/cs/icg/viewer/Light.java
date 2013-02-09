@@ -1,12 +1,12 @@
 package de.fh_wiesbaden.cs.icg.viewer;
 
-import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.vecmath.Color4f;
 import javax.vecmath.Point3f;
 import javax.vecmath.Vector3f;
 
-import com.sun.opengl.util.GLUT;
+//import com.sun.opengl.util.GLUT;
 
 import de.fh_wiesbaden.cs.icg.math.Geometry;
 import de.fh_wiesbaden.cs.icg.renderable.Renderable;
@@ -74,40 +74,38 @@ public class Light implements Renderable {
 	@Override
 	public void draw(GLAutoDrawable drawable) {
 		// Get thte OpenGL object
-		GL gl = drawable.getGL();	
-		GLUT glut = new GLUT();
+		GL2 gl = drawable.getGL().getGL2();	
+//		GLUT glut = new GLUT();
 		// Set the constant attenuation
-		gl.glLightf(this.light, GL.GL_CONSTANT_ATTENUATION,
+		gl.glLightf(this.light, GL2.GL_CONSTANT_ATTENUATION,
 				this.constantAttenuation);
 		// Set the linear attenuation
-		gl.glLightf(this.light, GL.GL_LINEAR_ATTENUATION,
+		gl.glLightf(this.light, GL2.GL_LINEAR_ATTENUATION,
 				this.linearAttenuation);
 		// Set the quadratic attenuation
-		gl.glLightf(this.light, GL.GL_QUADRATIC_ATTENUATION,
+		gl.glLightf(this.light, GL2.GL_QUADRATIC_ATTENUATION,
 				this.quadraticAttenuation);
 		// Set the ambient light
-		gl
-				.glLightfv(this.light, GL.GL_AMBIENT, Geometry.vector4ToFloat(
+		gl.glLightfv(this.light, GL2.GL_AMBIENT, Geometry.vector4ToFloat(
 						this.ambient.x, this.ambient.y, this.ambient.z,
 						this.ambient.w));
 		// Set the diffuse light
-		gl
-				.glLightfv(this.light, GL.GL_DIFFUSE, Geometry.vector4ToFloat(
+		gl.glLightfv(this.light, GL2.GL_DIFFUSE, Geometry.vector4ToFloat(
 						this.diffuse.x, this.diffuse.y, this.diffuse.z,
 						this.diffuse.w));
 		// Set the specular light
-		gl.glLightfv(this.light, GL.GL_SPECULAR, Geometry.vector4ToFloat(
+		gl.glLightfv(this.light, GL2.GL_SPECULAR, Geometry.vector4ToFloat(
 				this.specular.x, this.specular.y, this.specular.z,
 				this.specular.w));
 		// Set the cut off angle
-		gl.glLightf(this.light, GL.GL_SPOT_CUTOFF, this.cutOffAngle);
+		gl.glLightf(this.light, GL2.GL_SPOT_CUTOFF, this.cutOffAngle);
 		// Set the spot exponent
-		gl.glLightf(this.light, GL.GL_SPOT_EXPONENT, this.spotLightExponent);
+		gl.glLightf(this.light, GL2.GL_SPOT_EXPONENT, this.spotLightExponent);
 		// Set the position of the light
-		gl.glLightfv(this.light, GL.GL_POSITION, Geometry.vector4ToFloat(
+		gl.glLightfv(this.light, GL2.GL_POSITION, Geometry.vector4ToFloat(
 				this.position.x, this.position.y, this.position.z, 1.0f));
 		// Set the direction of the light
-		gl.glLightfv(this.light, GL.GL_SPOT_DIRECTION, Geometry.vector3ToFloat(
+		gl.glLightfv(this.light, GL2.GL_SPOT_DIRECTION, Geometry.vector3ToFloat(
 				this.direction.x, this.direction.y, this.direction.z));
 		
 		// glutwirecone
