@@ -16,6 +16,17 @@ Installation from git
 		* jogl
 		* java3d
 
+3. 
+
+Usage
+-----
+
+
+
+
+License
+-------
+
 
 [1]:http://paulbourke.net/dataformats/obj/
 [2]:http://en.wikipedia.org/wiki/Winged_edge
