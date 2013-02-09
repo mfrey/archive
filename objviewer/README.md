@@ -9,7 +9,7 @@ Installation from git
 ---------------------
 1. Clone the repository:
 
-  	git clone git://github.com/mfrey/objviewer.git
+  		git clone git://github.com/mfrey/objviewer.git
 
 2. Install the dependencies for your distribution (packages names can differ):
 
